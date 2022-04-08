@@ -8,11 +8,23 @@
       id="btnstart"
       @click="hideMenu"
     >
-      <img src="@/assets/icon-game.png" class="buttonIcon" alt="" />
+      <img
+        src="@/assets/icon-game.png"
+        class="buttonIcon"
+        alt=""
+        width="23"
+        height="17"
+      />
       <span class="buttonTxt">Yuk Main</span>
     </button>
-    <button class="button buttonMenu" id="btnscore">
-      <img src="@/assets/icon-score.png" class="buttonIcon" alt="" />
+    <button class="button buttonMenu" id="btnscore" @click="showScoreboard">
+      <img
+        src="@/assets/icon-score.png"
+        class="buttonIcon"
+        alt=""
+        width="20"
+        height="16"
+      />
       <span class="buttonTxt">Papan Skor</span>
     </button>
   </div>
@@ -21,6 +33,8 @@
 
   <!-- <Game_compo :myGame="myGame" v-if="myGame" /> -->
   <Game_compo />
+  <Scoreboard_compo v-if="displayScoreboard" />
+  <!-- <Scoreboard_compo /> -->
 
   <!-- <h2>Welcome {{ name }}</h2>
   <button @click="changeName">Change Name</button>
@@ -30,17 +44,6 @@
       >Go to my Portfolio</a
     >
   </p>
-
-  <div v-if="answers.length">
-    <ul>
-      <li v-for="answer in answers" :key="answer.id">
-        {{ answer.guest }} - {{ answer.time }}
-      </li>
-    </ul>
-  </div>
-  <div v-else>
-    <p>No data found</p>
-  </div>
 
   <input type="text" placeholder="Cari berdasar tebakan" v-model="find" />
   <ul>
@@ -57,6 +60,7 @@ import { gsap, Expo, Back } from "gsap";
 import Header_compo from "@/components/Header.vue";
 import Menu_level from "@/components/Menu-level.vue";
 import Game_compo from "@/components/Game.vue";
+import Scoreboard_compo from "@/components/Score-board.vue";
 import Footer_compo from "@/components/Footer.vue";
 
 export default {
@@ -65,6 +69,7 @@ export default {
     Header_compo,
     Menu_level,
     Game_compo,
+    Scoreboard_compo,
     Footer_compo,
   },
   data() {
@@ -73,6 +78,7 @@ export default {
       isHidden: false,
       myGame: null,
       isBackActive: false,
+      displayScoreboard: false,
       number: 0,
       tweenedNumber: 0,
       name: "Ilma",
@@ -102,11 +108,31 @@ export default {
         },
       });
       gsap.to("#btnback", 0.5, {
-        display: 'block',
+        display: "block",
         ease: Expo.easeOut,
       });
       this.isBackActive = !this.isBackActive;
       console.log("hd menu");
+    },
+    showScoreboard() {
+      gsap.to("#menuWrap", 0.5, {
+        scale: 0,
+        alpha: 0,
+        ease: Back.easeIn,
+        onComplete: () => {
+          this.displayScoreboard = true;
+          this.isHidden = true;
+        },
+      });
+      gsap.to("#logo", 0.5, {
+        scale: 0,
+        ease: Expo.easeIn,
+      });
+      gsap.to("#btnback", 0.5, {
+        display: "block",
+        ease: Expo.easeOut,
+      });
+      this.isBackActive = !this.isBackActive;
     },
   },
   beforeCreate() {
@@ -179,6 +205,7 @@ export default {
   --cl-main: #ff512f;
   --cl-secondary: #f09819;
   --cl-white: #fff;
+  --cl-black: #333333;
   --font-parent: "Roboto Slab", serif;
   --font-child: "Mukta", sans-serif;
 }
@@ -187,7 +214,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: left;
-  color: #2c3e50;
+  color: var(--cl-black);
   background-image: url(@/assets/bg.png);
   background-repeat: no-repeat;
   background-position: top center;
@@ -249,12 +276,59 @@ body {
   }
   &Icon {
     margin-right: 10px;
+    vertical-align: sub;
+  }
+  &Primary {
+    font-family: var(--font-parent);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--cl-white);
+    background: linear-gradient(
+      93.98deg,
+      var(--cl-main) -19.89%,
+      var(--cl-secondary) 118.82%
+    );
+    border: 1px solid transparent;
+    border-radius: 3px;
+    padding: 12px 10px;
+    width: 100%;
+  }
+  &Secondary {
+    font-family: var(--font-parent);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--cl-main);
+    background: var(--cl-white);
+    border: 1px solid var(--cl-main);
+    border-radius: 3px;
+    padding: 12px 10px;
+    width: 100%;
+  }
+  &Share {
+    margin: 0 7px 15px;
+    width: calc(100% / 2 - 14px);
+  }
+}
+.player {
+  &User {
+    &__rank {
+      font-family: var(--font-parent);
+      font-size: 28px;
+      line-height: 36px;
+      color: var(--cl-main);
+    }
   }
 }
 .center-flex {
   justify-content: center;
   align-items: center;
   display: flex;
+}
+.align-center {
+  display: flex;
+  align-items: center;
 }
 .text-center {
   text-align: center;

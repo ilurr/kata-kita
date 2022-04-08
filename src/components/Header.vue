@@ -1,6 +1,14 @@
 <template>
   <div class="text-center" id="logoWrap">
-    <img src="@/assets/logo.png" class="headerImg" ref="logo" id="logo" alt="Kata Kita" />
+    <img
+      src="@/assets/logo.png"
+      class="headerImg"
+      ref="logo"
+      id="logo"
+      alt="Kata Kita"
+      width="482"
+      height="360"
+    />
     <!-- <h1 cl>{{ gametitle }}</h1> -->
   </div>
 </template>
@@ -18,6 +26,7 @@ export default {
     margin-top: 90px;
     margin-bottom: 40px;
     max-width: 160px;
+    height: auto;
     transform: scale(0) rotate(180deg);
   }
 }
