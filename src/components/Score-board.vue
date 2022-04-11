@@ -22,7 +22,7 @@
       <button class="button buttonScore buttonMenu">6 Kata</button>
     </div>
     <div class="scoreContent">
-      <div v-if="players.length">
+      <div class="scoreContent__wrap" v-if="players.length">
         <div class="scoreContent__title">
           Total <span class="playerCount">89.028</span> pemain
         </div>
@@ -32,6 +32,7 @@
               <div class="playerRank">{{ player.rank }}</div>
               <div
                 class="playerAva"
+                :data-initial="player.initial"
                 :style="{ backgroundColor: randomColor(player.id) }"
               >
                 {{ player.ava }}
@@ -85,8 +86,11 @@
         </div>
       </template>
       <template #body>
-        Ayo bagikan progres permainanmu. <br />
-        Tantang teman untuk adu skor.
+
+        <div class="modalShare__content">
+          Ayo bagikan progres permainanmu. <br />
+          Tantang teman untuk adu skor.
+        </div>
 
         <div class="modalShare__list align-center">
           <button class="buttonSecondary buttonShare">
@@ -168,14 +172,14 @@ export default {
   },
   created() {
     this.players = [
-      { rank: 1, id: 1, name: "Anggara Kusumaatmadja", score: 1290 },
-      { rank: 2, id: 2, name: "Andika Bayu", score: 1290 },
-      { rank: 3, id: 3, name: "Nurdita Afifah", score: 1290 },
-      { rank: 4, id: 4, name: "Nurhaman", score: 1290 },
-      { rank: 5, id: 5, name: "Hendrawan Witjacksono", score: 1290 },
-      { rank: 6, id: 6, name: "Nabila Maulida", score: 1290 },
-      { rank: 7, id: 7, name: "Mohammad Khoirul Huda", score: 1290 },
-      { rank: 8, id: 8, name: "Markus Wattimena", score: 1290 },
+      { rank: 1, id: 1, name: "Anggara Kusumaatmadja", initial: "AK", score: 1290 },
+      { rank: 2, id: 2, name: "Andika Bayu", initial: "AB", score: 1290 },
+      { rank: 3, id: 3, name: "Nurdita Afifah", initial: "NA", score: 1290 },
+      { rank: 4, id: 4, name: "Nurhaman", initial: "N", score: 1290 },
+      { rank: 5, id: 5, name: "Hendrawan Witjacksono", initial: "HW", score: 1290 },
+      { rank: 6, id: 6, name: "Nabila Maulida", initial: "NM", score: 1290 },
+      { rank: 7, id: 7, name: "Mohammad Khoirul Huda", initial: "MKH", score: 1290 },
+      { rank: 8, id: 8, name: "Markus Wattimena", initial: "MW", score: 1290 },
     ];
   },
 };
@@ -187,23 +191,23 @@ export default {
     position: absolute;
     top: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 56px);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
   }
   &Head {
-    margin-top: 40px;
+    margin-top: 30px;
     justify-content: space-between;
     width: 100%;
+    height: 60px;
     &__wrap {
       padding-left: 10px;
       padding-right: 10px;
     }
   }
   &Title {
-    margin-left: 15px;
-    margin-right: 15px;
+    margin: 0 15px;
     font-family: var(--font-parent);
     font-weight: 500;
     font-size: 24px;
@@ -222,14 +226,19 @@ export default {
     background: var(--cl-white);
     box-shadow: 0px 0px 10px rgba(51, 51, 51, 0.05);
     border-radius: 5px;
-    height: 488px;
+    height: calc(100% - 90px - 50px - 15px);
     overflow: hidden;
     z-index: 1;
+    &__wrap {
+      position: relative;
+      height: 100%;
+    }
     &__title {
       font-family: var(--font-parent);
       font-weight: 500;
       font-size: 18px;
       line-height: 24px;
+      margin-bottom: 10px;
     }
   }
 }
@@ -241,7 +250,8 @@ export default {
   &List {
     list-style: none;
     padding: 0;
-    max-height: 380px;
+    margin: 0;
+    max-height: calc(100% - 84px - 19px);
     overflow: scroll;
   }
   &Item {
@@ -277,6 +287,18 @@ export default {
     border-radius: 50%;
     background: var(--cl-secondary);
     position: relative;
+    &:after {
+      content: attr(data-initial);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
   }
   &Top {
     position: absolute;
@@ -285,14 +307,14 @@ export default {
   }
   &User {
     position: absolute;
-    bottom: 0;
-    left: 0;
+    bottom: -15px;
+    left: -15px;
     padding: 14px 15px;
     background: var(--cl-white);
     font-family: var(--font-child);
     font-size: 16px;
     line-height: 24px;
-    width: calc(100% - 30px);
+    width: calc(100% + 30px);
     justify-content: space-between;
     box-shadow: 0px -5px 10px rgba(51, 51, 51, 0.05);
     &__content {

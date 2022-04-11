@@ -4,7 +4,7 @@
   <!-- @click="(showMenu = !showMenu), (isHidden = true), hideMenu" -->
   <div v-if="!isHidden" id="menuWrap">
     <button
-      class="button buttonMenu buttonMenu--active"
+      class="button buttonMenu -active"
       id="btnstart"
       @click="hideMenu"
     >
@@ -32,7 +32,7 @@
   <Menu_level @showGame="displayGame" v-if="showMenu" />
 
   <!-- <Game_compo :myGame="myGame" v-if="myGame" /> -->
-  <Game_compo />
+  <Game_compo :levelChar="levelChar" v-if="displayGameBoard" />
   <Scoreboard_compo v-if="displayScoreboard" />
   <!-- <Scoreboard_compo /> -->
 
@@ -79,6 +79,7 @@ export default {
       myGame: null,
       isBackActive: false,
       displayScoreboard: false,
+      displayGameBoard: false,
       number: 0,
       tweenedNumber: 0,
       name: "Ilma",
@@ -86,12 +87,42 @@ export default {
       answers: [],
       find: "",
       gametitle: "Game Kompla",
+      levelChar: Number
     };
   },
   methods: {
     displayGame(val) {
-      this.myGame = val;
-      console.log("mygame:", this.myGame);
+      this.levelChar = val;
+      gsap.to("#logo", 0.5, {
+        scale: 0,
+        ease: Expo.easeIn,
+      });
+      gsap.to("#lvlWrap", 0.5, {
+        x: 1000,
+        ease: Expo.easeIn,
+        onComplete: () => {
+          this.displayGameBoard = true;
+          this.showMenu = false;
+          // gsap.to("#gameWrap", 1, {
+          //   scale: 1,
+          //   ease: Expo.easeOut,
+          // });
+        },
+      });
+      gsap.to("#ftLogo", 0.5, {
+        scale: 0,
+        ease: Expo.easeIn,
+      });
+      gsap.to("#btnback", 0.5, {
+        display: 'none',
+        ease: Expo.easeOut,
+        onComplete: () => {
+          gsap.to("#btnhome", 0.5, {
+            display: 'block',
+            ease: Expo.easeIn,
+          });
+        }
+      });
     },
     hideMenu() {
       gsap.to("#logo", 0.5, {
@@ -153,7 +184,7 @@ export default {
   },
   mounted() {
     console.log("Mounted");
-    gsap.to("#logo", 2, {
+    gsap.to("#logo", 0.2, {
       scale: 0,
       rotation: 180,
       ease: Expo.easeOut,
@@ -166,11 +197,11 @@ export default {
       scale: 0,
       ease: Expo.easeOut,
     });
-    gsap.to("#logo", 2, {
+    gsap.to("#logo", 0.2, {
       scale: 1,
       rotation: 0,
       ease: Back.easeOut,
-      delay: 0.5,
+      delay: 0.2,
       onComplete: () => {
         gsap.to("#logo", 0.5, {
           scale: 0.7,
@@ -180,12 +211,12 @@ export default {
         gsap.to("#btnstart", 0.5, {
           scale: 1,
           ease: Back.easeOut,
-          delay: 0.5,
+          delay: 0.2,
         });
         gsap.to("#btnscore", 0.5, {
           scale: 1,
           ease: Back.easeOut,
-          delay: 0.8,
+          delay: 0.4,
         });
       },
     });
@@ -201,6 +232,9 @@ export default {
 </script>
 
 <style lang="scss">
+*,*:after,*:before {
+  box-sizing: border-box;
+}
 :root {
   --cl-main: #ff512f;
   --cl-secondary: #f09819;
@@ -216,13 +250,20 @@ export default {
   text-align: left;
   color: var(--cl-black);
   background-image: url(@/assets/bg.png);
-  background-repeat: no-repeat;
+  background-repeat: repeat-x;
   background-position: top center;
-  background-size: contain;
+  background-size: auto calc(100% - 56px);
   position: relative;
-  max-width: 360px;
-  height: 800px;
+  width: 100%;
+  max-width: 500px;
+  // height: 100vh;
+  // max-height: 100vh;
+  // max-height: -webkit-fill-available;
+  // height: 800px;
   margin: auto;
+  height: 100%;
+  height: -webkit-fill-available;
+  overflow: auto;
 }
 @font-face {
   font-family: "Roboto Slab";
@@ -241,8 +282,16 @@ export default {
     url(https://fonts.gstatic.com/s/mukta/v12/iJWKBXyXfDDVXbnBrXw.woff2)
       format("woff2");
 }
+html,
 body {
   margin: 0;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  // min-height: -webkit-fill-available;
+  // max-height: -webkit-fill-available;
+  height: 100vh;
+  height: -webkit-fill-available;
+  overflow: hidden;
 }
 .button {
   border: 0;
@@ -252,6 +301,9 @@ body {
   font-size: 18px;
   line-height: 24px;
   background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   &Menu {
     width: calc(100% - 60px);
     padding: 16px 20px;
@@ -260,7 +312,7 @@ body {
     margin-left: 30px;
     margin-right: 30px;
     margin-bottom: 10px;
-    &--active {
+    &.-active {
       color: var(--cl-white);
       background: linear-gradient(
         93.98deg,
@@ -307,8 +359,8 @@ body {
     width: 100%;
   }
   &Share {
-    margin: 0 7px 15px;
-    width: calc(100% / 2 - 14px);
+    margin: 0;
+    width: calc(50% - (5px / 2));
   }
 }
 .player {

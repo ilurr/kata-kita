@@ -72,8 +72,8 @@ export default {
   position: absolute;
   bottom: 0;
   width: 100%;
-  padding-top: 27px;
-  padding-bottom: 27px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   background: var(--cl-white);
   &Wrap {
     width: calc(100% - 40px);

@@ -81,12 +81,15 @@ export default {
 .modal {
   &-container {
     position: relative;
-    padding: 20px;
-    width: 320px;
+    // padding: 20px;
+    width: calc(100% - 20px);
+    max-width: 360px;
     margin: 0px auto;
     background-color: var(--cl-white);
     border-radius: 10px;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
   }
   &-body {
     font-family: var(--font-child);
@@ -94,31 +97,51 @@ export default {
     font-size: 16px;
     line-height: 24px;
     color: var(--cl-black);
+    min-height: 150px;
+    max-height: 60vh;
+    overflow: scroll;
+  }
+  &-footer {
+    padding: 14px 15px;
+    position: relative;
+    box-shadow: 0px -5px 10px rgba(51, 51, 51, 0.05);
   }
   &Head {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    padding: 10px 15px;
   }
   &Title {
     font-family: var(--font-parent);
     font-weight: 500;
     font-size: 18px;
     line-height: 24px;
-    margin: 0 0 10px;
+    margin: 5px 0;
   }
   &Share {
+    &__content {
+      position: relative;
+      padding: 10px 15px;
+    }
     &__icon {
       vertical-align: text-bottom;
       margin-right: 7px;
     }
     &__list {
+      position: relative;
       flex-wrap: wrap;
-      margin-top: 15px;
-      margin-left: -7px;
-      margin-right: -7px;
+      padding: 15px 15px 25px;
+      gap: 5px;
+      justify-content: center;
+      // margin-top: 15px;
+      // margin-left: -7px;
+      // margin-right: -7px;
     }
     &__footer {
-      border-top: 1px solid #e2e2e2;
-      padding-top: 15px;
+      position: relative;
+      // border-top: 1px solid #e2e2e2;
+      // padding-top: 15px;
     }
   }
   &Icon {
