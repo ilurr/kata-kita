@@ -52,7 +52,8 @@
           height="48"
           alt="Timer"
         />
-        <span class="timer" id="timer">06:07</span>
+        <span class="timer">{{ansTimerDisplay}}</span>
+        <!-- <span class="timer" v-else>00:00</span> -->
       </div>
     </div>
 
@@ -140,7 +141,8 @@
                 height="55"
               />
               Skor sesi ini
-              <div class="modalGame__num">34</div>
+              <div class="modalGame__num" v-if="totalScore">{{totalScore}}</div>
+              <div class="modalGame__num" v-else>-</div>
             </div>
             <div class="modalGame__box">
               <img
@@ -155,14 +157,15 @@
             </div>
           </div>
           <div class="modalGame__rank align-center">
-            Peringkat kamu pada 4 huruf
+            Peringkat kamu pada {{ levelChar }} huruf
             <div class="playerUser__rank">#{{ userRank }}</div>
           </div>
         </div>
       </template>
       <template #footer>
         <div class="modalGame__footer center-flex">
-          <button class="button buttonPrimary" @click="showResult = false, userAns = false">
+          <a class="button buttonPrimary" href="/">
+          <!-- <button class="button buttonPrimary" @click="showResult = false, userAns = false"> -->
             <img
               src="@/assets/icon-home-white.png"
               class="modalGame__icon"
@@ -170,7 +173,8 @@
               width="18"
               height="18"
             />Kembali ke Beranda
-          </button>
+          </a>
+          <!-- </button> -->
           <button class="button buttonGame__share">
             <img
               src="@/assets/icon-share.png"
@@ -252,23 +256,6 @@ export default {
     /**
      * We define the inputs here
      */
-    // key_parent: null,
-    // inputs: {
-    //   input1: "",
-    //   input2: "",
-    //   input3: "",
-    //   input4: "",
-    // },
-    // inputName: "input1",
-    // inputsWrap: {
-    //   inputwrap1: "",
-    //   inputwrap2: "",
-    //   inputwrap3: "",
-    //   inputwrap4: "",
-    //   inputwrap5: "",
-    //   inputwrap6: "",
-    // },
-    // inputWrapName: "inputwrap1",
     showModal: false,
     showResult: false,
     userAns: false,
@@ -282,8 +269,17 @@ export default {
       { char: [] },
       { char: [] }
     ],
-    ansLvl: 0,
+    ansChance: 0,
+    ansChanceMax: 6,
     ansScore: 0,
+    totalScore: 0,
+    ansTimer: 0,
+    ansTimerDisplay: '00:00',
+    ansTimerVar: Number,
+    ansSecVar: 300,
+    ansSecMax: 600,
+    ansScoreTemp: [],
+    keyPressFirst: 0,
     keyBoardChar: [ 
       { char: "qwertyuiop" },
       { char: "asdfghjkl" },
@@ -306,94 +302,175 @@ export default {
     window.removeEventListener('keypress', this.doCommand);
   },
   methods: {
+    // fungsi general, untuk pecah string jadi array per-karakter 
     splitChar(char) {
       return char.split('');
     },
+
+    // fungsi general, untuk tampilan timer dengan format 00:00
+    str_pad(string, pad, length) {
+        return (new Array(length+1).join(pad)+string).slice(-length);
+    },
+
+    // fungsi untuk stop timer
+    stopTimer() {
+      clearInterval(this.ansTimerVar)
+    },
+
+    // fungsi untuk menjalankan timer, dalam satuan detik
+    runTimer() {
+      let _this = this
+      let localTimer = 0;
+
+      this.ansTimerVar = setInterval(function () {
+        localTimer++
+        let minutes = Math.floor(localTimer / 60);
+        let seconds = localTimer - minutes * 60;
+        _this.ansTimerDisplay = _this.str_pad(minutes,'0',2)+':'+_this.str_pad(seconds,'0',2);
+        _this.ansTimer = localTimer
+        console.log(_this.ansTimer)
+      }, 1000);
+    },
+
+    // fungsi ketika user pencet huruf pada layar
     onKeyPress(char) {
-      if(this.ansLvl < 6) {
+      let _this = this
+
+      // timer running when user start typing
+      if(this.keyPressFirst==0) {
+        _this.runTimer()
+        this.keyPressFirst = 1
+      }
+
+      // mari menjawab
+      if(this.ansChance < this.ansChanceMax) {
         if(char !== 'delete' && char !== 'enter') {
-          if(this.ansWord[this.ansLvl].char.length < this.levelChar) {
-            this.ansWord[this.ansLvl].char.push(char)
-            console.log(this.ansWord[this.ansLvl].char)
+          if(this.ansWord[this.ansChance].char.length < this.levelChar) {
+            this.ansWord[this.ansChance].char.push(char)
           }
         } else if(char == 'delete') {
-          this.ansWord[this.ansLvl].char.pop()        
-          console.log(this.ansWord[this.ansLvl].char)
+          this.ansWord[this.ansChance].char.pop()        
         }
       }
     },
+
+    // fungsi press keyboard di laptop, nanti aja ya
     // doCommand(e) {
     //   let cmd = String.fromCharCode(e.keyCode).toLowerCase();
     //   console.log(cmd)
     // }
+
+    // jika user pencet button Enter 
     onEnterPress() {
       let _this = this;
-      if(this.ansLvl < 6) {
-        if(this.ansWord[this.ansLvl].char.length == this.levelChar) {
-          console.log((this.ansLvl+1) +'pas')
-          _this.checkTile(this.ansWord[this.ansLvl].char)
+      if(this.ansChance < 5) {
+        if(this.ansWord[this.ansChance].char.length == this.levelChar) {
+          _this.checkTile(this.ansWord[this.ansChance].char)
         } else {
-          console.log('kurang')
+          console.log('Ada yang kosong kotaknya')
         }
       } else {
-        _this.onGameOver()
+        _this.finalScore()
       }
     },
+
+    // display popup result, sekalian reset variabel
     onGameOver() {
-      this.ansLvl = 0
+      // reset pencataan score
+      this.ansScore = 0
+      this.ansChance = 0
+      this.ansTimer = 0
       this.showResult = true
-      console.log('game over')
-      for (let i=0; i<6; i++) {
-        this.ansWord[i].char = []
-      }
+      this.ansWord.map(function(item){item.char=[]})
       document.querySelectorAll('.inputTxt').forEach(e => e.removeAttribute('style'));
+      console.log('game over')
     },
+
+    // hitung2an skor akhir
+    finalScore() {
+      
+      let _this = this;
+      let valid = false
+      console.log('Level User: '+ this.levelChar)
+      console.log('Total Kesempatan Jawab: '+ this.ansChance)
+      console.log('Total Huruf Tertabak: '+ this.ansScore)
+      console.log('Total Waktu: '+ this.ansTimer)
+
+      _this.stopTimer()
+      
+      // klo user jawab under 10 detik, penalti 10 detik hahaha, masak sih bisa jawab under 10 detik, yg bener aja gan
+      if(this.ansTimer < 10) {
+        this.ansTimer = 10
+      }
+
+      // klo user jawab lebih dari maksimal waktu yang ditentukan
+      if(this.ansTimer > this.ansSecMax) {
+        this.ansTimer = this.ansSecMax
+      }
+      
+      // Rumus : (((1 - (Response Time / Variabel Detik) / 2) * 940) / Kesempatan Jawab ) + Huruf Tertebak
+      this.totalScore = (((1 - (this.ansTimer / this.ansSecVar) / 2) * 940) / this.ansChance) + this.ansScore
+      this.totalScore = Math.round(this.totalScore)
+      if(this.totalScore) {
+        valid = true
+      }
+      
+      if(valid) {
+        return _this.onGameOver();
+      }
+    },
+
+    // fungsi untuk menyimpan scoring huruf per huruf yg sudah dijawab user
+    tempScore(temp) {
+      // scoring untuk yang disimpan, karena kalau user gagal jawab, tetep dihitung huruf per huruf
+      if(this.ansScoreTemp.indexOf(temp) === -1){
+        this.ansScoreTemp.push(temp)
+        this.ansScoreTemp.sort()
+      }
+      // console.log('tempcount '+ this.ansScoreTemp)
+      // return this.ansScoreTemp.length
+    },
+
+    // fungsi untuk cek kotak-kotak jawaban, serta pewarnaan kotak
     checkTile(answer) {
       let _this = this;
-      console.log('cek '+ answer)
-      let score = 0;
+      console.log('answer '+ answer)
+      let localScore = 0;
 
       let soal = this.contohSoal[this.levelChar].kata.split('');
       console.log('soal '+ soal)
 
-      for (let i=0; i<this.levelChar; i++) {
-        if(soal[i] == answer[i]) {
-          // console.log(document.getElementById('inputAnswer_'+(this.ansLvl+1)+'_'+(i+1)))
-          document.getElementById('inputAnswer_'+(this.ansLvl+1)+'_'+(i+1)).style.backgroundColor = '#4caf50';
-          score++
-          console.log(score+''+this.levelChar)
+      answer.map(function(char, index) {
+        if(char==soal[index]) {
+          // klo hurufnya betul di tempat yg betul // ijo
+          document.getElementById('inputAnswer_'+(_this.ansChance+1)+'_'+(index+1)).style.backgroundColor = '#4caf50';
+          _this.tempScore(index+char)
+          localScore++
         } else {
-          // console.log('g')
-          document.getElementById('inputAnswer_'+(this.ansLvl+1)+'_'+(i+1)).style.backgroundColor = '#c7c3c3';
-          for (let j=0; j<this.levelChar;j++) {
-            if(soal[j] == answer[i]) {
-              document.getElementById('inputAnswer_'+(this.ansLvl+1)+'_'+(i+1)).style.backgroundColor = '#ffeb3b';
+          // klo hurufnya salah // grey
+          document.getElementById('inputAnswer_'+(_this.ansChance+1)+'_'+(index+1)).style.backgroundColor = '#c7c3c3';
+          for (let j=0; j<_this.levelChar;j++) {
+            if(soal[j] == char) {
+              // klo hurufnya betul di tempat yg salah // kuning
+              document.getElementById('inputAnswer_'+(_this.ansChance+1)+'_'+(index+1)).style.backgroundColor = '#ffeb3b';
             }
           }
         }
-      }
+      })
 
-      this.ansLvl++
+      // kesempatan jawab
+      this.ansChance++
+      console.log(this.ansChance)
 
-      if(score==this.levelChar) {
+      // totel scoring yang tersimpan ke server
+      this.ansScore = this.ansScoreTemp.length
+
+      // jika jawaban benar semua
+      if(localScore==this.levelChar) {
         this.userAns = true
-        _this.onGameOver()
+        _this.finalScore()
       }
     },
-    // onChange(input) {
-    //   this.inputs[this.inputName] = input;
-    // },
-    // onKeyPress(button) {
-    //   console.log("button", button);
-    // },
-    // onInputChange(input) {
-    //   console.log("Input changed directly:", input.target.id);
-    //   this.inputs[input.target.id] = input.target.value;
-    // },
-    // onInputFocus(input) {
-    //   console.log("Focused input:", input.target.id);
-    //   this.inputName = input.target.id;
-    // },
   },
 };
 </script>

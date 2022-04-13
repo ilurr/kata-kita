@@ -336,6 +336,7 @@ body {
     font-size: 14px;
     line-height: 20px;
     color: var(--cl-white);
+    text-decoration: none;
     background: linear-gradient(
       93.98deg,
       var(--cl-main) -19.89%,
