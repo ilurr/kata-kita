@@ -15,11 +15,23 @@
       </div>
     </div>
     <div class="scoreLvl center-flex">
-      <button class="button buttonScore buttonMenu buttonMenu--active">
+      <!-- <button class="button buttonScore buttonMenu buttonMenu--active">
         4 Kata
       </button>
       <button class="button buttonScore buttonMenu">5 Kata</button>
-      <button class="button buttonScore buttonMenu">6 Kata</button>
+      <button class="button buttonScore buttonMenu">6 Kata</button> -->
+
+      <button
+        v-for="tab in tabs"
+        :key="tab.tabname"
+        :class="[
+          'button buttonScore buttonMenu',
+          { '-active': currentTab === tab.tabname },
+        ]"
+        @click="currentTab = tab.tabname"
+      >
+        {{ tab.text }} Kata
+      </button>
     </div>
     <div class="scoreContent">
       <div class="scoreContent__wrap" v-if="players.length">
@@ -31,7 +43,7 @@
             <div class="playerAva" :data-initial="userAva"></div>
             <div class="playerUser__content">
               Peringkat kamu pada <br />
-              <span><b>4 huruf</b></span>
+              <component :is="currentTab" class="tab"></component>
             </div>
           </div>
           <div class="playerUser__rank">#{{ userRank }}</div>
@@ -86,7 +98,6 @@
         </div>
       </template>
       <template #body>
-
         <div class="modalShare__content">
           Ayo bagikan progres permainanmu. <br />
           Tantang teman untuk adu skor.
@@ -145,10 +156,16 @@
 
 <script>
 import Modal_compo from "@/components/Modal-compo.vue";
+import score4_compo from "@/components/score4-board.vue";
+import score5_compo from "@/components/score5-board.vue";
+import score6_compo from "@/components/score6-board.vue";
 
 export default {
   components: {
     Modal_compo,
+    score4_compo,
+    score5_compo,
+    score6_compo,
   },
   data() {
     return {
@@ -159,6 +176,8 @@ export default {
       id: null,
       colorCache: {},
       showModal: false,
+      currentTab: "score4_compo",
+      tabs: [],
     };
   },
   methods: {
@@ -173,14 +192,37 @@ export default {
   },
   created() {
     this.players = [
-      { rank: 1, id: 1, name: "Anggara Kusumaatmadja", initial: "AK", score: 1290 },
+      {
+        rank: 1,
+        id: 1,
+        name: "Anggara Kusumaatmadja",
+        initial: "AK",
+        score: 1290,
+      },
       { rank: 2, id: 2, name: "Andika Bayu", initial: "AB", score: 1290 },
       { rank: 3, id: 3, name: "Nurdita Afifah", initial: "NA", score: 1290 },
       { rank: 4, id: 4, name: "Nurhaman", initial: "N", score: 1290 },
-      { rank: 5, id: 5, name: "Hendrawan Witjacksono", initial: "HW", score: 1290 },
+      {
+        rank: 5,
+        id: 5,
+        name: "Hendrawan Witjacksono",
+        initial: "HW",
+        score: 1290,
+      },
       { rank: 6, id: 6, name: "Nabila Maulida", initial: "NM", score: 1290 },
-      { rank: 7, id: 7, name: "Mohammad Khoirul Huda", initial: "MKH", score: 1290 },
+      {
+        rank: 7,
+        id: 7,
+        name: "Mohammad Khoirul Huda",
+        initial: "MKH",
+        score: 1290,
+      },
       { rank: 8, id: 8, name: "Markus Wattimena", initial: "MW", score: 1290 },
+    ];
+    this.tabs = [
+      { id: 1, tabname: "score4_compo", text: "4" },
+      { id: 2, tabname: "score5_compo", text: "5" },
+      { id: 3, tabname: "score6_compo", text: "6" },
     ];
   },
 };

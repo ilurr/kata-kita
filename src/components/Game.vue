@@ -3,17 +3,19 @@
   <div class="gameWrap center-flex" id="gameWrap">
     <div class="gameHead center-flex">
       <div class="gameHead__wrap">
-        <button class="button">
+        <button class="button" @click="showModal = true">
           <img
             src="@/assets/help.png"
             class="gameHead__img"
             alt="How to Play"
             width="40"
             height="36"
-            @click="showModal = true"
           />
         </button>
-        <button class="button">
+        <button
+          class="button"
+          @click.prevent="audio.isPlaying ? pause(audio) : play(audio)"
+        >
           <img
             src="@/assets/sound.png"
             class="gameHead__img"
@@ -39,7 +41,7 @@
         <div class="gameBoard__item" v-for="j in levelChar" :key="j">
           <KeyInput
             :inputName="`inputAnswer_${i}_${j}`"
-            :inputValue="ansWord[`${i-1}`].char[`${j-1}`]"
+            :inputValue="ansWord[`${i - 1}`].char[`${j - 1}`]"
           >
           </KeyInput>
         </div>
@@ -52,7 +54,7 @@
           height="48"
           alt="Timer"
         />
-        <span class="timer">{{ansTimerDisplay}}</span>
+        <span class="timer">{{ ansTimerDisplay }}</span>
         <!-- <span class="timer" v-else>00:00</span> -->
       </div>
     </div>
@@ -67,37 +69,25 @@
     </div> -->
 
     <div class="gameKey">
-      <div 
+      <div
         class="gameKey__row"
         v-for="(row, index) in keyBoardChar"
-        :id="[`keyBar_${index+1}`]"
+        :id="[`keyBar_${index + 1}`]"
         :key="row"
       >
         <div class="gameKey__item" v-if="index == 2">
-          <KeyBtn
-            @onKeyPress="onEnterPress"
-            keyChar="enter"
-            :isEnter=true
-          >
+          <KeyBtn @onKeyPress="onEnterPress" keyChar="enter" :isEnter="true">
           </KeyBtn>
         </div>
-        <div 
+        <div
           class="gameKey__item"
           v-for="item in splitChar(row.char)"
           :key="item"
         >
-          <KeyBtn
-            @onKeyPress="onKeyPress"
-            :keyChar="item"
-          >
-          </KeyBtn>
+          <KeyBtn @onKeyPress="onKeyPress" :keyChar="item"> </KeyBtn>
         </div>
         <div class="gameKey__item" v-if="index == 2">
-          <KeyBtn
-            @onKeyPress="onKeyPress"
-            keyChar="delete"
-            :isDelete=true
-          >
+          <KeyBtn @onKeyPress="onKeyPress" keyChar="delete" :isDelete="true">
           </KeyBtn>
         </div>
       </div>
@@ -115,10 +105,19 @@
       </template>
       <template #body>
         <div class="modalGame__body">
-          <div class="modalGame__result" v-if="userAns">Yey, kamu menebak kata dengan benar. Jawabannya adalah:</div>
-          <div class="modalGame__result" v-else>Ups, kamu salah menebak kata. Jawaban yang benar adalah:</div>
+          <div class="modalGame__result" v-if="userAns">
+            Yey, kamu menebak kata dengan benar. Jawabannya adalah:
+          </div>
+          <div class="modalGame__result" v-else>
+            Ups, kamu salah menebak kata. Jawaban yang benar adalah:
+          </div>
           <div class="modalGame__word">
-            <span class="letter" v-for="j in this.contohSoal[this.levelChar].kata.split('')" :key="j">{{j}}</span>
+            <span
+              class="letter"
+              v-for="j in this.contohSoal[this.levelChar].kata.split('')"
+              :key="j"
+              >{{ j }}</span
+            >
           </div>
           <div class="modalGame__explained">
             <p class="modalGame__verb">nomina</p>
@@ -141,7 +140,9 @@
                 height="55"
               />
               Skor sesi ini
-              <div class="modalGame__num" v-if="totalScore">{{totalScore}}</div>
+              <div class="modalGame__num" v-if="totalScore">
+                {{ totalScore }}
+              </div>
               <div class="modalGame__num" v-else>-</div>
             </div>
             <div class="modalGame__box">
@@ -165,7 +166,7 @@
       <template #footer>
         <div class="modalGame__footer center-flex">
           <a class="button buttonPrimary" href="/">
-          <!-- <button class="button buttonPrimary" @click="showResult = false, userAns = false"> -->
+            <!-- <button class="button buttonPrimary" @click="showResult = false, userAns = false"> -->
             <img
               src="@/assets/icon-home-white.png"
               class="modalGame__icon"
@@ -236,8 +237,8 @@
 <script>
 // import SimpleKeyboard from "@/components/SimpleKeyboard.vue";
 // import InputKeyboard from "./InputKeyboard";
-import KeyInput from "./InputBoard.vue"
-import KeyBtn from "./ButtonKeyboard.vue"
+import KeyInput from "./InputBoard.vue";
+import KeyBtn from "./ButtonKeyboard.vue";
 import Modal_compo from "@/components/Modal-compo.vue";
 
 export default {
@@ -249,13 +250,15 @@ export default {
     KeyBtn,
     Modal_compo,
   },
-  props: [
-    "levelChar"
-  ],
+  props: ["levelChar"],
   data: () => ({
     /**
      * We define the inputs here
      */
+    audio: {
+      file: new Audio(require("@/assets/fx/beautifulrussia.mp3")),
+      isPlaying: false,
+    },
     showModal: false,
     showResult: false,
     userAns: false,
@@ -267,89 +270,100 @@ export default {
       { char: [] },
       { char: [] },
       { char: [] },
-      { char: [] }
+      { char: [] },
     ],
     ansChance: 0,
     ansChanceMax: 6,
     ansScore: 0,
     totalScore: 0,
     ansTimer: 0,
-    ansTimerDisplay: '00:00',
+    ansTimerDisplay: "00:00",
     ansTimerVar: Number,
     ansSecVar: 300,
     ansSecMax: 600,
     ansScoreTemp: [],
     keyPressFirst: 0,
-    keyBoardChar: [ 
+    keyBoardChar: [
       { char: "qwertyuiop" },
       { char: "asdfghjkl" },
       { char: "zxcvbnm" },
     ],
     contohSoal: [
-      { kata: "0"},
-      { kata: "1"},
-      { kata: "2"},
-      { kata: "3"},
+      { kata: "0" },
+      { kata: "1" },
+      { kata: "2" },
+      { kata: "3" },
       { kata: "kota" },
       { kata: "semut" },
       { kata: "normal" },
-    ]
+    ],
   }),
   created() {
-    window.addEventListener('keypress', this.doCommand);
+    window.addEventListener("keypress", this.doCommand);
   },
   unmounted() {
-    window.removeEventListener('keypress', this.doCommand);
+    window.removeEventListener("keypress", this.doCommand);
   },
   methods: {
-    // fungsi general, untuk pecah string jadi array per-karakter 
+    //play music
+    play(audio) {
+      audio.isPlaying = true;
+      audio.file.play();
+      audio.file.loop = true;
+    },
+    pause(audio) {
+      audio.isPlaying = false;
+      audio.file.pause();
+    },
+    // fungsi general, untuk pecah string jadi array per-karakter
     splitChar(char) {
-      return char.split('');
+      return char.split("");
     },
 
     // fungsi general, untuk tampilan timer dengan format 00:00
     str_pad(string, pad, length) {
-        return (new Array(length+1).join(pad)+string).slice(-length);
+      return (new Array(length + 1).join(pad) + string).slice(-length);
     },
 
     // fungsi untuk stop timer
     stopTimer() {
-      clearInterval(this.ansTimerVar)
+      clearInterval(this.ansTimerVar);
     },
 
     // fungsi untuk menjalankan timer, dalam satuan detik
     runTimer() {
-      let _this = this
+      let _this = this;
       let localTimer = 0;
 
       this.ansTimerVar = setInterval(function () {
-        localTimer++
+        localTimer++;
         let minutes = Math.floor(localTimer / 60);
         let seconds = localTimer - minutes * 60;
-        _this.ansTimerDisplay = _this.str_pad(minutes,'0',2)+':'+_this.str_pad(seconds,'0',2);
-        _this.ansTimer = localTimer
-        console.log(_this.ansTimer)
+        _this.ansTimerDisplay =
+          _this.str_pad(minutes, "0", 2) + ":" + _this.str_pad(seconds, "0", 2);
+        _this.ansTimer = localTimer;
+        console.log(_this.ansTimer);
       }, 1000);
     },
 
     // fungsi ketika user pencet huruf pada layar
     onKeyPress(char) {
-      let _this = this
+      let _this = this;
 
       // timer running when user start typing
-      if(this.keyPressFirst==0) {
-        _this.runTimer()
-        this.keyPressFirst = 1
+      if (this.keyPressFirst == 0) {
+        _this.runTimer();
+        this.keyPressFirst = 1;
       }
 
       // mari menjawab
-      if(this.ansChance < this.ansChanceMax) {
-        if(char !== 'delete' && char !== 'enter') {
-          if(this.ansWord[this.ansChance].char.length < this.levelChar) {
-            this.ansWord[this.ansChance].char.push(char)
+      if (this.ansChance < this.ansChanceMax) {
+        if (char !== "delete" && char !== "enter") {
+          if (this.ansWord[this.ansChance].char.length < this.levelChar) {
+            this.ansWord[this.ansChance].char.push(char);
           }
-        } else if(char == 'delete') {
-          this.ansWord[this.ansChance].char.pop()        
+        } else if (char == "delete") {
+          this.ansWord[this.ansChance].char.pop();
         }
       }
     },
@@ -360,62 +374,67 @@ export default {
     //   console.log(cmd)
     // }
 
-    // jika user pencet button Enter 
+    // jika user pencet button Enter
     onEnterPress() {
       let _this = this;
-      if(this.ansChance < 5) {
-        if(this.ansWord[this.ansChance].char.length == this.levelChar) {
-          _this.checkTile(this.ansWord[this.ansChance].char)
+      if (this.ansChance < 5) {
+        if (this.ansWord[this.ansChance].char.length == this.levelChar) {
+          _this.checkTile(this.ansWord[this.ansChance].char);
         } else {
-          console.log('Ada yang kosong kotaknya')
+          console.log("Ada yang kosong kotaknya");
         }
       } else {
-        _this.finalScore()
+        _this.finalScore();
       }
     },
 
     // display popup result, sekalian reset variabel
     onGameOver() {
       // reset pencataan score
-      this.ansScore = 0
-      this.ansChance = 0
-      this.ansTimer = 0
-      this.showResult = true
-      this.ansWord.map(function(item){item.char=[]})
-      document.querySelectorAll('.inputTxt').forEach(e => e.removeAttribute('style'));
-      console.log('game over')
+      this.ansScore = 0;
+      this.ansChance = 0;
+      this.ansTimer = 0;
+      this.showResult = true;
+      this.ansWord.map(function (item) {
+        item.char = [];
+      });
+      document
+        .querySelectorAll(".inputTxt")
+        .forEach((e) => e.removeAttribute("style"));
+      console.log("game over");
     },
 
     // hitung2an skor akhir
     finalScore() {
-      
       let _this = this;
-      let valid = false
-      console.log('Level User: '+ this.levelChar)
-      console.log('Total Kesempatan Jawab: '+ this.ansChance)
-      console.log('Total Huruf Tertabak: '+ this.ansScore)
-      console.log('Total Waktu: '+ this.ansTimer)
+      let valid = false;
+      console.log("Level User: " + this.levelChar);
+      console.log("Total Kesempatan Jawab: " + this.ansChance);
+      console.log("Total Huruf Tertabak: " + this.ansScore);
+      console.log("Total Waktu: " + this.ansTimer);
 
-      _this.stopTimer()
-      
+      _this.stopTimer();
+
       // klo user jawab under 10 detik, penalti 10 detik hahaha, masak sih bisa jawab under 10 detik, yg bener aja gan
-      if(this.ansTimer < 10) {
-        this.ansTimer = 10
+      if (this.ansTimer < 10) {
+        this.ansTimer = 10;
       }
 
       // klo user jawab lebih dari maksimal waktu yang ditentukan
-      if(this.ansTimer > this.ansSecMax) {
-        this.ansTimer = this.ansSecMax
+      if (this.ansTimer > this.ansSecMax) {
+        this.ansTimer = this.ansSecMax;
       }
-      
+
       // Rumus : (((1 - (Response Time / Variabel Detik) / 2) * 940) / Kesempatan Jawab ) + Huruf Tertebak
-      this.totalScore = (((1 - (this.ansTimer / this.ansSecVar) / 2) * 940) / this.ansChance) + this.ansScore
-      this.totalScore = Math.round(this.totalScore)
-      if(this.totalScore) {
-        valid = true
+      this.totalScore =
+        ((1 - this.ansTimer / this.ansSecVar / 2) * 940) / this.ansChance +
+        this.ansScore;
+      this.totalScore = Math.round(this.totalScore);
+      if (this.totalScore) {
+        valid = true;
       }
-      
-      if(valid) {
+
+      if (valid) {
         return _this.onGameOver();
       }
     },
@@ -423,9 +442,9 @@ export default {
     // fungsi untuk menyimpan scoring huruf per huruf yg sudah dijawab user
     tempScore(temp) {
       // scoring untuk yang disimpan, karena kalau user gagal jawab, tetep dihitung huruf per huruf
-      if(this.ansScoreTemp.indexOf(temp) === -1){
-        this.ansScoreTemp.push(temp)
-        this.ansScoreTemp.sort()
+      if (this.ansScoreTemp.indexOf(temp) === -1) {
+        this.ansScoreTemp.push(temp);
+        this.ansScoreTemp.sort();
       }
       // console.log('tempcount '+ this.ansScoreTemp)
       // return this.ansScoreTemp.length
@@ -434,41 +453,47 @@ export default {
     // fungsi untuk cek kotak-kotak jawaban, serta pewarnaan kotak
     checkTile(answer) {
       let _this = this;
-      console.log('answer '+ answer)
+      console.log("answer " + answer);
       let localScore = 0;
 
-      let soal = this.contohSoal[this.levelChar].kata.split('');
-      console.log('soal '+ soal)
+      let soal = this.contohSoal[this.levelChar].kata.split("");
+      console.log("soal " + soal);
 
-      answer.map(function(char, index) {
-        if(char==soal[index]) {
+      answer.map(function (char, index) {
+        if (char == soal[index]) {
           // klo hurufnya betul di tempat yg betul // ijo
-          document.getElementById('inputAnswer_'+(_this.ansChance+1)+'_'+(index+1)).style.backgroundColor = '#4caf50';
-          _this.tempScore(index+char)
-          localScore++
+          document.getElementById(
+            "inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1)
+          ).style.backgroundColor = "#4caf50";
+          _this.tempScore(index + char);
+          localScore++;
         } else {
           // klo hurufnya salah // grey
-          document.getElementById('inputAnswer_'+(_this.ansChance+1)+'_'+(index+1)).style.backgroundColor = '#c7c3c3';
-          for (let j=0; j<_this.levelChar;j++) {
-            if(soal[j] == char) {
+          document.getElementById(
+            "inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1)
+          ).style.backgroundColor = "#c7c3c3";
+          for (let j = 0; j < _this.levelChar; j++) {
+            if (soal[j] == char) {
               // klo hurufnya betul di tempat yg salah // kuning
-              document.getElementById('inputAnswer_'+(_this.ansChance+1)+'_'+(index+1)).style.backgroundColor = '#ffeb3b';
+              document.getElementById(
+                "inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1)
+              ).style.backgroundColor = "#ffeb3b";
             }
           }
         }
-      })
+      });
 
       // kesempatan jawab
-      this.ansChance++
-      console.log(this.ansChance)
+      this.ansChance++;
+      console.log(this.ansChance);
 
       // totel scoring yang tersimpan ke server
-      this.ansScore = this.ansScoreTemp.length
+      this.ansScore = this.ansScoreTemp.length;
 
       // jika jawaban benar semua
-      if(localScore==this.levelChar) {
-        this.userAns = true
-        _this.finalScore()
+      if (localScore == this.levelChar) {
+        this.userAns = true;
+        _this.finalScore();
       }
     },
   },

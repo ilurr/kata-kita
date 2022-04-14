@@ -9,7 +9,7 @@
       height="16"
     />
     <div :class="{ active: isBackActive }" class="footerWrap center-flex">
-      <button class="button footerBack__btn" @click="backHome" id="btnback">
+      <a href="/" class="button footerBack__btn" @click="backHome" id="btnback">
         <img
           src="@/assets/icon-back.png"
           alt=""
@@ -18,8 +18,8 @@
           height="14"
         />
         Kembali
-      </button>
-      <button class="button footerBack__btn" @click="backHome" id="btnhome">
+      </a>
+      <a href="/" class="button footerBack__btn" @click="backHome" id="btnhome">
         <img
           src="@/assets/icon-home.png"
           alt=""
@@ -28,7 +28,7 @@
           height="16"
         />
         Beranda
-      </button>
+      </a>
       <img
         src="@/assets/logokomplay.png"
         alt="Kompas Play"
@@ -45,24 +45,7 @@
 export default {
   name: "Footer_compo",
   props: ["isBackActive"],
-  methods: {
-    // backHome() {
-    //   gsap.to("#logo", 2, {
-    //     scale: 1,
-    //     ease: Expo.easeOut,
-    //     delay: 0.5,
-    //     onComplete: () => {
-    //       gsap.to("#menuWrap", 0.5, {
-    //         scale: 1,
-    //         alpha: 1,
-    //         ease: Back.easeIn,
-    //       });
-    //     },
-    //   });
-    //   this.displayScoreboard = false;
-    //   this.isHidden = false;
-    // },
-  },
+  methods: {},
 };
 </script>
 
@@ -96,6 +79,7 @@ export default {
       font-weight: 400;
       font-size: 14px;
       color: var(--cl-secondary);
+      text-decoration: none;
     }
   }
 }
