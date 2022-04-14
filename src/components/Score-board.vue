@@ -26,6 +26,16 @@
         <div class="scoreContent__title">
           Total <span class="playerCount">89.028</span> pemain
         </div>
+        <div class="playerUser -show align-center">
+          <div class="align-center">
+            <div class="playerAva" :data-initial="userAva"></div>
+            <div class="playerUser__content">
+              Peringkat kamu pada <br />
+              <span><b>4 huruf</b></span>
+            </div>
+          </div>
+          <div class="playerUser__rank">#{{ userRank }}</div>
+        </div>
         <ul class="playerList">
           <li v-for="player in players" :key="player.id" class="playerItem">
             <div class="align-center">
@@ -53,16 +63,6 @@
             </div>
           </li>
         </ul>
-        <div class="playerUser align-center">
-          <div class="align-center">
-            <div class="playerAva"></div>
-            <div class="playerUser__content">
-              Peringkat kamu pada <br />
-              <span><b>4 huruf</b></span>
-            </div>
-          </div>
-          <div class="playerUser__rank">#{{ userRank }}</div>
-        </div>
       </div>
       <div v-else>
         <p>No data found</p>
@@ -154,6 +154,7 @@ export default {
     return {
       players: [],
       user: "Ilma Akrimatunnisa",
+      userAva: "IA",
       userRank: "90",
       id: null,
       colorCache: {},
@@ -251,7 +252,7 @@ export default {
     list-style: none;
     padding: 0;
     margin: 0;
-    max-height: calc(100% - 84px - 19px);
+    max-height: calc(100% - 30px);
     overflow: scroll;
   }
   &Item {
@@ -287,6 +288,7 @@ export default {
     border-radius: 50%;
     background: var(--cl-secondary);
     position: relative;
+    font-family: var(--font-parent);
     &:after {
       content: attr(data-initial);
       position: absolute;
@@ -317,6 +319,13 @@ export default {
     width: calc(100% + 30px);
     justify-content: space-between;
     box-shadow: 0px -5px 10px rgba(51, 51, 51, 0.05);
+    visibility: hidden;
+    &.-show {
+      visibility: visible;
+      & ~ .playerList {
+        max-height: calc(100% - 84px - 19px);
+      }
+    }
     &__content {
       margin-left: 15px;
     }
