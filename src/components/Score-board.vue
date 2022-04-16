@@ -28,7 +28,7 @@
         </div>
         <div class="playerUser -show align-center">
           <div class="align-center">
-            <div class="playerAva" :data-initial="userAva"></div>
+            <div class="playerAva" :data-initial="userData.initial"></div>
             <div class="playerUser__content">
               Peringkat kamu pada <br />
               <span><b>4 huruf</b></span>
@@ -150,6 +150,9 @@ export default {
   components: {
     Modal_compo,
   },
+  props: [
+    "userData"
+  ],
   data() {
     return {
       players: [],

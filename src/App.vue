@@ -4,27 +4,29 @@
   <!-- @click="(showMenu = !showMenu), (isHidden = true), hideMenu" -->
   <div v-if="!isHidden" id="menuWrap">
     <button
-      class="button buttonMenu -active"
+      class="button buttonMenu -active -loading"
       id="btnstart"
       @click="hideMenu"
     >
-      <img
-        src="@/assets/icon-game.png"
-        class="buttonIcon"
-        alt=""
-        width="23"
-        height="17"
-      />
+      <span class="buttonIcon">
+        <img
+          src="@/assets/icon-game.png"
+          alt=""
+          width="23"
+          height="17"
+        />
+      </span>
       <span class="buttonTxt">Yuk Main</span>
     </button>
-    <button class="button buttonMenu" id="btnscore" @click="showScoreboard">
-      <img
-        src="@/assets/icon-score.png"
-        class="buttonIcon"
-        alt=""
-        width="20"
-        height="16"
-      />
+    <button class="button buttonMenu -loading" id="btnscore" @click="showScoreboard">
+      <span class="buttonIcon">
+        <img
+          src="@/assets/icon-score.png"
+          alt=""
+          width="20"
+          height="16"
+        />
+      </span>
       <span class="buttonTxt">Papan Skor</span>
     </button>
   </div>
@@ -33,7 +35,7 @@
 
   <!-- <Game_compo :myGame="myGame" v-if="myGame" /> -->
   <Game_compo :levelChar="levelChar" v-if="displayGameBoard" />
-  <Scoreboard_compo v-if="displayScoreboard" />
+  <Scoreboard_compo v-if="displayScoreboard" :userData="userData" />
   <!-- <Scoreboard_compo /> -->
 
   <!-- <h2>Welcome {{ name }}</h2>
@@ -74,6 +76,8 @@ export default {
   },
   data() {
     return {
+      userData: {},
+      isLogged: false,
       showMenu: false,
       isHidden: false,
       myGame: null,
@@ -91,6 +95,49 @@ export default {
     };
   },
   methods: {
+    getCookie(cname) {
+      let name = cname + "=";
+      let decodedCookie = decodeURIComponent(document.cookie);
+      let ca = decodedCookie.split(';');
+      for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    },
+    getUserLogin() {
+      // GET request using fetch with error handling
+      fetch("https://subs.kompas.com/api/v1/subscription?user_id=" + this.getCookie('kmps_usrid') + "&token=" + this.getCookie('kmp_uid') + "&loginwith=" + this.getCookie("lgn_w"))
+      .then(async response => {
+        const data = await response.json();
+        // check for error response
+        if (!response.ok) {
+          // get error message from body or default to response statusText
+          const error = (data && data.message) || response.statusText;
+          return Promise.reject(error);
+        } else {
+          console.log(data);
+          if(!data.email) {
+            this.isLogged = false
+          } else {
+            this.userData = data
+            this.userData.initial = data.first_name.substr(0,1).toUpperCase() + (data.last_name.length>0?data.last_name.substr(0,1).toUpperCase():'')
+            this.isLogged = true
+          }
+          document.getElementById('btnstart').classList.remove('-loading')
+          document.getElementById('btnscore').classList.remove('-loading')
+        }
+      })
+      .catch(error => {
+        this.errorMessage = error;
+        console.error("There was an error login!", error);
+      });
+    },
     displayGame(val) {
       this.levelChar = val;
       gsap.to("#logo", 0.5, {
@@ -125,25 +172,29 @@ export default {
       });
     },
     hideMenu() {
-      gsap.to("#logo", 0.5, {
-        scale: 1,
-        ease: Expo.easeOut,
-      });
-      gsap.to("#menuWrap", 0.5, {
-        scale: 0,
-        alpha: 0,
-        ease: Back.easeIn,
-        onComplete: () => {
-          this.isHidden = true;
-          this.showMenu = true;
-        },
-      });
-      gsap.to("#btnback", 0.5, {
-        display: "block",
-        ease: Expo.easeOut,
-      });
-      this.isBackActive = !this.isBackActive;
-      console.log("hd menu");
+      if(!this.isLogged) {
+        window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_blank');
+      } else {
+        gsap.to("#logo", 0.5, {
+          scale: 1,
+          ease: Expo.easeOut,
+        });
+        gsap.to("#menuWrap", 0.5, {
+          scale: 0,
+          alpha: 0,
+          ease: Back.easeIn,
+          onComplete: () => {
+            this.isHidden = true;
+            this.showMenu = true;
+          },
+        });
+        gsap.to("#btnback", 0.5, {
+          display: "block",
+          ease: Expo.easeOut,
+        });
+        this.isBackActive = !this.isBackActive;
+        console.log(this.userData);
+      }
     },
     showScoreboard() {
       gsap.to("#menuWrap", 0.5, {
@@ -164,6 +215,7 @@ export default {
         ease: Expo.easeOut,
       });
       this.isBackActive = !this.isBackActive;
+      console.log(this.userData);
     },
   },
   beforeCreate() {
@@ -183,6 +235,7 @@ export default {
     console.log("Before mount");
   },
   mounted() {
+    this.getUserLogin();
     console.log("Mounted");
     gsap.to("#logo", 0.2, {
       scale: 0,
@@ -304,6 +357,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-decoration: none;
   &Menu {
     width: calc(100% - 60px);
     padding: 16px 20px;
@@ -362,6 +416,25 @@ body {
   &Share {
     margin: 0;
     width: calc(50% - (5px / 2));
+  }
+  &.-loading {
+    background: #EBEBE4;
+    pointer-events: none;
+    .buttonTxt {
+      display: none;
+    }
+    .buttonIcon {
+      margin-right: 0;
+      vertical-align: center;
+      width: 23px;
+      height: 23px;
+      background-position: center center;
+      background-size: contain;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='margin:auto;background:0 0;display:block;shape-rendering:auto' width='23' height='23' viewBox='0 0 100 100' preserveAspectRatio='xMidYMid'%3E%3Ccircle cx='50' cy='50' r='0' fill='none' stroke='%23ff512f' stroke-width='12'%3E%3Canimate attributeName='r' repeatCount='indefinite' dur='1.1764705882352942s' values='0;40' keyTimes='0;1' keySplines='0 0.2 0.8 1' calcMode='spline' begin='0s'/%3E%3Canimate attributeName='opacity' repeatCount='indefinite' dur='1.1764705882352942s' values='1;0' keyTimes='0;1' keySplines='0.2 0 0.8 1' calcMode='spline' begin='0s'/%3E%3C/circle%3E%3Ccircle cx='50' cy='50' r='0' fill='none' stroke='%23f09819' stroke-width='12'%3E%3Canimate attributeName='r' repeatCount='indefinite' dur='1.1764705882352942s' values='0;40' keyTimes='0;1' keySplines='0 0.2 0.8 1' calcMode='spline' begin='-0.5882352941176471s'/%3E%3Canimate attributeName='opacity' repeatCount='indefinite' dur='1.1764705882352942s' values='1;0' keyTimes='0;1' keySplines='0.2 0 0.8 1' calcMode='spline' begin='-0.5882352941176471s'/%3E%3C/circle%3E%3C/svg%3E");
+      & > img {
+        display: none;
+      }
+    }
   }
 }
 .player {
