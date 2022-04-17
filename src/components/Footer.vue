@@ -9,7 +9,7 @@
       height="16"
     />
     <div :class="{ active: isBackActive }" class="footerWrap center-flex">
-      <a href="/" class="button footerBack__btn" @click="backHome" id="btnback">
+      <button class="button footerBack__btn" @click="$emit('backHome')" id="btnback">
         <img
           src="@/assets/icon-back.png"
           alt=""
@@ -18,8 +18,8 @@
           height="14"
         />
         Kembali
-      </a>
-      <a href="/" class="button footerBack__btn" @click="backHome" id="btnhome">
+      </button>
+      <button class="button footerBack__btn" @click="$emit('backHome')" id="btnhome">
         <img
           src="@/assets/icon-home.png"
           alt=""
@@ -28,7 +28,7 @@
           height="16"
         />
         Beranda
-      </a>
+      </button>
       <img
         src="@/assets/logokomplay.png"
         alt="Kompas Play"
@@ -45,7 +45,12 @@
 export default {
   name: "Footer_compo",
   props: ["isBackActive"],
-  methods: {},
+  methods: {
+    // backHome() {
+    //   window.location.href = window.location.origin
+    //   console.log(window.location.origin)
+    // },
+  },
 };
 </script>
 

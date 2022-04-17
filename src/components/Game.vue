@@ -165,7 +165,7 @@
       </template>
       <template #footer>
         <div class="modalGame__footer center-flex">
-          <a class="button buttonPrimary" href="/">
+          <button class="button buttonPrimary" @click="$emit('backHome')">
             <!-- <button class="button buttonPrimary" @click="showResult = false, userAns = false"> -->
             <img
               src="@/assets/icon-home-white.png"
@@ -174,7 +174,7 @@
               width="18"
               height="18"
             />Kembali ke Beranda
-          </a>
+          </button>
           <!-- </button> -->
           <button class="button buttonGame__share">
             <img
@@ -235,6 +235,7 @@
 </template>
 
 <script>
+import { gsap, Expo, Sine } from "gsap";
 // import SimpleKeyboard from "@/components/SimpleKeyboard.vue";
 // import InputKeyboard from "./InputKeyboard";
 import KeyInput from "./InputBoard.vue";
@@ -251,6 +252,7 @@ export default {
     Modal_compo,
   },
   props: ["levelChar"],
+  emits: ["backHome"],
   data: () => ({
     /**
      * We define the inputs here
@@ -258,6 +260,10 @@ export default {
     audio: {
       file: new Audio(require("@/assets/fx/beautifulrussia.mp3")),
       isPlaying: false,
+    },
+    fx: {
+      tap: new Audio(require("@/assets/fx/tap.mp3")),
+      juggle: new Audio(require("@/assets/fx/jadi.mp3")),
     },
     showModal: false,
     showResult: false,
@@ -273,7 +279,7 @@ export default {
       { char: [] },
     ],
     ansChance: 0,
-    ansChanceMax: 6,
+    ansChanceMax: 5,
     ansScore: 0,
     totalScore: 0,
     ansTimer: 0,
@@ -299,13 +305,17 @@ export default {
     ],
   }),
   created() {
-    window.addEventListener("keypress", this.doCommand);
+    window.addEventListener("keydown", this.doCommand);
   },
   unmounted() {
-    window.removeEventListener("keypress", this.doCommand);
+    window.removeEventListener("keydown", this.doCommand);
   },
   methods: {
     //play music
+    playFx(audio) {
+      audio.currentTime = 0
+      audio.play();
+    },
     play(audio) {
       audio.isPlaying = true;
       audio.file.play();
@@ -320,17 +330,17 @@ export default {
       return char.split("");
     },
 
-    // fungsi general, untuk tampilan timer dengan format 00:00
+    // timer for display, format 00:00
     str_pad(string, pad, length) {
       return (new Array(length + 1).join(pad) + string).slice(-length);
     },
 
-    // fungsi untuk stop timer
+    // stop timer
     stopTimer() {
       clearInterval(this.ansTimerVar);
     },
 
-    // fungsi untuk menjalankan timer, dalam satuan detik
+    // timer func, in second
     runTimer() {
       let _this = this;
       let localTimer = 0;
@@ -342,13 +352,17 @@ export default {
         _this.ansTimerDisplay =
           _this.str_pad(minutes, "0", 2) + ":" + _this.str_pad(seconds, "0", 2);
         _this.ansTimer = localTimer;
-        console.log(_this.ansTimer);
+        // console.log(_this.ansTimer);
       }, 1000);
     },
 
     // fungsi ketika user pencet huruf pada layar
-    onKeyPress(char) {
+    onKeyPress(e, char) {
       let _this = this;
+
+      // effect
+      _this.animateZoom(e)
+      _this.playFx(this.fx.tap)
 
       // timer running when user start typing
       if (this.keyPressFirst == 0) {
@@ -357,7 +371,7 @@ export default {
       }
 
       // mari menjawab
-      if (this.ansChance < this.ansChanceMax) {
+      if (this.ansChance <= this.ansChanceMax) {
         if (char !== "delete" && char !== "enter") {
           if (this.ansWord[this.ansChance].char.length < this.levelChar) {
             this.ansWord[this.ansChance].char.push(char);
@@ -369,15 +383,42 @@ export default {
     },
 
     // fungsi press keyboard di laptop, nanti aja ya
-    // doCommand(e) {
-    //   let cmd = String.fromCharCode(e.keyCode).toLowerCase();
-    //   console.log(cmd)
-    // }
+    doCommand(e) {
+      if(!this.showResult) {
+        let _this = this
+        let cmd = String.fromCharCode(e.keyCode).toLowerCase();
+        // console.log(cmd)
+        // console.log(e.keyCode)
+        if(e.keyCode == 8) {
+          _this.onKeyPress(document.querySelector(".keyBtn[keychar=delete]"), 'delete')
+          document.querySelector(".keyBtn[keychar=delete]").focus();
+        } else if(e.keyCode == 13) {
+          _this.onEnterPress(document.querySelector(".keyBtn[keychar=enter]"))
+          document.querySelector(".keyBtn[keychar=enter]").focus();
+        } else {
+          for(let u=0;u<this.keyBoardChar.length;u++) {
+            this.keyBoardChar[u].char.split('').map(function(char){
+              if(cmd == char) {
+                _this.onKeyPress(document.querySelector(".keyBtn[keychar="+cmd+"]"), cmd)
+                document.querySelector(".keyBtn[keychar="+cmd+"]").focus();
+              }
+            });
+          }
+        }
+      }
+    },
 
-    // jika user pencet button Enter
-    onEnterPress() {
+    // button Enter func
+    onEnterPress(e) {
       let _this = this;
-      if (this.ansChance < 5) {
+
+      // effect
+      _this.animateZoom(e)
+
+      if (this.ansChance <= this.ansChanceMax) {
+
+        _this.animateJuggle()
+
         if (this.ansWord[this.ansChance].char.length == this.levelChar) {
           _this.checkTile(this.ansWord[this.ansChance].char);
         } else {
@@ -388,9 +429,47 @@ export default {
       }
     },
 
-    // display popup result, sekalian reset variabel
+    animateZoom(e) {
+      gsap.to(e, 0.1, {
+        scale: 1.25,
+        ease: Expo.easeOut,
+      });
+      gsap.to(e, 0.1, {
+        scale: 1,
+        ease: Expo.easeOut,
+        delay: 0.1
+      });
+    },
+
+    animateJuggle() {
+      let _this = this
+      let andelay = 0;
+
+      _this.playFx(this.fx.juggle)
+
+      //Animate fx
+      for (let i = 0; i < this.levelChar; i++) {
+        gsap.to(document.getElementById(
+          "inputAnswer_" + (this.ansChance + 1) + "_" + (i + 1)
+        ), 0.2, {
+            scale: 1.25,
+            ease: Sine.easeOut,
+            delay: andelay
+        });
+        gsap.to(document.getElementById(
+          "inputAnswer_" + (this.ansChance + 1) + "_" + (i + 1)
+        ), 0.2, {
+            scale: 1,
+            ease: Sine.easeOut,
+            delay: andelay + 0.09
+        });
+        andelay += 0.05;
+      }
+    },
+
+    // display popup result, reset variables
     onGameOver() {
-      // reset pencataan score
+      // reset score
       this.ansScore = 0;
       this.ansChance = 0;
       this.ansTimer = 0;
@@ -401,10 +480,13 @@ export default {
       document
         .querySelectorAll(".inputTxt")
         .forEach((e) => e.removeAttribute("style"));
+      document
+        .querySelectorAll(".keyBtn")
+        .forEach((e) => e.removeAttribute("style"));
       console.log("game over");
     },
 
-    // hitung2an skor akhir
+    // final scoring
     finalScore() {
       let _this = this;
       let valid = false;
@@ -415,12 +497,12 @@ export default {
 
       _this.stopTimer();
 
-      // klo user jawab under 10 detik, penalti 10 detik hahaha, masak sih bisa jawab under 10 detik, yg bener aja gan
+      // under 10 seconds, penalti 10 detik hahaha, masak sih bisa jawab under 10 detik, yg bener aja gan
       if (this.ansTimer < 10) {
         this.ansTimer = 10;
       }
 
-      // klo user jawab lebih dari maksimal waktu yang ditentukan
+      // max timer (10 minutes)
       if (this.ansTimer > this.ansSecMax) {
         this.ansTimer = this.ansSecMax;
       }
@@ -439,18 +521,15 @@ export default {
       }
     },
 
-    // fungsi untuk menyimpan scoring huruf per huruf yg sudah dijawab user
+    // scoring per letter
     tempScore(temp) {
-      // scoring untuk yang disimpan, karena kalau user gagal jawab, tetep dihitung huruf per huruf
       if (this.ansScoreTemp.indexOf(temp) === -1) {
         this.ansScoreTemp.push(temp);
         this.ansScoreTemp.sort();
       }
-      // console.log('tempcount '+ this.ansScoreTemp)
-      // return this.ansScoreTemp.length
     },
 
-    // fungsi untuk cek kotak-kotak jawaban, serta pewarnaan kotak
+    // checking one by one tile answer
     checkTile(answer) {
       let _this = this;
       console.log("answer " + answer);
@@ -461,20 +540,23 @@ export default {
 
       answer.map(function (char, index) {
         if (char == soal[index]) {
-          // klo hurufnya betul di tempat yg betul // ijo
+          // green
+          document.querySelector(".keyBtn[keychar="+char+"]").style.backgroundColor = "#4caf50";
           document.getElementById(
             "inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1)
           ).style.backgroundColor = "#4caf50";
           _this.tempScore(index + char);
           localScore++;
         } else {
-          // klo hurufnya salah // grey
+          // grey
+          document.querySelector(".keyBtn[keychar="+char+"]").style.backgroundColor = "#c7c3c3";
           document.getElementById(
             "inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1)
           ).style.backgroundColor = "#c7c3c3";
           for (let j = 0; j < _this.levelChar; j++) {
             if (soal[j] == char) {
-              // klo hurufnya betul di tempat yg salah // kuning
+              // yellow
+              document.querySelector(".keyBtn[keychar="+char+"]").style.backgroundColor = "#ffeb3b";
               document.getElementById(
                 "inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1)
               ).style.backgroundColor = "#ffeb3b";
@@ -483,18 +565,24 @@ export default {
         }
       });
 
-      // kesempatan jawab
+      // overall chance
       this.ansChance++;
       console.log(this.ansChance);
 
-      // totel scoring yang tersimpan ke server
+      // scoring letter
       this.ansScore = this.ansScoreTemp.length;
 
-      // jika jawaban benar semua
+      // all true in a row
       if (localScore == this.levelChar) {
         this.userAns = true;
         _this.finalScore();
       }
+
+      // max chance 
+      if (this.ansChance > this.ansChanceMax) {
+        _this.finalScore();
+      }
+
     },
   },
 };

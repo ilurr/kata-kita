@@ -34,7 +34,7 @@
   <Menu_level @showGame="displayGame" v-if="showMenu" />
 
   <!-- <Game_compo :myGame="myGame" v-if="myGame" /> -->
-  <Game_compo :levelChar="levelChar" v-if="displayGameBoard" />
+  <Game_compo :levelChar="levelChar" v-if="displayGameBoard" @backHome='backHome' />
   <Scoreboard_compo v-if="displayScoreboard" :userData="userData" />
   <!-- <Scoreboard_compo /> -->
 
@@ -54,7 +54,7 @@
     </li>
   </ul> -->
 
-  <Footer_compo :isBackActive="isBackActive" />
+  <Footer_compo :isBackActive="isBackActive" @backHome='backHome' />
 </template>
 
 <script>
@@ -95,6 +95,10 @@ export default {
     };
   },
   methods: {
+    backHome() {
+      window.location.href = window.location.origin
+      console.log(window.location.origin)
+    },
     getCookie(cname) {
       let name = cname + "=";
       let decodedCookie = decodeURIComponent(document.cookie);
@@ -173,7 +177,7 @@ export default {
     },
     hideMenu() {
       if(!this.isLogged) {
-        window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_blank');
+        window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_parent');
       } else {
         gsap.to("#logo", 0.5, {
           scale: 1,
@@ -193,7 +197,7 @@ export default {
           ease: Expo.easeOut,
         });
         this.isBackActive = !this.isBackActive;
-        console.log(this.userData);
+        // console.log(this.userData);
       }
     },
     showScoreboard() {

@@ -3,7 +3,7 @@
     class="keyBtn"
     :class="{ '-enter': isEnter, '-delete': isDelete }"
     :keyChar="keyChar"
-    @click="$emit('onKeyPress', keyChar)"
+    @click="$emit('onKeyPress', $event.target, keyChar)"
   >
     <span v-if="keyChar == 'delete'">
       <img
@@ -38,8 +38,9 @@ export default {
     min-width: 28px;
     height: 40px;
     background-color: var(--cl-white);
-    color: var(--cl-main);
+    // color: var(--cl-main);
     font-size: 14px;
+    font-weight: 500;
     margin: 0;
     text-align: center;
     text-transform: uppercase;
@@ -51,6 +52,7 @@ export default {
     align-items: center;
     & > span {
       display: block;
+      pointer-events: none;
       img {
         vertical-align: top;
       }

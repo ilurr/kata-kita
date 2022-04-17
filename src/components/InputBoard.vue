@@ -35,7 +35,7 @@ export default {
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    // font-weight: 700;
+    font-weight: 500;
   }
 }
 </style>
