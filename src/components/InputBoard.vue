@@ -23,9 +23,10 @@ export default {
 .input {
   &Txt {
     width: 40px;
-    height: 40px;
+    height: 48px;
+    color: #454545;
     background-color: var(--cl-white);
-    margin: 5px;
+    margin: 2px;
     text-align: center;
     text-transform: uppercase;
     border: 0;
@@ -34,7 +35,8 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-family: var(--font-parent);
+    font-size: 18px;
     font-weight: 500;
   }
 }

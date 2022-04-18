@@ -96,7 +96,8 @@ export default {
   },
   methods: {
     backHome() {
-      window.location.href = window.location.origin
+      window.location.href = 'https://dummy.kompas.com/repo/game-kompla-dist/'
+      // window.location.href = window.location.origin
       console.log(window.location.origin)
     },
     getCookie(cname) {
@@ -297,6 +298,9 @@ export default {
   --cl-secondary: #f09819;
   --cl-white: #fff;
   --cl-black: #333333;
+  --cl-correct: #7BBC49;
+  --cl-wrong: #c8c8c8;
+  --cl-almost: #FBAB18;
   --font-parent: "Roboto Slab", serif;
   --font-child: "Mukta", sans-serif;
 }

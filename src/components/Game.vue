@@ -106,7 +106,7 @@
       <template #body>
         <div class="modalGame__body">
           <div class="modalGame__result" v-if="userAns">
-            Yey, kamu menebak kata dengan benar. Jawabannya adalah:
+            Yey, tebakanmu benar!
           </div>
           <div class="modalGame__result" v-else>
             Ups, kamu salah menebak kata. Jawaban yang benar adalah:
@@ -211,7 +211,43 @@
           </p>
           <p>
             Ketika jawaban salah, ulangi merangkai huruf hingga menjadi kata
-            yang dimaksud hingga <b>enam kali</b> kesempatan.
+            yang dimaksud hingga <strong>enam kali</strong> kesempatan.
+          </p>
+          <p>
+            Contoh:
+          </p>
+          <div class="modalGame__word -example">
+            <span class="letter -correct">M</span>
+            <span class="letter">A</span>
+            <span class="letter">R</span>
+            <span class="letter">I</span>
+            <span class="letter">N</span>
+            <span class="letter">A</span>
+          </div>
+          <p>
+            Huruf ‘M’ berada dalam kata dan berada <strong>di posisi yang benar</strong>.
+          </p>
+          <div class="modalGame__word -example">
+            <span class="letter">M</span>
+            <span class="letter">A</span>
+            <span class="letter -almost">N</span>
+            <span class="letter">G</span>
+            <span class="letter">G</span>
+            <span class="letter">A</span>
+          </div>
+          <p>
+            Huruf ‘N’ berada dalam kata tapi <strong>tidak berada di posisi yang benar</strong>.
+          </p>
+          <div class="modalGame__word -example">
+            <span class="letter">M</span>
+            <span class="letter">A</span>
+            <span class="letter">K</span>
+            <span class="letter -wrong">I</span>
+            <span class="letter">A</span>
+            <span class="letter">N</span>
+          </div>
+          <p>
+            Huruf ‘I’ <strong>tidak berada dalam kata</strong>.
           </p>
           <!-- Contoh: -->
         </div>
@@ -430,11 +466,11 @@ export default {
     },
 
     animateZoom(e) {
-      gsap.to(e, 0.1, {
+      gsap.to(e.parentElement, 0.1, {
         scale: 1.25,
         ease: Expo.easeOut,
       });
-      gsap.to(e, 0.1, {
+      gsap.to(e.parentElement, 0.1, {
         scale: 1,
         ease: Expo.easeOut,
         delay: 0.1
@@ -451,14 +487,14 @@ export default {
       for (let i = 0; i < this.levelChar; i++) {
         gsap.to(document.getElementById(
           "inputAnswer_" + (this.ansChance + 1) + "_" + (i + 1)
-        ), 0.2, {
+        ).parentElement, 0.2, {
             scale: 1.25,
             ease: Sine.easeOut,
             delay: andelay
         });
         gsap.to(document.getElementById(
           "inputAnswer_" + (this.ansChance + 1) + "_" + (i + 1)
-        ), 0.2, {
+        ).parentElement, 0.2, {
             scale: 1,
             ease: Sine.easeOut,
             delay: andelay + 0.09
@@ -529,6 +565,14 @@ export default {
       }
     },
 
+    // coloring response
+    colorIt(idEl, classEl, colorEl, bgEl) {
+      document.querySelector(classEl).style.backgroundColor = bgEl;
+      document.querySelector(classEl).style.color = colorEl;
+      document.getElementById(idEl).style.backgroundColor = bgEl;
+      document.getElementById(idEl).style.color = colorEl;
+    },
+
     // checking one by one tile answer
     checkTile(answer) {
       let _this = this;
@@ -541,25 +585,16 @@ export default {
       answer.map(function (char, index) {
         if (char == soal[index]) {
           // green
-          document.querySelector(".keyBtn[keychar="+char+"]").style.backgroundColor = "#4caf50";
-          document.getElementById(
-            "inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1)
-          ).style.backgroundColor = "#4caf50";
+          _this.colorIt("inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1), ".keyBtn[keychar="+char+"]", "#fff", "var(--cl-correct)")
           _this.tempScore(index + char);
           localScore++;
         } else {
           // grey
-          document.querySelector(".keyBtn[keychar="+char+"]").style.backgroundColor = "#c7c3c3";
-          document.getElementById(
-            "inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1)
-          ).style.backgroundColor = "#c7c3c3";
+          _this.colorIt("inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1), ".keyBtn[keychar="+char+"]", "#000", "var(--cl-wrong)")
           for (let j = 0; j < _this.levelChar; j++) {
             if (soal[j] == char) {
               // yellow
-              document.querySelector(".keyBtn[keychar="+char+"]").style.backgroundColor = "#ffeb3b";
-              document.getElementById(
-                "inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1)
-              ).style.backgroundColor = "#ffeb3b";
+              _this.colorIt("inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1), ".keyBtn[keychar="+char+"]", "#fff", "var(--cl-almost)")
             }
           }
         }
@@ -605,6 +640,10 @@ export default {
       display: flex;
       justify-content: center;
     }
+    &__item {
+      position: relative;
+      will-change: transform;
+    }
   }
   &Wrap {
     position: absolute;
@@ -640,6 +679,7 @@ export default {
       gap: 5px;
     }
     &__item {
+      will-change: transform;
       position: relative;
     }
   }
@@ -677,7 +717,7 @@ export default {
 
 .timer {
   &Wrap {
-    margin: 20px;
+    margin: 15px;
     font-size: 14px;
     color: var(--cl-white);
     text-align: center;
@@ -778,16 +818,34 @@ export default {
       line-height: 32px;
       color: var(--cl-white);
       .letter {
-        background: #7bbc49;
+        background: var(--cl-correct);
         border-radius: 5px;
         padding: 0;
         width: 40px;
-        height: 42px;
+        height: 48px;
         justify-content: center;
         align-items: center;
         display: inline-flex;
         text-transform: uppercase;
-        margin: 5px 1px;
+        margin: 5px 2px;
+      }
+      &.-example {
+        & > .letter {
+          background: #fff;
+          border: 1px solid var(--cl-black);
+          color: var(--cl-black);
+          &.-correct {
+            background: var(--cl-correct);
+            color: #fff;
+          }
+          &.-wrong {
+            background: var(--cl-wrong);
+          }
+          &.-almost {
+            color: #fff;
+            background: var(--cl-almost);
+          }
+        }
       }
     }
   }

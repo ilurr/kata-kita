@@ -38,7 +38,8 @@ export default {
     min-width: 28px;
     height: 40px;
     background-color: var(--cl-white);
-    // color: var(--cl-main);
+    color: #000;
+    font-family: var(--font-parent);
     font-size: 14px;
     font-weight: 500;
     margin: 0;
