@@ -1,5 +1,5 @@
 <template>
-  <div class="tab">
-    <span><b>6 huruf</b></span>
-  </div>
+  <div class="scoreContent__wrap">
+    <p>Data masih kosong</p>
+  </div>    
 </template>

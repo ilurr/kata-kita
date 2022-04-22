@@ -23,8 +23,8 @@ export default {
 <style lang="scss">
 .header {
   &Img {
-    margin-top: 90px;
-    margin-bottom: 40px;
+    margin-top: 12vh;
+    margin-bottom: 8vh;
     max-width: 160px;
     height: auto;
     transform: scale(0) rotate(180deg);

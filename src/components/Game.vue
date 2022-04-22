@@ -1,28 +1,27 @@
 <template>
-  <!-- <p>Prop from child 1: {{ mygame }}</p> -->
+  <!-- <p>Prop from child 1: {{ api }}</p> -->
   <div class="gameWrap center-flex" id="gameWrap">
     <div class="gameHead center-flex">
       <div class="gameHead__wrap">
-        <button class="button" @click="showModal = true">
-          <img
+        <button class="button buttonHead -help" @click="showModal = true">
+          <span class="buttonIcon icon-help"></span>
+          <!-- <img
             src="@/assets/help.png"
             class="gameHead__img"
             alt="How to Play"
             width="40"
             height="36"
-          />
+          /> -->
         </button>
-        <button
-          class="button"
-          @click.prevent="audio.isPlaying ? pause(audio) : play(audio)"
-        >
-          <img
+        <button class="button buttonHead -active -audio" @click.prevent="audio.isPlaying ? pause(audio) : play(audio)">
+          <span class="buttonIcon icon-audio"></span>
+          <!-- <img
             src="@/assets/sound.png"
             class="gameHead__img"
             alt="Sound"
             width="40"
             height="36"
-          />
+          /> -->
         </button>
       </div>
       <button class="button buttonClue">
@@ -36,7 +35,7 @@
       </button>
     </div>
 
-    <div class="gameBoard">
+    <div class="gameBoard" v-if="api.status == 200">
       <div class="gameBoard__row" v-for="i in 6" :key="i">
         <div class="gameBoard__item" v-for="j in levelChar" :key="j">
           <KeyInput
@@ -58,17 +57,19 @@
         <!-- <span class="timer" v-else>00:00</span> -->
       </div>
     </div>
+    <div class="gameBoard" v-else-if="api.status == 404">
+      <div class="gameBoard__status">
+        <p>Pertanyaan tidak ditemukan, silakan coba lagi.</p>
+        <p><a class="button -active -default" href="">Kembali ke Beranda</a></p>
+      </div>
+    </div>
+    <div class="gameBoard" v-else>
+      <div class="gameBoard__status">
+        <p>Silakan tunggu...</p>
+      </div>
+    </div>
 
-    <!-- <div v-for="key in Object.keys(inputs)" :key="key">
-      <InputKeyboard
-        :inputs="inputs"
-        :inputName="key"
-        @onInputFocus="onInputFocus"
-        @onInputChange="onInputChange"
-      />
-    </div> -->
-
-    <div class="gameKey">
+    <div class="gameKey" v-if="api.status == 200">
       <div
         class="gameKey__row"
         v-for="(row, index) in keyBoardChar"
@@ -92,6 +93,8 @@
         </div>
       </div>
     </div>
+    <div class="gameKey" v-else>
+    </div>
   </div>
 
   <!-- s: modal result -->
@@ -114,22 +117,22 @@
           <div class="modalGame__word">
             <span
               class="letter"
-              v-for="j in this.contohSoal[this.levelChar].kata.split('')"
+              v-for="j in this.getQ.decryptedTitle.split('')"
               :key="j"
               >{{ j }}</span
             >
           </div>
-          <div class="modalGame__explained">
-            <p class="modalGame__verb">nomina</p>
-            <p>
+          <div class="modalGame__explained" v-html="this.getQ.decryptedDescription">
+          </div>
+            <!-- <p class="modalGame__verb">nomina</p> -->
+            <!-- <p>
               <span class="modalGame__misc">1</span> perkataan yg keluar sewaktu
               tidur;
             </p>
             <p>
               <span class="modalGame__misc">2</span> <b>ki</b> perkataan yg
               bukan-bukan; omong kosong; ocehan;
-            </p>
-          </div>
+            </p> -->
           <div class="modalGame__result center-flex">
             <div class="modalGame__box">
               <img
@@ -271,9 +274,9 @@
 </template>
 
 <script>
+import axios from 'axios';
+import CryptoJS from 'crypto-js';
 import { gsap, Expo, Sine } from "gsap";
-// import SimpleKeyboard from "@/components/SimpleKeyboard.vue";
-// import InputKeyboard from "./InputKeyboard";
 import KeyInput from "./InputBoard.vue";
 import KeyBtn from "./ButtonKeyboard.vue";
 import Modal_compo from "@/components/Modal-compo.vue";
@@ -289,10 +292,32 @@ export default {
   },
   props: ["levelChar"],
   emits: ["backHome"],
-  data: () => ({
+  data() {
+    return {
     /**
      * We define the inputs here
      */
+    key: 'G4mKatKit',
+    apiQuestion: {
+      url: 'https://play.kompas.com/api/kata_kita/question',
+      query: {},
+      status: ''
+    },
+    CryptoJSAesJson: {
+      stringify: function (cipherParams) {
+        var j = {ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)};
+        if (cipherParams.iv) j.iv = cipherParams.iv.toString();
+        if (cipherParams.salt) j.s = cipherParams.salt.toString();
+        return JSON.stringify(j).replace(/\s/g, '');
+      },
+      parse: function (jsonStr) {
+        var j = JSON.parse(jsonStr);
+        var cipherParams = CryptoJS.lib.CipherParams.create({ciphertext: CryptoJS.enc.Base64.parse(j.ct)});
+        if (j.iv) cipherParams.iv = CryptoJS.enc.Hex.parse(j.iv);
+        if (j.s) cipherParams.salt = CryptoJS.enc.Hex.parse(j.s);
+        return cipherParams;
+      }
+    },
     audio: {
       file: new Audio(require("@/assets/fx/beautifulrussia.mp3")),
       isPlaying: false,
@@ -330,23 +355,49 @@ export default {
       { char: "asdfghjkl" },
       { char: "zxcvbnm" },
     ],
-    contohSoal: [
-      { kata: "0" },
-      { kata: "1" },
-      { kata: "2" },
-      { kata: "3" },
-      { kata: "kota" },
-      { kata: "semut" },
-      { kata: "normal" },
-    ],
-  }),
+    getQ: { decryptedTitle: "", decryptedDescription: "" },
+  }
+  },
+  setup() {
+    console.log(CryptoJS);
+  },
   created() {
     window.addEventListener("keydown", this.doCommand);
   },
   unmounted() {
     window.removeEventListener("keydown", this.doCommand);
   },
+  mounted() {
+    // console.log(this.levelChar)
+    let _this = this
+    if(this.levelChar>0) {
+      _this.getQuestion()
+    }
+  },
   methods: {
+    async getQuestion() {
+        try {
+          const response = await axios.get(this.apiQuestion.url + '?level=' + this.levelChar);
+          console.log(response);
+          if (!response.ok) {
+            const error = (response && response.message) || response.statusText;
+            this.apiQuestion.status = error
+            // return Promise.reject(error);
+          }
+
+          this.apiQuestion.query = response.data
+          this.apiQuestion.status = response.status
+
+          this.getQ.decryptedTitle = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.title, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8))
+          this.getQ.decryptedDescription = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.description, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).replace(/&nbsp;/g, " ")
+
+        } catch (error) {
+          console.log(error.response.status);
+          this.apiQuestion.status = error.response.status
+        }
+
+    },
+
     //play music
     playFx(audio) {
       audio.currentTime = 0
@@ -579,7 +630,7 @@ export default {
       console.log("answer " + answer);
       let localScore = 0;
 
-      let soal = this.contohSoal[this.levelChar].kata.split("");
+      let soal = this.getQ.decryptedTitle.split("");
       console.log("soal " + soal);
 
       answer.map(function (char, index) {
@@ -634,7 +685,8 @@ export default {
 .game {
   &Board {
     position: relative;
-    padding: 15px 0 0;
+    padding: 0;
+    min-height: 363px;
     &__row {
       position: relative;
       display: flex;
@@ -643,6 +695,14 @@ export default {
     &__item {
       position: relative;
       will-change: transform;
+    }
+    &__status {
+      position: relative;
+      padding: 20px 30px;
+      text-align: center;
+      // display: flex;
+      // justify-content: center;
+      margin: 0 auto;
     }
   }
   &Wrap {
@@ -661,8 +721,9 @@ export default {
     justify-content: space-between;
     width: 100%;
     &__wrap {
-      padding: 10px;
+      padding: 15px;
       display: flex;
+      gap: 10px;
       justify-content: flex-start;
     }
   }
@@ -686,6 +747,25 @@ export default {
 }
 
 .button {
+  &Head {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid #ED543A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    // border-radius: 4px;
+    &.-audio {
+      border: transparent
+    }
+    .buttonIcon {
+      margin-right: 0;
+      width: 16px;
+      height: 16px;
+    }
+  }
   &Clue {
     margin-left: 15px;
     margin-right: 15px;
@@ -743,6 +823,13 @@ export default {
       p {
         margin-top: 10px;
         margin-bottom: 10px;
+      }
+    }
+    &__explained {
+      position: relative;
+      padding: 5px 0 0;
+      &:deep(p) {
+        margin: 5px 0;
       }
     }
     &__footer {

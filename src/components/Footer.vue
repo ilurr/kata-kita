@@ -9,32 +9,42 @@
       height="16"
     />
     <div :class="{ active: isBackActive }" class="footerWrap center-flex">
-      <button class="button footerBack__btn" @click="$emit('backHome')" id="btnback">
-        <img
-          src="@/assets/icon-back.png"
-          alt=""
-          class="footerBack"
-          width="16"
-          height="14"
-        />
-        Kembali
-      </button>
-      <button class="button footerBack__btn" @click="$emit('backHome')" id="btnhome">
-        <img
-          src="@/assets/icon-home.png"
-          alt=""
-          class="footerBack"
-          width="16"
-          height="16"
-        />
-        Beranda
-      </button>
-      <img
-        src="@/assets/logokomplay.png"
-        alt="Kompas Play"
-        width="148"
-        height="18"
-      />
+      <div class="footerItem" id="btnback">
+        <button class="button footerBack__btn" @click="$emit('backHome')">
+          <span class="buttonIcon icon-back"></span>
+          <!-- <img
+            src="@/assets/icon-back.png"
+            alt=""
+            class="footerBack"
+            width="16"
+            height="14"
+          /> -->
+          <span class="buttonTxt">Kembali</span>
+        </button>
+      </div>
+      <div class="footerItem" id="btnhome">
+        <button class="button footerBack__btn" @click="$emit('backHome')">
+          <span class="buttonIcon icon-home"></span>
+          <!-- <img
+            src="@/assets/icon-home.png"
+            alt=""
+            class="footerBack"
+            width="16"
+            height="16"
+          /> -->
+          <span class="buttonTxt">Beranda</span>        
+        </button>
+      </div>
+      <div class="footerItem -play">
+        <a href="https://play.kompas.com/" target="_parent">
+          <img
+            src="@/assets/logokomplay.png"
+            alt="Kompas Play"
+            width="148"
+            height="18"
+          />
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -75,11 +85,21 @@ export default {
     position: absolute;
     top: -70px;
   }
+  &Item {
+    position: relative;
+    display: none;
+    height: 18px;
+    &.-play {
+      display: flex;
+      a {
+        display: inline-flex;
+      }
+    }
+  }
   &Back {
     vertical-align: sub;
     margin-right: 10px;
     &__btn {
-      display: none;
       font-family: var(--font-child);
       font-weight: 400;
       font-size: 14px;
