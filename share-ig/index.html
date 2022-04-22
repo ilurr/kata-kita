@@ -1,0 +1,140 @@
+<body>
+    <form id="myForm">
+        Score 4: <input id="score4" placeholder="" value="90" />
+        Score 5: <input id="score5" placeholder="" value="72" />
+        Score 6: <input id="score6" placeholder="" value="132" />
+        <br />
+        <button type="button" onclick="myFunction()">share</button>
+    </form>
+    <canvas id="myCanvas" width="330" height="587"></canvas>
+
+    <script>
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+
+        function loadImages(sources, callback) {
+            var images = {};
+            var loadedImages = 0;
+            var numImages = 0;
+            // get num of sources
+            for (var src in sources) {
+                numImages++;
+            }
+            for (var src in sources) {
+                images[src] = new Image();
+                images[src].onload = function () {
+                    if (++loadedImages >= numImages) {
+                        callback(images);
+                    }
+                };
+                images[src].src = sources[src];
+                images[src].setAttribute('crossorigin', 'anonymous'); // works for me
+            }
+        }
+
+        var sources = {
+            //image1: 'https://dummy.kompas.com/repo/kompasiana-share-igs/html/images/bg-igs.png',
+            image1: 'https://i.ibb.co/ggn04dF/bg-rank.png',
+        };
+
+        loadImages(sources, function (images) {
+            context.drawImage(images.image1, 0, 0);
+        });
+
+        let myFont = new FontFace(
+            "Mukta",
+            "url(https://fonts.gstatic.com/s/mukta/v12/iJWKBXyXfDDVXbnBrXw.woff2)"
+        );
+        let myFont2 = new FontFace(
+            "Roboto Slab",
+            "url(https://fonts.gstatic.com/s/robotoslab/v22/BngbUXZYTXPIvIBgJJSb6s3BzlRRfKOFbvjovoSmb2Rj.woff2)"
+        );
+
+        myFont.load().then(function (font) {
+            // Ready to use the font in a canvas context
+            document.fonts.add(font);
+            console.log("Font loaded");
+        });
+
+        function myFunction() {
+            var score4 = document.getElementById('score4').value;
+            var score5 = document.getElementById('score5').value;
+            var score6 = document.getElementById('score6').value;
+            var textwriter = 'Ilma Akrimatunnisa';
+            var initialwriter = 'IA';
+
+            if (score4.length == 0) {
+                alert("you forgot to put something");
+            }
+
+            //initial gamer
+            context.font = "500 28px Roboto Slab";
+            context.fillStyle = "#fff";
+            context.textAlign = "center";
+            context.fillText(initialwriter, 165, 220);
+
+            //gamer
+            context.font = "700 16px Mukta";
+            context.fillStyle = "#333333";
+            context.textAlign = "center";
+            context.fillText(textwriter, 165, 295);
+
+            //content score
+            context.font = "400 16px Mukta";
+            context.fillStyle = "#333333";
+            context.textAlign = "left";
+            context.fillText("Tantangan 4 huruf", 40, 375);
+            context.font = "400 16px Mukta";
+            context.fillStyle = "#333333";
+            context.textAlign = "left";
+            context.fillText("Tantangan 5 huruf", 40, 425);
+            context.font = "400 16px Mukta";
+            context.fillStyle = "#333333";
+            context.textAlign = "left";
+            context.fillText("Tantangan 6 huruf", 40, 475);
+
+            //score
+            context.font = "500 28px Roboto Slab";
+            context.fillStyle = "#ff512f";
+            context.textAlign = "right";
+            context.fillText("#"+score4, 290, 380);
+            context.font = "500 28px Roboto Slab";
+            context.fillStyle = "#ff512f";
+            context.textAlign = "right";
+            context.fillText("#"+score5, 290, 430);
+            context.font = "500 28px Roboto Slab";
+            context.fillStyle = "#ff512f";
+            context.textAlign = "right";
+            context.fillText("#"+score6, 290, 480);
+
+
+            var url = canvas.toDataURL();
+
+            fetch(url)
+                .then(function (response) {
+                    return response.blob()
+                })
+                .then(function (blob) {
+                    var file = new File([blob], "picture.jpg", {
+                        type: 'image/jpeg'
+                    });
+                    var filesArray = [file];
+
+                    if (navigator.canShare && navigator.canShare({
+                        files: filesArray
+                    })) {
+                        navigator.share({
+                            text: textwriter,
+                            files: filesArray,
+                            title: textwriter,
+                            url: 'https://www.kompasiana.com/'
+                        });
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+        }
+    </script>
+</body>
