@@ -35,7 +35,7 @@
       </button>
     </div>
 
-    <div class="gameBoard" v-if="api.status == 200">
+    <div class="gameBoard" v-if="apiQuestion.status == 200">
       <div class="gameBoard__row" v-for="i in 6" :key="i">
         <div class="gameBoard__item" v-for="j in levelChar" :key="j">
           <KeyInput
@@ -57,10 +57,10 @@
         <!-- <span class="timer" v-else>00:00</span> -->
       </div>
     </div>
-    <div class="gameBoard" v-else-if="api.status == 404">
+    <div class="gameBoard" v-else-if="apiQuestion.status == 404">
       <div class="gameBoard__status">
         <p>Pertanyaan tidak ditemukan, silakan coba lagi.</p>
-        <p><a class="button -active -default" href="">Kembali ke Beranda</a></p>
+        <p><a class="button -active -default" href="<%= BASE_URL %>">Kembali ke Beranda</a></p>
       </div>
     </div>
     <div class="gameBoard" v-else>
@@ -69,7 +69,7 @@
       </div>
     </div>
 
-    <div class="gameKey" v-if="api.status == 200">
+    <div class="gameKey" v-if="apiQuestion.status == 200">
       <div
         class="gameKey__row"
         v-for="(row, index) in keyBoardChar"
@@ -274,6 +274,7 @@
 </template>
 
 <script>
+import KJUR  from 'jsrsasign';
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import { gsap, Expo, Sine } from "gsap";
@@ -284,79 +285,80 @@ import Modal_compo from "@/components/Modal-compo.vue";
 export default {
   name: "Game_compo",
   components: {
-    // SimpleKeyboard,
-    // InputKeyboard,
     KeyInput,
     KeyBtn,
     Modal_compo,
   },
-  props: ["levelChar"],
+  props: ["levelChar","users"],
   emits: ["backHome"],
   data() {
     return {
-    /**
-     * We define the inputs here
-     */
-    key: 'G4mKatKit',
-    apiQuestion: {
-      url: 'https://play.kompas.com/api/kata_kita/question',
-      query: {},
-      status: ''
-    },
-    CryptoJSAesJson: {
-      stringify: function (cipherParams) {
-        var j = {ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)};
-        if (cipherParams.iv) j.iv = cipherParams.iv.toString();
-        if (cipherParams.salt) j.s = cipherParams.salt.toString();
-        return JSON.stringify(j).replace(/\s/g, '');
+      key: 'G4mKatKit',
+      apiAnswer: {
+        url: 'api/kata_kita/answer',
+        post: {},
+        token: {},
+        status: ''
       },
-      parse: function (jsonStr) {
-        var j = JSON.parse(jsonStr);
-        var cipherParams = CryptoJS.lib.CipherParams.create({ciphertext: CryptoJS.enc.Base64.parse(j.ct)});
-        if (j.iv) cipherParams.iv = CryptoJS.enc.Hex.parse(j.iv);
-        if (j.s) cipherParams.salt = CryptoJS.enc.Hex.parse(j.s);
-        return cipherParams;
-      }
-    },
-    audio: {
-      file: new Audio(require("@/assets/fx/beautifulrussia.mp3")),
-      isPlaying: false,
-    },
-    fx: {
-      tap: new Audio(require("@/assets/fx/tap.mp3")),
-      juggle: new Audio(require("@/assets/fx/jadi.mp3")),
-    },
-    showModal: false,
-    showResult: false,
-    userAns: false,
-    userRank: "90",
-    // key static
-    ansWord: [
-      { char: [] },
-      { char: [] },
-      { char: [] },
-      { char: [] },
-      { char: [] },
-      { char: [] },
-    ],
-    ansChance: 0,
-    ansChanceMax: 5,
-    ansScore: 0,
-    totalScore: 0,
-    ansTimer: 0,
-    ansTimerDisplay: "00:00",
-    ansTimerVar: Number,
-    ansSecVar: 300,
-    ansSecMax: 600,
-    ansScoreTemp: [],
-    keyPressFirst: 0,
-    keyBoardChar: [
-      { char: "qwertyuiop" },
-      { char: "asdfghjkl" },
-      { char: "zxcvbnm" },
-    ],
-    getQ: { decryptedTitle: "", decryptedDescription: "" },
-  }
+      apiQuestion: {
+        url: 'api/kata_kita/question',
+        query: {},
+        status: ''
+      },
+      CryptoJSAesJson: {
+        stringify: function (cipherParams) {
+          var j = {ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)};
+          if (cipherParams.iv) j.iv = cipherParams.iv.toString();
+          if (cipherParams.salt) j.s = cipherParams.salt.toString();
+          return JSON.stringify(j).replace(/\s/g, '');
+        },
+        parse: function (jsonStr) {
+          var j = JSON.parse(jsonStr);
+          var cipherParams = CryptoJS.lib.CipherParams.create({ciphertext: CryptoJS.enc.Base64.parse(j.ct)});
+          if (j.iv) cipherParams.iv = CryptoJS.enc.Hex.parse(j.iv);
+          if (j.s) cipherParams.salt = CryptoJS.enc.Hex.parse(j.s);
+          return cipherParams;
+        }
+      },
+      audio: {
+        file: new Audio(require("@/assets/fx/beautifulrussia.mp3")),
+        isPlaying: false,
+      },
+      fx: {
+        tap: new Audio(require("@/assets/fx/tap.mp3")),
+        juggle: new Audio(require("@/assets/fx/jadi.mp3")),
+      },
+      showModal: false,
+      showResult: false,
+      userAns: false,
+      userRank: "90",
+      // key static
+      ansWord: [
+        { char: [] },
+        { char: [] },
+        { char: [] },
+        { char: [] },
+        { char: [] },
+        { char: [] },
+      ],
+      ansChance: 0,
+      ansChanceMax: 5,
+      ansScore: 0,
+      totalScore: 0,
+      ansTimer: 0,
+      ansTimerDisplay: "00:00",
+      ansTimerVar: Number,
+      ansSecVar: 300,
+      ansSecMax: 600,
+      ansScoreTemp: [],
+      keyPressFirst: 0,
+      keyBoardChar: [
+        { char: "qwertyuiop" },
+        { char: "asdfghjkl" },
+        { char: "zxcvbnm" },
+      ],
+      getQ: { decryptedId: "", decryptedTitle: "", decryptedDescription: "" },
+    }
   },
   setup() {
     console.log(CryptoJS);
@@ -368,7 +370,7 @@ export default {
     window.removeEventListener("keydown", this.doCommand);
   },
   mounted() {
-    // console.log(this.levelChar)
+    console.log(process.env.VUE_APP_KEY)
     let _this = this
     if(this.levelChar>0) {
       _this.getQuestion()
@@ -377,7 +379,7 @@ export default {
   methods: {
     async getQuestion() {
         try {
-          const response = await axios.get(this.apiQuestion.url + '?level=' + this.levelChar);
+          const response = await axios.get(process.env.VUE_APP_API_URL + this.apiQuestion.url + '?level=' + this.levelChar);
           console.log(response);
           if (!response.ok) {
             const error = (response && response.message) || response.statusText;
@@ -388,7 +390,8 @@ export default {
           this.apiQuestion.query = response.data
           this.apiQuestion.status = response.status
 
-          this.getQ.decryptedTitle = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.title, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8))
+          this.getQ.decryptedId = this.apiQuestion.query.data.id
+          this.getQ.decryptedTitle = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.title, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).toLowerCase()
           this.getQ.decryptedDescription = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.description, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).replace(/&nbsp;/g, " ")
 
         } catch (error) {
@@ -396,6 +399,37 @@ export default {
           this.apiQuestion.status = error.response.status
         }
 
+    },
+
+    generateJWT() {
+      let sHeader = JSON.stringify({alg: 'HS256', typ: 'JWT'});
+      let sPayload = JSON.stringify({
+          "id_question": this.getQ.decryptedId,
+          "score": this.totalScore,
+          "playtime": this.ansTimer,
+          "kgid": this.users.kmpsid
+        });
+      let sJWT = KJUR.jws.JWS.sign("HS256", sHeader, sPayload, "NdRgUkXn2r5u8x/A?D(G+KbPeShVmYq3s6v9y$B&E)H@McQfTjWnZr4u7w!z%C*F");
+      return sJWT
+    },
+
+    // submit answer
+    async submitAnswer() {
+      let _this = this
+      const token = JSON.stringify({
+        "token": _this.generateJWT()
+      })
+      console.log(token)
+      const request = new Request(process.env.VUE_APP_API_URL + this.apiAnswer.url,
+        {
+          method: "POST",
+          body: token
+        }
+      );
+      const res = await fetch(request);
+      const data = await res.json();
+      this.apiAnswer.status = data;
+      console.log(this.apiAnswer.status)
     },
 
     //play music
@@ -600,7 +634,16 @@ export default {
         this.ansScore;
       this.totalScore = Math.round(this.totalScore);
       if (this.totalScore) {
-        valid = true;
+
+        this.apiAnswer.post = {
+          "id_question": this.getQ.decryptedId,
+          "score": this.totalScore,
+          "playtime": this.ansTimer,
+          "kgid": this.users.kmpsid
+        } 
+
+        // return _this.submitAnswer()
+        valid = _this.submitAnswer()
       }
 
       if (valid) {

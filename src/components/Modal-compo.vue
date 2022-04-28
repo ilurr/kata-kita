@@ -99,7 +99,7 @@ export default {
     color: var(--cl-black);
     min-height: 150px;
     max-height: 60vh;
-    overflow: scroll;
+    overflow-y: auto;
   }
   &-footer {
     padding: 14px 15px;

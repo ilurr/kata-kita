@@ -34,7 +34,7 @@
   <Menu_level @showGame="displayGame" v-if="showMenu" />
 
   <!-- <Game_compo :myGame="myGame" v-if="myGame" /> -->
-  <Game_compo :levelChar="levelChar" v-if="displayGameBoard" @backHome='backHome' />
+  <Game_compo :levelChar="levelChar" v-if="displayGameBoard" @backHome='backHome' :users="users" />
   <Scoreboard_compo v-if="displayScoreboard" :users="users" />
   <!-- <Scoreboard_compo /> -->
 
@@ -100,8 +100,8 @@ export default {
   },
   methods: {
     backHome() {
-      // window.location.href = 'https://dummy.kompas.com/repo/game-kompla-dist/'
-      window.location.href = window.location.origin
+      window.location.href = process.env.VUE_APP_BASE_URL
+      // window.location.href = window.location.origin
       console.log(window.location.origin)
     },
     getCookie(cname) {
@@ -133,6 +133,7 @@ export default {
           this.users.isLogged = false
         } else {
           this.users.data = response.data
+          this.users.kmpsid = this.getCookie('kmps_usrid')
           this.users.initial = response.data.first_name.substr(0,1).toUpperCase() + (response.data.last_name.length>0?response.data.last_name.substr(0,1).toUpperCase():'')
           this.users.isLogged = true
         }
@@ -146,12 +147,13 @@ export default {
     },
     displayGame(val) {
       this.levelChar = val;
-      gsap.to("#logo", 0.5, {
+      gsap.to("#logo", 0.25, {
         scale: 0,
         ease: Expo.easeIn,
       });
-      gsap.to("#lvlWrap", 0.5, {
-        x: 1000,
+      gsap.to("#lvlWrap", 0.25, {
+        y: 100,
+        opacity: 0,
         ease: Expo.easeIn,
         onComplete: () => {
           this.displayGameBoard = true;
@@ -162,15 +164,15 @@ export default {
           // });
         },
       });
-      gsap.to("#ftLogo", 0.5, {
+      gsap.to("#ftLogo", 0.25, {
         scale: 0,
         ease: Expo.easeIn,
       });
-      gsap.to("#btnback", 0.5, {
+      gsap.to("#btnback", 0.25, {
         display: 'none',
         ease: Expo.easeOut,
         onComplete: () => {
-          gsap.to("#btnhome", 0.5, {
+          gsap.to("#btnhome", 0.25, {
             display: 'block',
             ease: Expo.easeIn,
           });
@@ -228,6 +230,7 @@ export default {
     console.log("Before create");
   },
   created() {
+    this.baseurl = process.env.VUE_APP_API_URL
     console.log("Created"); //call data after component created
     this.answers = [
       { id: 1, guest: "marjan", time: 1000 },
@@ -356,6 +359,7 @@ body {
   overflow: hidden;
 }
 .button {
+  cursor: pointer;
   border: 0;
   border-radius: 3px;
   font-family: var(--font-parent);

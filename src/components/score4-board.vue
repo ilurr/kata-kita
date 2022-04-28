@@ -125,7 +125,7 @@ export default {
     padding: 0;
     margin: 0;
     max-height: calc(100% - 30px);
-    overflow: scroll;
+    overflow-y: auto;
   }
   &Item {
     margin-top: 14px;
