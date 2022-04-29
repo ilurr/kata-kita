@@ -205,25 +205,29 @@ export default {
       }
     },
     showScoreboard() {
-      gsap.to("#menuWrap", 0.5, {
-        scale: 0,
-        alpha: 0,
-        ease: Back.easeIn,
-        onComplete: () => {
-          this.displayScoreboard = true;
-          this.isHidden = true;
-        },
-      });
-      gsap.to("#logo", 0.5, {
-        scale: 0,
-        ease: Expo.easeIn,
-      });
-      gsap.to("#btnback", 0.5, {
-        display: "block",
-        ease: Expo.easeOut,
-      });
-      this.isBackActive = !this.isBackActive;
-      // console.log(this.userData);
+      if(!this.users.isLogged) {
+        window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_parent');
+      } else {
+        gsap.to("#menuWrap", 0.5, {
+          scale: 0,
+          alpha: 0,
+          ease: Back.easeIn,
+          onComplete: () => {
+            this.displayScoreboard = true;
+            this.isHidden = true;
+          },
+        });
+        gsap.to("#logo", 0.5, {
+          scale: 0,
+          ease: Expo.easeIn,
+        });
+        gsap.to("#btnback", 0.5, {
+          display: "block",
+          ease: Expo.easeOut,
+        });
+        this.isBackActive = !this.isBackActive;
+        // console.log(this.userData);
+      }
     },
   },
   beforeCreate() {

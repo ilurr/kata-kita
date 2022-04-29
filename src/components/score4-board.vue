@@ -1,7 +1,7 @@
 <template>
-  <div class="scoreContent__wrap" v-if="players.length">
+  <div class="scoreContent__wrap" v-if="apiRank.query.data.length">
     <div class="scoreContent__title">
-      Total <span class="playerCount">89.028</span> pemain
+      Total <span class="playerCount">{{ apiRank.query.total }}</span> pemain
     </div>
     <div class="playerUser -show align-center">
       <div class="align-center">
@@ -11,19 +11,19 @@
           <span><b>4 huruf</b></span>
         </div>
       </div>
-      <div class="playerUser__rank">#{{ userRank }}</div>
+      <div class="playerUser__rank">#{{ apiRank.query.myrank.position }}</div>
     </div>
     <ul class="playerList">
-      <li v-for="player in players" :key="player.id" class="playerItem">
+      <li v-for="(player, index) in apiRank.query.data" :key="index" class="playerItem">
         <div class="align-center">
-          <div class="playerRank">{{ player.rank }}</div>
+          <div class="playerRank">{{ index+1 }}</div>
           <div
             class="playerAva"
             :data-initial="player.initial"
-            :style="{ backgroundColor: randomColor(player.id) }"
+            :style="{ backgroundColor: randomColor(index) }"
           >
-            {{ player.ava }}
-            <div class="playerTop" v-if="player.id === 1">
+            <span class="playerInitial">{{ player.name.split(' ')[1] ? player.name.split(' ')[0].substr(0,1).toUpperCase() + '' + player.name.split(' ')[1].substr(0,1).toUpperCase() : player.name.split(' ')[0].substr(0,1).toUpperCase() }}</span>
+            <div class="playerTop" v-if="index === 0">
               <span class="playerTopIcon icon-crown"></span>
             </div>
           </div>
@@ -41,12 +41,23 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   props: [
     "users"
   ],
   data() {
     return {
+      ranks: {},
+      page: 1,
+      apiRank: {
+        url: 'api/kata_kita/score',
+        query: {
+          data: {}
+        },
+        status: ''
+      },
       players: [],
       user: "Ilma Akrimatunnisa",
       userAva: "IA",
@@ -55,45 +66,40 @@ export default {
       colorCache: {},
     }
   },
+  mounted() {
+    // let _this = this
+    if(this.users.kmpsid.length>0) {
+      this.getRank()
+    }
+  },
   methods: {
+    async getRank() {
+      try {
+        const response = await axios.get(process.env.VUE_APP_API_URL + this.apiRank.url + '?level=4&kgid=' + this.users.kmpsid + '&page=' + this.page);
+        console.log(response);
+        if (!response.ok) {
+          const error = (response && response.message) || response.statusText;
+          this.apiRank.status = error
+          // return Promise.reject(error);
+        }
+
+        this.apiRank.query = response.data
+        this.apiRank.status = response.status
+        console.log(this.apiRank.query);
+
+      } catch (error) {
+        console.log(error.response.status);
+        this.apiRank.status = error.response.status
+      }
+    },
     randomColor(id) {
       const r = () => Math.floor(256 * Math.random());
 
       return (
         this.colorCache[id] ||
-        (this.colorCache[id] = `rgb(${r()}, ${r()}, ${r()})`)
+        (this.colorCache[id] = `rgba(${r()}, ${r()}, ${r()}, .5)`)
       );
     },
-  },
-  created() {
-    this.players = [
-      {
-        rank: 1,
-        id: 1,
-        name: "Anggara Kusumaatmadja",
-        initial: "AK",
-        score: 1290,
-      },
-      { rank: 2, id: 2, name: "Andika Bayu", initial: "AB", score: 1290 },
-      { rank: 3, id: 3, name: "Nurdita Afifah", initial: "NA", score: 1290 },
-      { rank: 4, id: 4, name: "Nurhaman", initial: "N", score: 1290 },
-      {
-        rank: 5,
-        id: 5,
-        name: "Hendrawan Witjacksono",
-        initial: "HW",
-        score: 1290,
-      },
-      { rank: 6, id: 6, name: "Nabila Maulida", initial: "NM", score: 1290 },
-      {
-        rank: 7,
-        id: 7,
-        name: "Mohammad Khoirul Huda",
-        initial: "MKH",
-        score: 1290,
-      },
-      { rank: 8, id: 8, name: "Markus Wattimena", initial: "MW", score: 1290 },
-    ];
   }
 }
 </script>
@@ -173,6 +179,14 @@ export default {
       justify-content: center;
       color: #fff;
     }
+  }
+  &Initial {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
   }
   &Top {
     position: absolute;

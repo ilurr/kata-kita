@@ -157,12 +157,13 @@
                 height="52"
               />
               Skor total
-              <div class="modalGame__num">129 <span>+34</span></div>
+              <div class="modalGame__num">{{ userRank.scoreNow }}</div>
+              <!-- <span>{{ (parseInt(userRank.scoreNow) - parseInt(userRank.scoreLast)) }}</span> -->
             </div>
           </div>
           <div class="modalGame__rank align-center">
             Peringkat kamu pada {{ levelChar }} huruf
-            <div class="playerUser__rank">#{{ userRank }}</div>
+            <div class="playerUser__rank">{{ userRank.rankNow.length>0 ? '#'+ userRank.rankNow : '' }}</div>
           </div>
         </div>
       </template>
@@ -300,6 +301,13 @@ export default {
         token: {},
         status: ''
       },
+      apiMyRank: {
+        url: 'api/kata_kita/score',
+        query: {
+          myrank: {}
+        },
+        status: ''
+      },
       apiQuestion: {
         url: 'api/kata_kita/question',
         query: {},
@@ -331,7 +339,13 @@ export default {
       showModal: false,
       showResult: false,
       userAns: false,
-      userRank: "90",
+      userRank: {
+        rankNow: 0,
+        rankLast: 0,
+        scoreNow: 0,
+        scoreLast: 0,
+        status: ''
+      },
       // key static
       ansWord: [
         { char: [] },
@@ -374,9 +388,48 @@ export default {
     let _this = this
     if(this.levelChar>0) {
       _this.getQuestion()
+      _this.getRankBefore()
     }
   },
   methods: {
+    async getRankBefore() {
+      try {
+        const response = await axios.get(process.env.VUE_APP_API_URL + this.apiMyRank.url + '?level=' + this.levelChar + '&kgid=' + this.users.kmpsid + '&page=1');
+        console.log(response);
+        if (!response.ok) {
+          const error = (response && response.message) || response.statusText;
+          this.apiMyRank.status = error
+          // return Promise.reject(error);
+        }
+
+        this.userRank.scoreLast = response.data.myrank.score
+        this.userRank.rankLast = response.data.myrank.position
+        this.userRank.status = response.status
+
+      } catch (error) {
+        console.log(error.response.status);
+        this.userRank.status = error.response.status
+      }
+    },
+    async getRankAfter() {
+      try {
+        const response = await axios.get(process.env.VUE_APP_API_URL + this.apiMyRank.url + '?level=' + this.levelChar + '&kgid=' + this.users.kmpsid + '&page=1');
+        console.log(response);
+        if (!response.ok) {
+          const error = (response && response.message) || response.statusText;
+          this.apiMyRank.status = error
+          // return Promise.reject(error);
+        }
+
+        this.userRank.scoreNow = response.data.myrank.score
+        this.userRank.rankNow = response.data.myrank.position
+        this.userRank.status = response.status
+
+      } catch (error) {
+        console.log(error.response.status);
+        this.userRank.status = error.response.status
+      }
+    },
     async getQuestion() {
         try {
           const response = await axios.get(process.env.VUE_APP_API_URL + this.apiQuestion.url + '?level=' + this.levelChar);
@@ -590,6 +643,8 @@ export default {
 
     // display popup result, reset variables
     onGameOver() {
+      this.getRankAfter()
+
       // reset score
       this.ansScore = 0;
       this.ansChance = 0;
@@ -687,6 +742,11 @@ export default {
           _this.colorIt("inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1), ".keyBtn[keychar="+char+"]", "#000", "var(--cl-wrong)")
           for (let j = 0; j < _this.levelChar; j++) {
             if (soal[j] == char) {
+              // for (let k = 0; k < _this.ansScoreTemp.length; k++) {
+              //   if (char == _this.ansScoreTemp.substr(1,1)) {
+                  
+              //   }
+              // }
               // yellow
               _this.colorIt("inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1), ".keyBtn[keychar="+char+"]", "#fff", "var(--cl-almost)")
             }
