@@ -523,10 +523,11 @@ export default {
         localTimer++;
         let minutes = Math.floor(localTimer / 60);
         let seconds = localTimer - minutes * 60;
-        _this.ansTimerDisplay =
-          _this.str_pad(minutes, "0", 2) + ":" + _this.str_pad(seconds, "0", 2);
+        _this.ansTimerDisplay = _this.str_pad(minutes, "0", 2) + ":" + _this.str_pad(seconds, "0", 2);
         _this.ansTimer = localTimer;
-        // console.log(_this.ansTimer);
+        if(minutes>58) {
+          window.location.href = process.env.VUE_APP_BASE_URL
+        }
       }, 1000);
     },
 
