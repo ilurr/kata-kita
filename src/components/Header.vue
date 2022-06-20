@@ -1,5 +1,6 @@
 <template>
-  <div class="text-center" id="logoWrap">
+  <div class="headerTop" id="headerTop"></div>
+  <div class="logoWrap text-center" id="logoWrap">
     <img
       src="@/assets/logo.png"
       class="headerImg"
@@ -23,11 +24,37 @@ export default {
 <style lang="scss">
 .header {
   &Img {
-    margin-top: 12vh;
-    margin-bottom: 8vh;
-    max-width: 160px;
-    height: auto;
+    // margin-top: 12vh;
+    // margin-bottom: 8vh;
+    // max-width: 160px;
+    width: auto;
+    height: 130px;
     transform: scale(0) rotate(180deg);
+  }
+  &Top {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(@/assets/bg-home-top.png);
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: 250px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-25px);
+  }
+}
+.logo {
+  &Wrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-180%);
+    z-index: 1;
+    width: 100%;
   }
 }
 </style>

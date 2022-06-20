@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isHiddenLvl" id="lvlWrap">
+  <div v-if="!isHiddenLvl" id="lvlWrap" class="lvlWrap">
     <h2 class="text-center menuTitle" id="text1">Pilih Jumlah Huruf</h2>
     <ul class="listMenu">
       <li>
@@ -58,6 +58,14 @@ export default {
   line-height: 24px;
   color: var(--cl-white);
   margin-bottom: 27px;
+}
+.lvlWrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-20%);
+    z-index: 1;
+    width: 100%;
 }
 .buttonMenu {
   padding: 24px 30px;

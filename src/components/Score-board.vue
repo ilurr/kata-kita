@@ -1,5 +1,5 @@
 <template>
-  <div class="scoreWrap">
+  <div class="scoreWrap bgMain">
     <div class="scoreHead center-flex">
       <h2 class="scoreTitle" id="text2">Skor</h2>
       <div class="scoreHead__wrap">
@@ -151,7 +151,7 @@ export default {
     position: relative;
     margin-left: 15px;
     margin-right: 15px;
-    padding: 15px;
+    padding: 15px 10px;
     background: var(--cl-white);
     box-shadow: 0px 0px 10px rgba(51, 51, 51, 0.05);
     border-radius: 5px;
@@ -167,6 +167,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    z-index: 2;
   }
   &Head {
     margin-top: 30px;

@@ -5,7 +5,9 @@
     :keyChar="keyChar"
     @click="$emit('onKeyPress', $event.target, keyChar)"
   >
-    <span v-if="keyChar == 'delete'">
+    <span class="icon-enter" v-if="keyChar == 'enter'">
+    </span>
+    <span v-else-if="keyChar == 'delete'">
       <img
         src="@/assets/backspace.svg"
         alt=""
@@ -64,6 +66,7 @@ export default {
     }
     &.-delete {
       padding: 0 12px;
+      height: 34px;
     }
   }
 }

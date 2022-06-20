@@ -1,6 +1,6 @@
 <template>
   <!-- <p>Prop from child 1: {{ api }}</p> -->
-  <div class="gameWrap center-flex" id="gameWrap">
+  <div class="gameWrap bgMain center-flex" id="gameWrap">
     <div class="gameHead center-flex">
       <div class="gameHead__wrap">
         <button class="button buttonHead -help" @click="showModal = true">
@@ -13,7 +13,7 @@
             height="36"
           /> -->
         </button>
-        <button class="button buttonHead -active -audio" @click.prevent="audio.isPlaying ? pause(audio) : play(audio)">
+        <button class="button buttonHead -audio" :class="{'-active': audio.isPlaying}" @click.prevent="audio.isPlaying ? pause(audio) : play(audio)">
           <span class="buttonIcon icon-audio"></span>
           <!-- <img
             src="@/assets/sound.png"
@@ -35,51 +35,63 @@
       </button>
     </div>
 
-    <div class="gameBoard" v-if="apiQuestion.status == 200">
-      <div class="gameBoard__row" v-for="i in 6" :key="i">
-        <div class="gameBoard__item" v-for="j in levelChar" :key="j">
-          <KeyInput
-            :inputName="`inputAnswer_${i}_${j}`"
-            :inputValue="ansWord[`${i - 1}`].char[`${j - 1}`]"
-          >
-          </KeyInput>
+    <div class="gameBoard__wrapper">
+      <div class="gameBoard__toast">
+        <div id="gameToast" class="gameToast" :class="{'-active': toast.show}">
+          <div class="gameToast__wrapper">
+            <div class="gameToast__content">{{toast.msg}}</div>
+            <button class="button gameToast__close" @click="toast.show = false"><span class="icon-close"></span></button>
+          </div>
         </div>
       </div>
-      <div class="timerWrap">
-        <img
-          class="timerImg"
-          src="@/assets/ph_timer.png"
-          width="48"
-          height="48"
-          alt="Timer"
-        />
-        <span class="timer">{{ ansTimerDisplay }}</span>
-        <!-- <span class="timer" v-else>00:00</span> -->
+      <div class="gameBoard" v-if="apiQuestion.status == 200">
+        <div class="gameBoard__row" v-for="i in 6" :key="i">
+          <div class="gameBoard__item" v-for="j in levelChar" :key="j">
+            <KeyInput
+              :inputName="`inputAnswer_${i}_${j}`"
+              :inputValue="ansWord[`${i - 1}`].char[`${j - 1}`]"
+            >
+            </KeyInput>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="gameBoard" v-else-if="apiQuestion.status == 404">
-      <div class="gameBoard__status">
-        <p>Pertanyaan tidak ditemukan, silakan coba lagi.</p>
-        <p><a class="button -active -default" href="<%= BASE_URL %>">Kembali ke Beranda</a></p>
+      <div class="gameBoard" v-else-if="apiQuestion.status == 404">
+        <div class="gameBoard__status">
+          <p>Pertanyaan tidak ditemukan, silakan coba lagi.</p>
+          <p><a class="button -active -default" href="<%= BASE_URL %>">Kembali ke Beranda</a></p>
+        </div>
       </div>
-    </div>
-    <div class="gameBoard" v-else>
-      <div class="gameBoard__status">
-        <p>Silakan tunggu...</p>
+      <div class="gameBoard" v-else>
+        <div class="gameBoard__status">
+          <p>Silakan tunggu...</p>
+        </div>
       </div>
     </div>
 
     <div class="gameKey" v-if="apiQuestion.status == 200">
+      <div class="gameKey__top">
+        <div class="timerWrap">
+          <img
+            class="timerImg"
+            src="@/assets/ph_timer.png"
+            width="48"
+            height="48"
+            alt="Timer"
+          />
+          <span class="timer">{{ ansTimerDisplay }}</span>
+          <!-- <span class="timer" v-else>00:00</span> -->
+        </div>
+        <div class="gameKey__delete">
+          <KeyBtn @onKeyPress="onKeyPress" keyChar="delete" :isDelete="true">
+          </KeyBtn>
+        </div>
+      </div>
       <div
         class="gameKey__row"
         v-for="(row, index) in keyBoardChar"
         :id="[`keyBar_${index + 1}`]"
         :key="row"
       >
-        <div class="gameKey__item" v-if="index == 2">
-          <KeyBtn @onKeyPress="onEnterPress" keyChar="enter" :isEnter="true">
-          </KeyBtn>
-        </div>
         <div
           class="gameKey__item"
           v-for="item in splitChar(row.char)"
@@ -88,9 +100,11 @@
           <KeyBtn @onKeyPress="onKeyPress" :keyChar="item"> </KeyBtn>
         </div>
         <div class="gameKey__item" v-if="index == 2">
-          <KeyBtn @onKeyPress="onKeyPress" keyChar="delete" :isDelete="true">
+          <KeyBtn @onKeyPress="onEnterPress" keyChar="enter" :isEnter="true">
           </KeyBtn>
         </div>
+        <!-- <div class="gameKey__item" v-if="index == 2">
+        </div> -->
       </div>
     </div>
     <div class="gameKey" v-else>
@@ -157,8 +171,7 @@
                 height="52"
               />
               Skor total
-              <div class="modalGame__num">{{ userRank.scoreNow }}</div>
-              <!-- <span>{{ (parseInt(userRank.scoreNow) - parseInt(userRank.scoreLast)) }}</span> -->
+              <div class="modalGame__num">{{ userRank.scoreNow }}<span>+{{ totalScore }}</span></div>
             </div>
           </div>
           <div class="modalGame__rank align-center">
@@ -313,6 +326,11 @@ export default {
         query: {},
         status: ''
       },
+      apiKBBI: {
+        url: 'api/kata_kita/question',
+        query: {},
+        status: ''
+      },
       CryptoJSAesJson: {
         stringify: function (cipherParams) {
           var j = {ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)};
@@ -335,6 +353,10 @@ export default {
       fx: {
         tap: new Audio(require("@/assets/fx/tap.mp3")),
         juggle: new Audio(require("@/assets/fx/jadi.mp3")),
+      },
+      toast: {
+        show: false,
+        msg: ''
       },
       showModal: false,
       showResult: false,
@@ -402,9 +424,14 @@ export default {
           // return Promise.reject(error);
         }
 
-        this.userRank.scoreLast = response.data.myrank.score
-        this.userRank.rankLast = response.data.myrank.position
-        this.userRank.status = response.status
+        if(response.data.myrank) {
+          this.userRank.scoreLast = response.data.myrank.score
+          this.userRank.rankLast = response.data.myrank.position
+          this.userRank.status = response.status
+          if(this.userRank.rankLast == 0) {
+            this.showModal = true
+          }
+        }
 
       } catch (error) {
         console.log(error.response.status);
@@ -452,6 +479,31 @@ export default {
           this.apiQuestion.status = error.response.status
         }
 
+    },
+    getKBBI(answer) {
+      let _this = this;
+        axios.get(process.env.VUE_APP_API_URL + this.apiKBBI.url + '?title=' + answer.join('')).then((response) => {
+          this.apiKBBI.status = response.data.status
+          _this.checkTile(answer);
+        }).catch((error) => {
+          this.apiKBBI.status = error.response.status
+          _this.badgeShow('Kata tidak ada di dalam kamus!', true);
+        });
+
+        console.log(this.apiKBBI.status);
+    },
+
+    // badge 
+    badgeShow(msg, exp) {
+      let _this = this;
+      this.toast.show = true
+      this.toast.msg = msg
+      _this.animateZoom(document.getElementById("gameToast"))
+      if(exp) {
+        setTimeout(() => {
+          this.toast.show = false
+        }, 3500);
+      }
     },
 
     generateJWT() {
@@ -595,7 +647,8 @@ export default {
         _this.animateJuggle()
 
         if (this.ansWord[this.ansChance].char.length == this.levelChar) {
-          _this.checkTile(this.ansWord[this.ansChance].char);
+          // _this.checkTile(this.ansWord[this.ansChance].char);
+          _this.getKBBI(this.ansWord[this.ansChance].char);
         } else {
           console.log("Ada yang kosong kotaknya");
         }
@@ -790,7 +843,17 @@ export default {
   &Board {
     position: relative;
     padding: 0;
-    min-height: 363px;
+    min-height: 310px;
+    &__wrapper {
+      position: relative;
+      // min-height: 350px;
+    }
+    &__toast {
+      position: relative;
+      min-height: 50px;
+      padding: 2px 10px;
+      will-change: transform;
+    }
     &__row {
       position: relative;
       display: flex;
@@ -809,15 +872,67 @@ export default {
       margin: 0 auto;
     }
   }
+  &Toast {
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+    height: 40px;
+    background: #fff;
+    visibility: hidden;
+    opacity: 0;
+    will-change: transform;
+    transition: all .2s ease;
+    &.-active {
+      opacity: 1;
+      visibility: visible;
+    }
+    &__wrapper {
+      padding: 0;
+      position: relative;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-left: 5px solid var(--cl-almost);
+    }
+    &__content {
+      font-weight: 400;
+      font-size: 14px;
+      flex-basis: 0;
+      flex-grow: 1;
+      padding: 0 10px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      max-height: 20px;
+      -webkit-line-clamp: 1;
+      text-overflow: ellipsis;
+      overflow-wrap: break-word;
+      min-width: 140px;
+    }
+    &__close {
+      width: 40px;
+      height: 40px;
+      flex-basis: 40px;
+      flex-grow: 0;
+    }
+  }
   &Wrap {
     position: absolute;
     top: 0;
     width: 100%;
     height: calc(100% - 56px);
+    // background-repeat: repeat-x;
+    // background-position: top center;
+    // background-size: auto 100%;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    z-index: 2;
     // transform: scale(0);
+    & > * {
+      z-index: 2;
+    }
   }
   &Head {
     // margin-top: 40px;
@@ -825,7 +940,7 @@ export default {
     justify-content: space-between;
     width: 100%;
     &__wrap {
-      padding: 15px;
+      padding: 10px 15px;
       display: flex;
       gap: 10px;
       justify-content: flex-start;
@@ -847,6 +962,18 @@ export default {
       will-change: transform;
       position: relative;
     }
+    &__top {
+      position: relative;
+      margin: 10px 0;
+      display: flex;
+      // width: 100vw;
+      // padding: 0 20px;
+      justify-content: space-between;
+      align-items: center;
+    }
+    &__delete {
+      position: relative;
+    }
   }
 }
 
@@ -861,8 +988,13 @@ export default {
     justify-content: center;
     background: #fff;
     // border-radius: 4px;
-    &.-audio {
-      border: transparent
+    &.-active {
+      &.-audio {
+        border: transparent;
+        .icon-audio {
+          background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.72.55a.5.5 0 0 0-.527.055L3.828 4H1a1.001 1.001 0 0 0-1 1v4a1.001 1.001 0 0 0 1 1h2.828l4.365 3.395A.5.5 0 0 0 9 13V1a.5.5 0 0 0-.28-.45ZM8 11.979 4.307 9.105A.5.5 0 0 0 4 9H1V5h3a.5.5 0 0 0 .307-.105L8 2.022v9.956ZM11.498 5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 1 0Zm2-1v5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 1 0Z' fill='%23fff'/%3E%3C/svg%3E");
+        }
+      }
     }
     .buttonIcon {
       margin-right: 0;
@@ -901,7 +1033,6 @@ export default {
 
 .timer {
   &Wrap {
-    margin: 15px;
     font-size: 14px;
     color: var(--cl-white);
     text-align: center;
@@ -998,6 +1129,7 @@ export default {
       span {
         position: relative;
         top: -8px;
+        left: 5px;
         font-size: 18px;
         line-height: 24px;
         color: var(--cl-main);
