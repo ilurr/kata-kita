@@ -53,6 +53,9 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    @media screen and (max-height: 650px) {
+      height: 38px;
+    }
     & > span {
       display: block;
       pointer-events: none;

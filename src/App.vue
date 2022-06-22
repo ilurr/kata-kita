@@ -187,11 +187,11 @@ export default {
       if(!this.users.isLogged) {
         window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_parent');
       } else {
-        gsap.to("#headerTop", 0.5, {
-          y: -90,
-          scale: 0.8,
-          ease: Expo.easeOut,
-        });
+        // gsap.to("#headerTop", 0.5, {
+        //   y: -90,
+        //   scale: 0.8,
+        //   ease: Expo.easeOut,
+        // });
         gsap.to("#logo", 0.5, {
           scale: 1,
           ease: Expo.easeOut,
@@ -264,9 +264,9 @@ export default {
     this.getUsers();
     console.log("Mounted");
     gsap.to("#headerTop", 0.5, {
-      y: -25,
-      delay: 1.2,
-      opacity: 1,
+      y: -20,
+      delay: 0.2,
+      //opacity: 1,
       ease: Expo.easeOut,
     });
     gsap.to("#logo", 0.5, {
@@ -286,22 +286,22 @@ export default {
       scale: 1,
       rotation: 0,
       ease: Back.easeOut,
-      delay: 0.2,
+      delay: 0.6,
       onComplete: () => {
         gsap.to("#logo", 0.5, {
           scale: 0.7,
-          y: 30,
+          y: -140,
           ease: Expo.easeIn,
         });
         gsap.to("#btnstart", 0.5, {
           scale: 1,
           ease: Back.easeOut,
-          delay: 0.2,
+          delay: 0.6,
         });
         gsap.to("#btnscore", 0.5, {
           scale: 1,
           ease: Back.easeOut,
-          delay: 0.4,
+          delay: 0.8,
         });
       },
     });

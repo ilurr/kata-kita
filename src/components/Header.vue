@@ -43,8 +43,8 @@ export default {
     background-position: top center;
     background-size: 250px;
     pointer-events: none;
-    opacity: 0;
-    transform: translateY(-25px);
+    //opacity: 0;
+    transform: translate(0,-20%);
   }
 }
 .logo {
@@ -52,7 +52,7 @@ export default {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-180%);
+    transform: translate(-50%,-50%);
     z-index: 1;
     width: 100%;
   }

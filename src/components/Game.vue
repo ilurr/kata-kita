@@ -844,6 +844,9 @@ export default {
     position: relative;
     padding: 0;
     min-height: 310px;
+    @media screen and (max-height: 650px) {
+      min-height: 295px;
+    }
     &__wrapper {
       position: relative;
       // min-height: 350px;
@@ -944,6 +947,9 @@ export default {
       display: flex;
       gap: 10px;
       justify-content: flex-start;
+      @media screen and (max-height: 650px) {
+        padding: 5px 15px;
+      }
     }
   }
   &Key {
