@@ -56,6 +56,10 @@ export default {
     @media screen and (max-height: 650px) {
       height: 38px;
     }
+    @media screen and (max-height: 500px) {
+      height: 35px;
+      min-width: 26px;
+    }
     & > span {
       display: block;
       pointer-events: none;

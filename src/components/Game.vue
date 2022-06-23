@@ -285,6 +285,41 @@
     </Modal_compo>
   </Teleport>
   <!-- e: modal help -->
+
+  <!-- s: modal error -->
+  <Teleport to="body">
+    <Modal_compo :show="showError" @close="showError = false">
+      <template #header>
+        <div class="modalHead center-flex">
+          <h3 class="modalTitle">Error</h3>
+        </div>
+      </template>
+      <template #body>
+        <div class="modalGame__body">
+          <p>
+            {{ showErrorMsg }}
+          </p>
+          <p>
+            Jika Anda tetap mengalami hal yang sama berulang kali, kontak pengembang game.
+          </p>
+        </div>
+      </template>
+      <template #footer>
+        <div class="modalGame__footer">
+          <button class="button buttonSecondary" @click="$emit('backHome')">
+            <img
+              src="@/assets/icon-close.png"
+              class="modalIcon"
+              alt=""
+              width="15"
+              height="15"
+            />Tutup 
+          </button>
+        </div>
+      </template>
+    </Modal_compo>
+  </Teleport>
+  <!-- e: modal error -->
 </template>
 
 <script>
@@ -353,11 +388,14 @@ export default {
       fx: {
         tap: new Audio(require("@/assets/fx/tap.mp3")),
         juggle: new Audio(require("@/assets/fx/jadi.mp3")),
+        wrong: new Audio(require("@/assets/fx/wrong.mp3")),
       },
       toast: {
         show: false,
         msg: ''
       },
+      showError: false,
+      showErrorMsg: '',
       showModal: false,
       showResult: false,
       userAns: false,
@@ -414,50 +452,62 @@ export default {
     }
   },
   methods: {
-    async getRankBefore() {
-      try {
-        const response = await axios.get(process.env.VUE_APP_API_URL + this.apiMyRank.url + '?level=' + this.levelChar + '&kgid=' + this.users.kmpsid + '&page=1');
-        console.log(response);
-        if (!response.ok) {
-          const error = (response && response.message) || response.statusText;
-          this.apiMyRank.status = error
-          // return Promise.reject(error);
-        }
-
-        if(response.data.myrank) {
-          this.userRank.scoreLast = response.data.myrank.score
-          this.userRank.rankLast = response.data.myrank.position
-          this.userRank.status = response.status
-          if(this.userRank.rankLast == 0) {
+    getRankBefore() {
+      // let _this = this;
+        axios.get(process.env.VUE_APP_API_URL + this.apiMyRank.url + '?level=' + this.levelChar + '&kgid=' + this.users.kmpsid).then((response) => {
+          this.apiMyRank.status = response.data.status
+          if(response.data.myrank) {
+            this.userRank.scoreLast = response.data.myrank.score
+            this.userRank.rankLast = response.data.myrank.position
+          } else {
             this.showModal = true
           }
-        }
-
-      } catch (error) {
-        console.log(error.response.status);
-        this.userRank.status = error.response.status
-      }
+        }).catch((error) => {
+          this.userRank.status = error.response.status
+          this.apiMyRank.status = error.response.status
+        });
+        console.log(this.apiMyRank.status);
     },
-    async getRankAfter() {
-      try {
-        const response = await axios.get(process.env.VUE_APP_API_URL + this.apiMyRank.url + '?level=' + this.levelChar + '&kgid=' + this.users.kmpsid + '&page=1');
-        console.log(response);
-        if (!response.ok) {
-          const error = (response && response.message) || response.statusText;
-          this.apiMyRank.status = error
-          // return Promise.reject(error);
-        }
-
-        this.userRank.scoreNow = response.data.myrank.score
-        this.userRank.rankNow = response.data.myrank.position
-        this.userRank.status = response.status
-
-      } catch (error) {
-        console.log(error.response.status);
-        this.userRank.status = error.response.status
-      }
+    getRankAfter() {
+      let ermsg = 'Terdapat kesalahan sistem dalam memproses jawaban Anda, silakan refresh halaman ini.'
+      let _this = this;
+        axios.get(process.env.VUE_APP_API_URL + this.apiMyRank.url + '?level=' + this.levelChar + '&kgid=' + this.users.kmpsid).then((response) => {
+          this.apiMyRank.status = response.data.status
+          if(response.data.myrank) {
+            this.userRank.scoreNow = response.data.myrank.score
+            this.userRank.rankNow = response.data.myrank.position
+          } else {
+            _this.modalError(ermsg);
+          }
+        }).catch((error) => {
+          _this.modalError(ermsg);
+          this.userRank.status = error.response.status
+          this.apiMyRank.status = error.response.status
+        });
+        console.log(this.apiMyRank.status);
     },
-    async getQuestion() {
+    getQuestion() {
+      let ermsg = 'Terdapat kesalahan sistem dalam memuat pertanyaan, silakan refresh halaman ini.'
+      let _this = this;
+        axios.get(process.env.VUE_APP_API_URL + this.apiQuestion.url + '?level=' + this.levelChar).then((response) => {
+          this.apiQuestion.status = response.data.status
+          if(response.data) {
+            this.apiQuestion.query = response.data
+            this.apiQuestion.status = response.status
+
+            this.getQ.decryptedId = this.apiQuestion.query.data.id
+            this.getQ.decryptedTitle = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.title, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).toLowerCase()
+            this.getQ.decryptedDescription = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.description, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).replace(/&nbsp;/g, " ")
+          } else {
+            _this.modalError(ermsg);
+          }
+        }).catch((error) => {
+          _this.modalError(ermsg);
+          this.apiQuestion.status = error.response.status
+        });
+        console.log(this.apiQuestion);
+    },
+    async getQuestion_() {
         try {
           const response = await axios.get(process.env.VUE_APP_API_URL + this.apiQuestion.url + '?level=' + this.levelChar);
           console.log(response);
@@ -484,17 +534,24 @@ export default {
       let _this = this;
         axios.get(process.env.VUE_APP_API_URL + this.apiKBBI.url + '?title=' + answer.join('')).then((response) => {
           this.apiKBBI.status = response.data.status
+          _this.animateJuggle()
           _this.checkTile(answer);
         }).catch((error) => {
           this.apiKBBI.status = error.response.status
-          _this.badgeShow('Kata tidak ada di dalam kamus!', true);
+          _this.animateShake()
+          _this.toastShow('Kata tidak ada di dalam kamus!', true);
         });
 
         console.log(this.apiKBBI.status);
     },
 
-    // badge 
-    badgeShow(msg, exp) {
+    modalError(msg) {
+      this.showError = true
+      this.showErrorMsg = msg
+    },
+
+    // toast 
+    toastShow(msg, exp) {
       let _this = this;
       this.toast.show = true
       this.toast.msg = msg
@@ -502,7 +559,7 @@ export default {
       if(exp) {
         setTimeout(() => {
           this.toast.show = false
-        }, 3500);
+        }, 3000);
       }
     },
 
@@ -621,7 +678,7 @@ export default {
           document.querySelector(".keyBtn[keychar=delete]").focus();
         } else if(e.keyCode == 13) {
           _this.onEnterPress(document.querySelector(".keyBtn[keychar=enter]"))
-          document.querySelector(".keyBtn[keychar=enter]").focus();
+          //document.querySelector(".keyBtn[keychar=enter]").focus();
         } else {
           for(let u=0;u<this.keyBoardChar.length;u++) {
             this.keyBoardChar[u].char.split('').map(function(char){
@@ -644,12 +701,12 @@ export default {
 
       if (this.ansChance <= this.ansChanceMax) {
 
-        _this.animateJuggle()
-
         if (this.ansWord[this.ansChance].char.length == this.levelChar) {
           // _this.checkTile(this.ansWord[this.ansChance].char);
           _this.getKBBI(this.ansWord[this.ansChance].char);
         } else {
+          _this.animateJuggle()
+          _this.toastShow('Huruf kurang lengkap!', true);
           console.log("Ada yang kosong kotaknya");
         }
       } else {
@@ -667,6 +724,27 @@ export default {
         ease: Expo.easeOut,
         delay: 0.1
       });
+    },
+
+    animateShake() {
+      let _this = this
+
+      _this.playFx(this.fx.wrong)
+
+      // gsap.fromTo(document.getElementById(
+      //     "inputAnswer_" + (this.ansChance + 1) + "_1"
+      //   ).parentElement.parentElement, 0.3, {x:-10}, {x:10, ease:Bounce, clearProps:"x"})
+
+      gsap.fromTo(document.getElementById(
+          "inputAnswer_" + (this.ansChance + 1) + "_1"
+        ).parentElement.parentElement, 0.01, {x:-5}, {x:5, clearProps:"x", repeat:20})
+
+      // gsap.to(document.getElementById(
+      //     "inputAnswer_" + (this.ansChance + 1) + "_1"
+      //   ).parentElement.parentElement, 0.1, {x:"+=5", yoyo:true, repeat:5});
+      // gsap.to(document.getElementById(
+      //     "inputAnswer_" + (this.ansChance + 1) + "_1"
+      //   ).parentElement.parentElement, 0.1, {x:"-=5", yoyo:true, repeat:4});
     },
 
     animateJuggle() {
@@ -847,6 +925,9 @@ export default {
     @media screen and (max-height: 650px) {
       min-height: 295px;
     }
+    @media screen and (max-height: 500px) {
+      min-height: 235px;
+    }
     &__wrapper {
       position: relative;
       // min-height: 350px;
@@ -856,11 +937,15 @@ export default {
       min-height: 50px;
       padding: 2px 10px;
       will-change: transform;
+      @media screen and (max-height: 500px) {
+        min-height: 38px;
+      }
     }
     &__row {
       position: relative;
       display: flex;
       justify-content: center;
+      will-change: transform;
     }
     &__item {
       position: relative;
@@ -885,6 +970,9 @@ export default {
     opacity: 0;
     will-change: transform;
     transition: all .2s ease;
+    @media screen and (max-height: 500px) {
+      height: 34px;
+    }
     &.-active {
       opacity: 1;
       visibility: visible;
@@ -917,6 +1005,9 @@ export default {
       height: 40px;
       flex-basis: 40px;
       flex-grow: 0;
+      @media screen and (max-height: 500px) {
+        height: 34px;
+      }
     }
   }
   &Wrap {
@@ -976,6 +1067,9 @@ export default {
       // padding: 0 20px;
       justify-content: space-between;
       align-items: center;
+      @media screen and (max-height: 500px) {
+        margin: 5px 0 2px;
+      }
     }
     &__delete {
       position: relative;
@@ -994,6 +1088,10 @@ export default {
     justify-content: center;
     background: #fff;
     // border-radius: 4px;
+    @media screen and (max-height: 500px) {
+      width: 35px;
+      height: 35px;
+    }
     &.-active {
       &.-audio {
         border: transparent;

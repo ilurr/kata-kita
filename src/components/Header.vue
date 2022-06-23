@@ -30,6 +30,9 @@ export default {
     width: auto;
     height: 130px;
     transform: scale(0) rotate(180deg);
+    @media screen and (max-height: 500px) {
+      height: 100px;
+    }
   }
   &Top {
     position: absolute;

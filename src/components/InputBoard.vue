@@ -41,6 +41,10 @@ export default {
     @media screen and (max-height: 650px) {
       height: 45px;
     }
+    @media screen and (max-height: 500px) {
+      height: 35px;
+      width: 35px;
+    }
   }
 }
 </style>

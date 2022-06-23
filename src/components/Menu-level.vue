@@ -66,9 +66,15 @@ export default {
     transform: translate(-50%,-20%);
     z-index: 1;
     width: 100%;
+    @media screen and (max-height: 500px) {
+      transform: translate(-50%,-30%);
+    }
 }
 .buttonMenu {
   padding: 24px 30px;
+  @media screen and (max-height: 500px) {
+    padding: 15px 20px;
+  }
   &__lvl {
     text-align: left;
     display: flex;
