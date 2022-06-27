@@ -345,7 +345,7 @@
         </div>
 
         <div class="modalShare__list align-center">
-          <button class="button buttonSecondary buttonShare">
+          <button class="button buttonSecondary buttonShare" @click="shareLink('twitter')">
             <img
               src="@/assets/share-tw.png"
               class="modalShare__icon"
@@ -354,7 +354,7 @@
               height="16"
             />Twitter
           </button>
-          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas(false)">
             <img
               src="@/assets/share-ig.png"
               class="modalShare__icon"
@@ -363,7 +363,7 @@
               height="16"
             />Instagram
           </button>
-          <button class="button buttonSecondary buttonShare">
+          <button class="button buttonSecondary buttonShare" @click="shareLink('facebook')">
             <img
               src="@/assets/share-fb.png"
               class="modalShare__icon"
@@ -372,7 +372,7 @@
               height="16"
             />Facebook
           </button>
-          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas(true)">
             <img
               src="@/assets/share-save.png"
               class="modalShare__icon"
@@ -483,7 +483,8 @@ export default {
       userAns: false,
       userRank: {
         template: {
-          score: process.env.VUE_APP_BASE_URL+'asset/bg-skor.png'
+          // score: process.env.VUE_APP_BASE_URL+'asset/bg-skor.png'
+          score: 'https://i.ibb.co/x8NGB3Y/bg-skor.png'
         },
         rankNow: 0,
         rankLast: 0,
@@ -500,6 +501,15 @@ export default {
         { char: [] },
         { char: [] },
       ],
+      ansEmoji: [
+        { emoji: [] },
+        { emoji: [] },
+        { emoji: [] },
+        { emoji: [] },
+        { emoji: [] },
+        { emoji: [] },
+      ],
+      shareTxt: '',
       ansChance: 0,
       ansChanceMax: 5,
       ansScore: 0,
@@ -677,6 +687,10 @@ export default {
       const data = await res.json();
       this.apiAnswer.status = data;
       console.log(this.apiAnswer.status)
+      if(data) {
+        _this.getRankAfter()
+        _this.initCanvas()
+      }
     },
 
     //play music
@@ -760,16 +774,16 @@ export default {
         // console.log(e.keyCode)
         if(e.keyCode == 8) {
           _this.onKeyPress(document.querySelector(".keyBtn[keychar=delete]"), 'delete')
-          document.querySelector(".keyBtn[keychar=delete]").focus();
+          // document.querySelector(".keyBtn[keychar=delete]").focus();
         } else if(e.keyCode == 13) {
           _this.onEnterPress(document.querySelector(".keyBtn[keychar=enter]"))
-          //document.querySelector(".keyBtn[keychar=enter]").focus();
+          //document.querySelector(".keyBtn[keychar=enter]").focus(); // bugs twice call function
         } else {
           for(let u=0;u<this.keyBoardChar.length;u++) {
             this.keyBoardChar[u].char.split('').map(function(char){
               if(cmd == char) {
                 _this.onKeyPress(document.querySelector(".keyBtn[keychar="+cmd+"]"), cmd)
-                document.querySelector(".keyBtn[keychar="+cmd+"]").focus();
+                // document.querySelector(".keyBtn[keychar="+cmd+"]").focus();
               }
             });
           }
@@ -816,20 +830,9 @@ export default {
 
       _this.playFx(this.fx.wrong)
 
-      // gsap.fromTo(document.getElementById(
-      //     "inputAnswer_" + (this.ansChance + 1) + "_1"
-      //   ).parentElement.parentElement, 0.3, {x:-10}, {x:10, ease:Bounce, clearProps:"x"})
-
       gsap.fromTo(document.getElementById(
           "inputAnswer_" + (this.ansChance + 1) + "_1"
         ).parentElement.parentElement, 0.01, {x:-5}, {x:5, clearProps:"x", repeat:20})
-
-      // gsap.to(document.getElementById(
-      //     "inputAnswer_" + (this.ansChance + 1) + "_1"
-      //   ).parentElement.parentElement, 0.1, {x:"+=5", yoyo:true, repeat:5});
-      // gsap.to(document.getElementById(
-      //     "inputAnswer_" + (this.ansChance + 1) + "_1"
-      //   ).parentElement.parentElement, 0.1, {x:"-=5", yoyo:true, repeat:4});
     },
 
     animateJuggle() {
@@ -860,8 +863,9 @@ export default {
 
     // display popup result, reset variables
     onGameOver() {
-      this.getRankAfter()
-      this.initCanvas()
+      // this.getRankAfter()
+      // this.initCanvas()
+      this.generateText()
 
       // reset score
       this.ansScore = 0;
@@ -871,6 +875,9 @@ export default {
       this.ansWord.map(function (item) {
         item.char = [];
       });
+      // this.ansEmoji.map(function (item) {
+      //   item.emoji = [];
+      // });
       document
         .querySelectorAll(".inputTxt")
         .forEach((e) => e.removeAttribute("style"));
@@ -954,23 +961,23 @@ export default {
           // green
           _this.colorIt("inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1), ".keyBtn[keychar="+char+"]", "#fff", "var(--cl-correct)")
           _this.tempScore(index + char);
+          _this.ansEmoji[_this.ansChance].emoji.push('c')
           localScore++;
         } else {
           // grey
           _this.colorIt("inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1), ".keyBtn[keychar="+char+"]", "#000", "var(--cl-wrong)")
+          _this.ansEmoji[_this.ansChance].emoji.push('w')
           for (let j = 0; j < _this.levelChar; j++) {
             if (soal[j] == char) {
-              // for (let k = 0; k < _this.ansScoreTemp.length; k++) {
-              //   if (char == _this.ansScoreTemp.substr(1,1)) {
-                  
-              //   }
-              // }
               // yellow
               _this.colorIt("inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1), ".keyBtn[keychar="+char+"]", "#fff", "var(--cl-almost)")
+              _this.ansEmoji[_this.ansChance].emoji.pop()
+              _this.ansEmoji[_this.ansChance].emoji.push('a')
             }
           }
         }
       });
+      console.log(this.ansEmoji)
 
       // overall chance
       this.ansChance++;
@@ -990,6 +997,39 @@ export default {
         _this.finalScore();
       }
 
+    },
+
+    generateText() {
+      this.shareTxt = 'Kata Kita '+(this.ansChance>5?'X':this.ansChance)+'/6\n\n'
+      for(let i=0; i<this.ansChance; i++) {
+        if(this.ansEmoji[i].emoji.length>0) {
+          for(let j=0; j<this.ansEmoji[i].emoji.length; j++) {
+            if(this.ansEmoji[i].emoji[j]=='c') {
+              this.shareTxt += "🟩";
+            } else if(this.ansEmoji[i].emoji[j]=='a') {
+              this.shareTxt += "🟨";
+            } else {
+              this.shareTxt += "⬜️";
+            }            
+          }
+          this.shareTxt += '\n'
+        }
+        // this.shareTxt += i+'\n'
+      }
+      this.shareTxt += '\n'+ process.env.VUE_APP_BASE_URL
+      console.log(this.shareTxt)
+    },
+
+    shareLink(sosmed) {
+      const encodeURI = this.shareTxt.replace(/\n/g, "%0A");
+      if(sosmed=='twitter') {
+        const shareToTwitter = `https://twitter.com/intent/tweet?text=${encodeURI}`;
+        window.open(shareToTwitter, "_blank");
+      }
+      if(sosmed=='facebook') {
+        const shareToFacebook = `https://www.facebook.com/sharer/sharer.php?u=`+process.env.VUE_APP_BASE_URL;
+        window.open(shareToFacebook, "_blank");
+      }
     },
 
     initCanvas() {
@@ -1045,36 +1085,41 @@ export default {
       images.src = this.userRank.template.score;
       images.setAttribute('crossorigin', 'anonymous'); // works for me
     },
-    downloadCanvas() {
+    downloadCanvas(save) {
       let filesArray
       let url = document.getElementById('gameCanvas').toDataURL();
-      fetch(url)
-        .then(function (response) {
-            return response.blob()
-        })
-        .then(function (blob) {
-            let file = new File([blob], "kata-kita-score.jpg", {
-                type: 'image/jpeg'
-            });
-            filesArray = [file];
-
-            if (navigator.canShare && navigator.canShare({
-                files: filesArray
-            })) {
-                navigator.share({
-                    text: process.env.VUE_APP_DESC,
-                    files: filesArray,
-                    title: process.env.VUE_APP_TITLE,
-                    url: process.env.VUE_APP_BASE_URL
-                });
-            } else {
-              let tab = window.open('about:blank', '_blank');
-              tab.document.write('<img src="'+url+'"/>');
-            }
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
+      if(save) {
+        fetch(url)
+          .then(function (response) {
+              return response.blob()
+          })
+          .then(function (blob) {
+              let file = new File([blob], "kata-kita-score.jpg", {
+                  type: 'image/jpeg'
+              });
+              filesArray = [file];
+  
+              if (navigator.canShare && navigator.canShare({
+                  files: filesArray
+              })) {
+                  navigator.share({
+                      text: process.env.VUE_APP_DESC+' '+process.env.VUE_APP_BASE_URL,
+                      files: filesArray,
+                      title: process.env.VUE_APP_TITLE,
+                      url: process.env.VUE_APP_BASE_URL
+                  });
+              } else {
+                let tab = window.open('about:blank', '_blank');
+                tab.document.write('<img src="'+url+'"/>');
+              }
+          })
+          .catch(function (error) {
+              console.log(error);
+          });
+      } else {
+        let tab = window.open('about:blank', '_blank');
+        tab.document.write('<img src="'+url+'"/>');
+      }
     },
 
   },

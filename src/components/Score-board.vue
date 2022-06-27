@@ -63,16 +63,16 @@
         </div>
 
         <div class="modalShare__list align-center">
-          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas(false)">
             <img
-              src="@/assets/share-ig.png"
+              src="@/assets/icon-share.png"
               class="modalShare__icon"
               alt=""
-              width="17"
+              width="15"
               height="16"
-            />Instagram
+            />Bagikan
           </button>
-          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas(true)">
             <img
               src="@/assets/share-save.png"
               class="modalShare__icon"
@@ -170,7 +170,8 @@ export default {
       },
       userRank: {
         template: {
-          rank: process.env.VUE_APP_BASE_URL+'asset/bg-rank.png'
+          // rank: process.env.VUE_APP_BASE_URL+'asset/bg-rank.png'
+          rank: 'https://i.ibb.co/ggn04dF/bg-rank.png'
         },
         name: '',
         rankNow: {
@@ -258,36 +259,42 @@ export default {
       //   context.drawImage(images, 0, 0);
       // });
     },
-    downloadCanvas() {
+    downloadCanvas(save) {
       let filesArray
       let url = document.getElementById('rankCanvas').toDataURL();
-      fetch(url)
-        .then(function (response) {
-            return response.blob()
-        })
-        .then(function (blob) {
-            let file = new File([blob], "kata-kita-rank.jpg", {
-                type: 'image/jpeg'
-            });
-            filesArray = [file];
+      if(save) {
+        fetch(url)
+          .then(function (response) {
+              return response.blob()
+          })
+          .then(function (blob) {
+              let file = new File([blob], "kata-kita-rank.jpg", {
+                  type: 'image/jpeg'
+              });
+              filesArray = [file];
+  
+              if (navigator.canShare && navigator.canShare({
+                  files: filesArray
+              })) {
+                  navigator.share({
+                      text: process.env.VUE_APP_DESC+' '+process.env.VUE_APP_BASE_URL,
+                      files: filesArray,
+                      title: process.env.VUE_APP_TITLE,
+                      url: process.env.VUE_APP_BASE_URL
+                  });
+              } else {
+                let tab = window.open('about:blank', '_blank');
+                tab.document.write('<img src="'+url+'"/>');
+              }
+          })
+          .catch(function (error) {
+              console.log(error);
+          });
+      } else {
+        let tab = window.open('about:blank', '_blank');
+        tab.document.write('<img src="'+url+'"/>');
+      }
 
-            if (navigator.canShare && navigator.canShare({
-                files: filesArray
-            })) {
-                navigator.share({
-                    text: process.env.VUE_APP_DESC,
-                    files: filesArray,
-                    title: process.env.VUE_APP_TITLE,
-                    url: process.env.VUE_APP_BASE_URL
-                });
-            } else {
-              let tab = window.open('about:blank', '_blank');
-              tab.document.write('<img src="'+url+'"/>');
-            }
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
     },
     getRankAfter(lvl) {
       let ermsg = 'Terdapat kesalahan sistem dalam memproses jawaban Anda, silakan refresh halaman ini.'
