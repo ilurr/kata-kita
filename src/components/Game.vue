@@ -1,9 +1,10 @@
 <template>
   <!-- <p>Prop from child 1: {{ api }}</p> -->
   <div class="gameWrap bgMain center-flex" id="gameWrap">
+    <canvas class="gameCanvas" id="gameCanvas" width="330" height="587"></canvas>
     <div class="gameHead center-flex">
       <div class="gameHead__wrap">
-        <button class="button buttonHead -help" @click="showModal = true">
+        <button class="button buttonHead -help" @click="showHelp = true">
           <span class="buttonIcon icon-help"></span>
           <!-- <img
             src="@/assets/help.png"
@@ -176,7 +177,7 @@
           </div>
           <div class="modalGame__rank align-center">
             Peringkat kamu pada {{ levelChar }} huruf
-            <div class="playerUser__rank">{{ userRank.rankNow.length>0 ? '#'+ userRank.rankNow : '' }}</div>
+            <div class="modalGame__userRank">{{ userRank.rankNow.length>0 ? '#'+ userRank.rankNow : '' }}</div>
           </div>
         </div>
       </template>
@@ -193,7 +194,7 @@
             />Kembali ke Beranda
           </button>
           <!-- </button> -->
-          <button class="button buttonGame__share">
+          <button class="button buttonGame__share" @click="showShare = true">
             <img
               src="@/assets/icon-share.png"
               alt="Bagikan"
@@ -209,7 +210,7 @@
 
   <!-- s: modal help -->
   <Teleport to="body">
-    <Modal_compo :show="showModal" @close="showModal = false">
+    <Modal_compo :show="showHelp" @close="showHelp = false">
       <template #header>
         <div class="modalHead center-flex">
           <h3 class="modalTitle">Cara Bermain</h3>
@@ -271,7 +272,7 @@
       </template>
       <template #footer>
         <div class="modalGame__footer">
-          <button class="button buttonSecondary" @click="showModal = false">
+          <button class="button buttonSecondary" @click="showHelp = false">
             <img
               src="@/assets/icon-close.png"
               class="modalIcon"
@@ -320,6 +321,86 @@
     </Modal_compo>
   </Teleport>
   <!-- e: modal error -->
+
+  <!-- s: modal share -->
+  <Teleport to="body">
+    <!-- use the modal component, pass in the prop -->
+    <Modal_compo :show="showShare" @close="showShare = false">
+      <template #header>
+        <div class="modalHead align-center">
+          <h3 class="modalTitle">Bagikan ke</h3>
+          <img
+            src="@/assets/icon-share.png"
+            class="modalShare__icon"
+            alt=""
+            width="25"
+            height="28"
+          />
+        </div>
+      </template>
+      <template #body>
+        <div class="modalShare__content">
+          Ayo bagikan progres permainanmu. <br />
+          Tantang teman untuk adu skor.
+        </div>
+
+        <div class="modalShare__list align-center">
+          <button class="button buttonSecondary buttonShare">
+            <img
+              src="@/assets/share-tw.png"
+              class="modalShare__icon"
+              alt=""
+              width="19"
+              height="16"
+            />Twitter
+          </button>
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
+            <img
+              src="@/assets/share-ig.png"
+              class="modalShare__icon"
+              alt=""
+              width="17"
+              height="16"
+            />Instagram
+          </button>
+          <button class="button buttonSecondary buttonShare">
+            <img
+              src="@/assets/share-fb.png"
+              class="modalShare__icon"
+              alt=""
+              width="17"
+              height="16"
+            />Facebook
+          </button>
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
+            <img
+              src="@/assets/share-save.png"
+              class="modalShare__icon"
+              alt=""
+              width="16"
+              height="16"
+            />Simpan Gambar
+          </button>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="modalShare__footer">
+          <button class="button buttonSecondary" @click="showShare = false">
+            <img
+              src="@/assets/icon-close.png"
+              class="modalIcon"
+              alt=""
+              width="15"
+              height="15"
+            />Tutup 
+          </button>
+        </div>
+      </template>
+    </Modal_compo>
+  </Teleport>
+  <!-- e: modal share -->
+
 </template>
 
 <script>
@@ -396,10 +477,14 @@ export default {
       },
       showError: false,
       showErrorMsg: '',
-      showModal: false,
+      showHelp: false,
+      showShare: false,
       showResult: false,
       userAns: false,
       userRank: {
+        template: {
+          score: process.env.VUE_APP_BASE_URL+'asset/bg-skor.png'
+        },
         rankNow: 0,
         rankLast: 0,
         scoreNow: 0,
@@ -460,7 +545,7 @@ export default {
             this.userRank.scoreLast = response.data.myrank.score
             this.userRank.rankLast = response.data.myrank.position
           } else {
-            this.showModal = true
+            this.showHelp = true
           }
         }).catch((error) => {
           this.userRank.status = error.response.status
@@ -776,6 +861,7 @@ export default {
     // display popup result, reset variables
     onGameOver() {
       this.getRankAfter()
+      this.initCanvas()
 
       // reset score
       this.ansScore = 0;
@@ -905,6 +991,92 @@ export default {
       }
 
     },
+
+    initCanvas() {
+      let _this = this
+      let images
+      let canvas = document.getElementById('gameCanvas');
+      let context = canvas.getContext('2d');
+
+      images = new Image();
+      images.onload = function () {
+        context.drawImage(images, 0, 0);
+
+        // initial
+        context.font = "500 20px Roboto Slab";
+        context.fillStyle = "#fff";
+        context.textAlign = "center";
+        context.fillText(_this.users.initial.toUpperCase(), 90, 188);
+
+        // name
+        context.font = "700 16px Mukta";
+        context.fillStyle = "#fff";
+        context.textAlign = "left";
+        context.fillText((_this.users.data.first_name+(_this.users.data.last_name.length>0?' '+_this.users.data.last_name:'')), 134, 176);
+
+        //score text
+        context.font = "700 16px Mukta";
+        context.fillStyle = "#333333";
+        context.textAlign = "left";
+        context.fillText(_this.levelChar+" huruf", 165, 414);
+
+        //score
+        context.font = "500 28px Roboto Slab";
+        context.fillStyle = "#ff512f";
+        context.textAlign = "right";
+        context.fillText((_this.userRank.rankLast.length>0?"#"+_this.userRank.rankLast:'-'), 303, 418);
+
+        context.font = "500 32px Roboto Slab";
+        context.fillStyle = "#333333";
+        context.textAlign = "center";
+        context.fillText(_this.totalScore, 82, 355);
+
+        context.font = "500 32px Roboto Slab";
+        context.fillStyle = "#333333";
+        context.textAlign = "left";
+        context.fillText(_this.userRank.scoreNow, 190, 355);
+
+        context.font = "500 18px Roboto Slab";
+        context.fillStyle = "#ff512f";
+        context.textAlign = "left";
+        context.fillText("+"+_this.totalScore, 266, 345);
+
+      };
+      images.src = this.userRank.template.score;
+      images.setAttribute('crossorigin', 'anonymous'); // works for me
+    },
+    downloadCanvas() {
+      let filesArray
+      let url = document.getElementById('gameCanvas').toDataURL();
+      fetch(url)
+        .then(function (response) {
+            return response.blob()
+        })
+        .then(function (blob) {
+            let file = new File([blob], "kata-kita-score.jpg", {
+                type: 'image/jpeg'
+            });
+            filesArray = [file];
+
+            if (navigator.canShare && navigator.canShare({
+                files: filesArray
+            })) {
+                navigator.share({
+                    text: process.env.VUE_APP_DESC,
+                    files: filesArray,
+                    title: process.env.VUE_APP_TITLE,
+                    url: process.env.VUE_APP_BASE_URL
+                });
+            } else {
+              let tab = window.open('about:blank', '_blank');
+              tab.document.write('<img src="'+url+'"/>');
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    },
+
   },
 };
 </script>
@@ -918,11 +1090,17 @@ export default {
 }
 
 .game {
+  &Canvas {
+    position: absolute;
+    // z-index: 9;
+    visibility: hidden;
+    opacity: 0;
+  }
   &Board {
     position: relative;
     padding: 0;
     min-height: 310px;
-    @media screen and (max-height: 650px) {
+    @media screen and (max-height: 670px) {
       min-height: 295px;
     }
     @media screen and (max-height: 500px) {
@@ -1024,6 +1202,9 @@ export default {
     padding-bottom: 20px;
     z-index: 2;
     // transform: scale(0);
+    @media screen and (max-height: 500px) {
+      height: calc(100% - 0px);
+    }
     & > * {
       z-index: 2;
     }
@@ -1038,7 +1219,7 @@ export default {
       display: flex;
       gap: 10px;
       justify-content: flex-start;
-      @media screen and (max-height: 650px) {
+      @media screen and (max-height: 670px) {
         padding: 5px 15px;
       }
     }
@@ -1150,39 +1331,12 @@ export default {
 }
 .modal {
   &Game {
-    &__body {
-      position: relative;
-      background: #fafafa;
-      // margin-left: -20px;
-      // margin-right: -20px;
-      // margin-bottom: 50px;
-      padding: 1px 15px;
-      // max-height: 250px;
-      // overflow: scroll;
-      p {
-        margin-top: 10px;
-        margin-bottom: 10px;
-      }
-    }
     &__explained {
       position: relative;
       padding: 5px 0 0;
       &:deep(p) {
         margin: 5px 0;
       }
-    }
-    &__footer {
-      position: relative;
-      // position: absolute;
-      // bottom: 0;
-      // left: 0;
-      // padding: 14px 15px;
-      // width: calc(100% - 30px);
-      justify-content: space-between;
-      background: var(--cl-white);
-      border-bottom-left-radius: 10px;
-      border-bottom-right-radius: 10px;
-      // box-shadow: 0px -5px 10px rgba(51, 51, 51, 0.05);
     }
     &__verb {
       color: var(--cl-main);
@@ -1192,9 +1346,6 @@ export default {
       position: relative;
       top: -4px;
       font-size: 10px;
-    }
-    &__icon {
-      margin-right: 10px;
     }
     &__result {
       flex-wrap: wrap;
@@ -1221,6 +1372,11 @@ export default {
       border-radius: 5px;
       justify-content: space-between;
       margin-bottom: 20px;
+    }
+    &__userRank {
+      font-family: var(--font-parent);
+      font-size: 30px;
+      color: var(--cl-main);
     }
     &__img {
       display: block;

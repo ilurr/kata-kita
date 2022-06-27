@@ -97,7 +97,7 @@ export default {
     font-size: 16px;
     line-height: 24px;
     color: var(--cl-black);
-    min-height: 150px;
+    min-height: 128px;
     max-height: 60vh;
     overflow-y: auto;
   }
@@ -118,6 +118,27 @@ export default {
     font-size: 18px;
     line-height: 24px;
     margin: 5px 0;
+  }
+  &Game {
+    &__icon {
+      margin-right: 10px;
+    }
+    &__body {
+      position: relative;
+      background: #fafafa;
+      padding: 1px 15px;
+      p {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+    }
+    &__footer {
+      position: relative;
+      justify-content: space-between;
+      background: var(--cl-white);
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
   }
   &Share {
     &__content {

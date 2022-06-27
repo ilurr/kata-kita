@@ -1,5 +1,6 @@
 <template>
   <div class="scoreWrap bgMain">
+    <canvas class="rankCanvas" id="rankCanvas" width="330" height="587"></canvas>
     <div class="scoreHead center-flex">
       <h2 class="scoreTitle" id="text2">Skor</h2>
       <div class="scoreHead__wrap">
@@ -62,16 +63,7 @@
         </div>
 
         <div class="modalShare__list align-center">
-          <button class="buttonSecondary buttonShare">
-            <img
-              src="@/assets/share-tw.png"
-              class="modalShare__icon"
-              alt=""
-              width="19"
-              height="16"
-            />Twitter
-          </button>
-          <button class="buttonSecondary buttonShare">
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
             <img
               src="@/assets/share-ig.png"
               class="modalShare__icon"
@@ -80,16 +72,7 @@
               height="16"
             />Instagram
           </button>
-          <button class="buttonSecondary buttonShare">
-            <img
-              src="@/assets/share-fb.png"
-              class="modalShare__icon"
-              alt=""
-              width="17"
-              height="16"
-            />Facebook
-          </button>
-          <button class="buttonSecondary buttonShare">
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
             <img
               src="@/assets/share-save.png"
               class="modalShare__icon"
@@ -104,15 +87,57 @@
       <template #footer>
         <div class="modalShare__footer">
           <button class="button buttonSecondary" @click="showModal = false">
-            Tutup
+            <img
+              src="@/assets/icon-close.png"
+              class="modalIcon"
+              alt=""
+              width="15"
+              height="15"
+            />Tutup 
           </button>
         </div>
       </template>
     </Modal_compo>
   </Teleport>
+
+  <!-- s: modal error -->
+  <Teleport to="body">
+    <Modal_compo :show="showError" @close="showError = false">
+      <template #header>
+        <div class="modalHead center-flex">
+          <h3 class="modalTitle">Error</h3>
+        </div>
+      </template>
+      <template #body>
+        <div class="modalGame__body">
+          <p>
+            {{ showErrorMsg }}
+          </p>
+          <p>
+            Jika Anda tetap mengalami hal yang sama berulang kali, kontak pengembang game.
+          </p>
+        </div>
+      </template>
+      <template #footer>
+        <div class="modalGame__footer center-flex">
+          <button class="button buttonPrimary" @click="$emit('backHome')">
+            <img
+              src="@/assets/icon-home-white.png"
+              class="modalGame__icon"
+              alt=""
+              width="18"
+              height="18"
+            />Kembali ke Beranda
+          </button>
+        </div>
+      </template>
+    </Modal_compo>
+  </Teleport>
+  <!-- e: modal error -->
 </template>
 
 <script>
+import axios from 'axios';
 import Modal_compo from "@/components/Modal-compo.vue";
 import score4_compo from "@/components/score4-board.vue";
 import score5_compo from "@/components/score5-board.vue";
@@ -128,11 +153,33 @@ export default {
   props: [
     "users"
   ],
+  emits: ["backHome"],
   data() {
     return {
       showModal: false,
       currentTab: "score4_compo",
       tabs: [],
+      showError: false,
+      showErrorMsg: '',
+      apiMyRank: {
+        url: 'api/kata_kita/score',
+        query: {
+          myrank: {}
+        },
+        status: ''
+      },
+      userRank: {
+        template: {
+          rank: process.env.VUE_APP_BASE_URL+'asset/bg-rank.png'
+        },
+        name: '',
+        rankNow: {
+          level4: '',
+          level5: '',
+          level6: ''
+        },
+        status: ''
+      },
     };
   },
   created() {
@@ -142,10 +189,152 @@ export default {
       { id: 3, tabname: "score6_compo", text: "6" },
     ];
   },
+  mounted() {
+    // let _this = this
+    if(this.users.kmpsid.length>0) {
+      this.getRankAfter(4)
+      this.getRankAfter(5)
+      this.getRankAfter(6)
+      this.initCanvas()
+    }
+  },
+  methods: {
+    initCanvas() {
+      let _this = this
+      let images
+      let canvas = document.getElementById('rankCanvas');
+      let context = canvas.getContext('2d');
+
+      images = new Image();
+      images.onload = function () {
+        context.drawImage(images, 0, 0);
+
+        // initial
+        context.font = "500 45px Roboto Slab";
+        context.fillStyle = "#fff";
+        context.textAlign = "center";
+        context.fillText(_this.users.initial.toUpperCase(), 165, 225);
+
+        // name
+        context.font = "700 16px Mukta";
+        context.fillStyle = "#333333";
+        context.textAlign = "center";
+        context.fillText((_this.users.data.first_name+(_this.users.data.last_name.length>0?' '+_this.users.data.last_name:'')), 165, 296);
+
+        // score txt
+        context.font = "400 16px Mukta";
+        context.fillStyle = "#333333";
+        context.textAlign = "left";
+        context.fillText("Tantangan 4 huruf", 40, 375);
+        context.font = "400 16px Mukta";
+        context.fillStyle = "#333333";
+        context.textAlign = "left";
+        context.fillText("Tantangan 5 huruf", 40, 425);
+        context.font = "400 16px Mukta";
+        context.fillStyle = "#333333";
+        context.textAlign = "left";
+        context.fillText("Tantangan 6 huruf", 40, 475);
+
+        // rank
+        context.font = "500 28px Roboto Slab";
+        context.fillStyle = "#ff512f";
+        context.textAlign = "right";
+        context.fillText((_this.userRank.rankNow.level4.length>0?"#"+_this.userRank.rankNow.level4:'-'), 290, 380);
+
+        context.font = "500 28px Roboto Slab";
+        context.fillStyle = "#ff512f";
+        context.textAlign = "right";
+        context.fillText((_this.userRank.rankNow.level5.length>0?"#"+_this.userRank.rankNow.level5:'-'), 290, 430);
+
+        context.font = "500 28px Roboto Slab";
+        context.fillStyle = "#ff512f";
+        context.textAlign = "right";
+        context.fillText((_this.userRank.rankNow.level6.length>0?"#"+_this.userRank.rankNow.level6:'-'), 290, 480);
+      };
+      images.src = this.userRank.template.rank;
+      images.setAttribute('crossorigin', 'anonymous'); // works for me
+
+      // _this.loadImages(this.userRank.template, function (images) {
+      //   context.drawImage(images, 0, 0);
+      // });
+    },
+    downloadCanvas() {
+      let filesArray
+      let url = document.getElementById('rankCanvas').toDataURL();
+      fetch(url)
+        .then(function (response) {
+            return response.blob()
+        })
+        .then(function (blob) {
+            let file = new File([blob], "kata-kita-rank.jpg", {
+                type: 'image/jpeg'
+            });
+            filesArray = [file];
+
+            if (navigator.canShare && navigator.canShare({
+                files: filesArray
+            })) {
+                navigator.share({
+                    text: process.env.VUE_APP_DESC,
+                    files: filesArray,
+                    title: process.env.VUE_APP_TITLE,
+                    url: process.env.VUE_APP_BASE_URL
+                });
+            } else {
+              let tab = window.open('about:blank', '_blank');
+              tab.document.write('<img src="'+url+'"/>');
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    },
+    getRankAfter(lvl) {
+      let ermsg = 'Terdapat kesalahan sistem dalam memproses jawaban Anda, silakan refresh halaman ini.'
+      let _this = this;
+        axios.get(process.env.VUE_APP_API_URL + this.apiMyRank.url + '?level=' + lvl + '&kgid=' + this.users.kmpsid).then((response) => {
+          if(response.data.myrank) {
+            // this.userRank.rankNow.push({
+            //   'level': lvl,
+            //   'position': response.data.myrank.position
+            // })
+            if(lvl==4) {
+              this.userRank.rankNow.level4 = response.data.myrank.position
+            }
+            if(lvl==5) {
+              this.userRank.rankNow.level5 = response.data.myrank.position
+            }
+            if(lvl==6) {
+              this.userRank.rankNow.level6 = response.data.myrank.position
+            }
+            this.userRank.name = response.data.myrank.name
+          } else {
+            console.log(lvl+' kosong')
+            // _this.modalError(ermsg);
+          }
+        }).catch((error) => {
+          _this.modalError(ermsg);
+          this.userRank.status = error.response.status
+        });
+        console.log(this.userRank);
+    },
+    modalError(msg) {
+      this.showError = true
+      this.showErrorMsg = msg
+    },
+  }
 };
 </script>
 
 <style scoped lang="scss">
+.rank {
+  &Canvas {
+    position: absolute;
+    // z-index: 9;
+    visibility: hidden;
+    opacity: 0;
+  }
+}
 .score {
   &Content {
     position: relative;

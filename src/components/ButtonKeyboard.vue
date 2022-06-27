@@ -57,8 +57,8 @@ export default {
       height: 38px;
     }
     @media screen and (max-height: 500px) {
-      height: 35px;
-      min-width: 26px;
+      height: 30px;
+      min-width: 25px;
     }
     & > span {
       display: block;
@@ -74,6 +74,9 @@ export default {
     &.-delete {
       padding: 0 12px;
       height: 34px;
+      @media screen and (max-height: 500px) {
+        height: 26px;
+      }
     }
   }
 }
