@@ -4,7 +4,7 @@
     <div class="scoreHead center-flex">
       <h2 class="scoreTitle" id="text2">Skor</h2>
       <div class="scoreHead__wrap">
-        <button class="button" id="show-modal" @click="showModal = true">
+        <button class="button" id="show-modal" @click="showShare = true">
           <img
             src="@/assets/share.png"
             class="scoreHead__img"
@@ -43,7 +43,7 @@
 
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->
-    <Modal_compo :show="showModal" @close="showModal = false">
+    <Modal_compo :show="showShare" @close="showShare = false">
       <template #header>
         <div class="modalHead align-center">
           <h3 class="modalTitle">Bagikan ke</h3>
@@ -63,7 +63,7 @@
         </div>
 
         <div class="modalShare__list align-center">
-          <button class="button buttonSecondary buttonShare" @click="downloadCanvas(false)">
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
             <img
               src="@/assets/icon-share.png"
               class="modalShare__icon"
@@ -72,7 +72,7 @@
               height="16"
             />Bagikan
           </button>
-          <button class="button buttonSecondary buttonShare" @click="downloadCanvas(true)">
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
             <img
               src="@/assets/share-save.png"
               class="modalShare__icon"
@@ -86,7 +86,7 @@
 
       <template #footer>
         <div class="modalShare__footer">
-          <button class="button buttonSecondary" @click="showModal = false">
+          <button class="button buttonSecondary" @click="showShare = false">
             <img
               src="@/assets/icon-close.png"
               class="modalIcon"
@@ -156,7 +156,7 @@ export default {
   emits: ["backHome"],
   data() {
     return {
-      showModal: false,
+      showShare: false,
       currentTab: "score4_compo",
       tabs: [],
       showError: false,
@@ -196,7 +196,6 @@ export default {
       this.getRankAfter(4)
       this.getRankAfter(5)
       this.getRankAfter(6)
-      this.initCanvas()
     }
   },
   methods: {
@@ -257,10 +256,10 @@ export default {
       img.src = this.userRank.template.rank;
       img.setAttribute('crossorigin', 'anonymous'); // works for me
     },
-    downloadCanvas(save) {
+    downloadCanvas() {
       let filesArray
       let url = document.getElementById('rankCanvas').toDataURL();
-      if(save==true) {
+      // if(save==true) {
         fetch(url)
           .then(function (response) {
               return response.blob()
@@ -288,10 +287,10 @@ export default {
           .catch(function (error) {
               console.log(error);
           });
-      } else {
-        let tab = window.open('about:blank', '_blank');
-        tab.document.write('<img src="'+url+'" style="height: 100%"/>');
-      }
+      // } else {
+      //   let tab = window.open('about:blank', '_blank');
+      //   tab.document.write('<img src="'+url+'" style="height: 100%"/>');
+      // }
 
     },
     getRankAfter(lvl) {
@@ -316,6 +315,9 @@ export default {
           } else {
             console.log(lvl+' kosong')
             // _this.modalError(ermsg);
+          }
+          if(lvl==6) {
+            _this.initCanvas()
           }
         }).catch((error) => {
           _this.modalError(ermsg);

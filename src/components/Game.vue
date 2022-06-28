@@ -25,15 +25,17 @@
           /> -->
         </button>
       </div>
-      <button class="button buttonClue">
-        <img
-          src="@/assets/icon-clue.png"
-          class="buttonIcon"
-          alt=""
-          width="14"
-          height="14"
-        />Contekan (3x)
-      </button>
+      <div class="gameHead__wrap">
+        <button class="button buttonClue">
+          <img
+            src="@/assets/icon-clue.png"
+            class="gameHead__img"
+            alt=""
+            width="16"
+            height="16"
+          />Contekan (3x)
+        </button>
+      </div>
     </div>
 
     <div class="gameBoard__wrapper">
@@ -354,7 +356,7 @@
               height="16"
             />Twitter
           </button>
-          <button class="button buttonSecondary buttonShare" @click="downloadCanvas(false)">
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
             <img
               src="@/assets/share-ig.png"
               class="modalShare__icon"
@@ -372,7 +374,7 @@
               height="16"
             />Facebook
           </button>
-          <button class="button buttonSecondary buttonShare" @click="downloadCanvas(true)">
+          <button class="button buttonSecondary buttonShare" @click="downloadCanvas()">
             <img
               src="@/assets/share-save.png"
               class="modalShare__icon"
@@ -571,6 +573,7 @@ export default {
           if(response.data.myrank) {
             this.userRank.scoreNow = response.data.myrank.score
             this.userRank.rankNow = response.data.myrank.position
+            _this.initCanvas()
           } else {
             _this.modalError(ermsg);
           }
@@ -689,7 +692,7 @@ export default {
       console.log(this.apiAnswer.status)
       if(data) {
         _this.getRankAfter()
-        _this.initCanvas()
+        // _this.initCanvas()
       }
     },
 
@@ -1000,7 +1003,7 @@ export default {
     },
 
     generateText() {
-      this.shareTxt = 'Kata Kita '+(this.ansChance>5?'X':this.ansChance)+'/6\n\n'
+      this.shareTxt = 'Kata Kita '+(this.userAns?this.ansChance:'X')+'/6\n\n'
       for(let i=0; i<this.ansChance; i++) {
         if(this.ansEmoji[i].emoji.length>0) {
           for(let j=0; j<this.ansEmoji[i].emoji.length; j++) {
@@ -1087,10 +1090,10 @@ export default {
       img.src = this.userRank.template.score;
       img.setAttribute('crossorigin', 'anonymous'); // works for me
     },
-    downloadCanvas(save) {
+    downloadCanvas() {
       let filesArray
       let url = document.getElementById('gameCanvas').toDataURL();
-      if(save==true) {
+      // if(save==true) {
         fetch(url)
           .then(function (response) {
               return response.blob()
@@ -1118,10 +1121,10 @@ export default {
           .catch(function (error) {
               console.log(error);
           });
-      } else {
-        let tab = window.open('about:blank', '_blank');
-        tab.document.write('<img src="'+url+'" style="height: 100%"/>');
-      }
+      // } else {
+      //   let tab = window.open('about:blank', '_blank');
+      //   tab.document.write('<img src="'+url+'" style="height: 100%"/>');
+      // }
     },
 
   },
@@ -1272,6 +1275,10 @@ export default {
         padding: 5px 15px;
       }
     }
+    &__img {
+      vertical-align: middle;
+      margin-right: 7px;
+    }
   }
   &Key {
     position: relative;
@@ -1309,8 +1316,8 @@ export default {
 
 .button {
   &Head {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     border: 1px solid #ED543A;
     display: flex;
@@ -1319,8 +1326,8 @@ export default {
     background: #fff;
     // border-radius: 4px;
     @media screen and (max-height: 500px) {
-      width: 35px;
-      height: 35px;
+      width: 34px;
+      height: 34px;
     }
     &.-active {
       &.-audio {
@@ -1337,14 +1344,14 @@ export default {
     }
   }
   &Clue {
-    margin-left: 15px;
-    margin-right: 15px;
+    // margin-left: 15px;
+    // margin-right: 15px;
     background: var(--cl-white);
     border-radius: 3px;
-    padding: 8px 12px;
+    padding: 7px 12px;
     font-family: var(--font-child);
     font-weight: 700;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 20px;
     color: var(--cl-main);
     border: 1px solid var(--cl-main);

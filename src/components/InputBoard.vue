@@ -23,7 +23,7 @@ export default {
 .input {
   &Txt {
     width: 40px;
-    height: 48px;
+    height: 46px;
     color: #454545;
     background-color: var(--cl-white);
     margin: 2px;
