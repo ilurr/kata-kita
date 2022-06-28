@@ -36,7 +36,44 @@
   <Game_compo :levelChar="levelChar" v-if="displayGameBoard" @backHome='backHome' :users="users" />
   <Scoreboard_compo v-if="displayScoreboard" :users="users" />
 
-  <Footer_compo :isBackActive="isBackActive" @backHome='backHome' />
+  <Footer_compo :isBackActive="isBackActive" @backHome='backHome' @isLeave='isLeave' />
+
+  <!-- s: modal leave -->
+  <Teleport to="body">
+    <Modal_compo :show="showLeave" @close="showLeave = false">
+      <template #header>
+        <div class="modalHead align-center">
+          <h3 class="modalTitle">Meninggalkan Permainan</h3>
+          <img
+            src="@/assets/icon-clue.png"
+            class="modalShare__icon"
+            alt=""
+            width="25"
+            height="25"
+          />
+        </div>
+      </template>
+      <template #body>
+        <div class="modalGame__body">
+          <p>
+            Apakah Anda yakin ingin meninggalkan permainan? <span style="font-weight: 700">Progres Anda akan hilang</span>.
+          </p>
+        </div>
+      </template>
+      <template #footer>
+        <div class="modalGame__footer">
+          <button class="button buttonPrimary" @click="showLeave = false">
+            Batal 
+          </button>
+          <button class="button buttonSecondary" @click="backHome()">
+            Ya, Saya Yakin 
+          </button>
+        </div>
+      </template>
+    </Modal_compo>
+  </Teleport>
+  <!-- e: modal leave -->
+
 </template>
 
 <script>
@@ -47,6 +84,7 @@ import Menu_level from "@/components/Menu-level.vue";
 import Game_compo from "@/components/Game.vue";
 import Scoreboard_compo from "@/components/Score-board.vue";
 import Footer_compo from "@/components/Footer.vue";
+import Modal_compo from "@/components/Modal-compo.vue";
 
 export default {
   name: "App",
@@ -56,6 +94,7 @@ export default {
     Game_compo,
     Scoreboard_compo,
     Footer_compo,
+    Modal_compo,
   },
   data() {
     return {
@@ -64,6 +103,7 @@ export default {
         error: '',
         isLogged: false,
       },
+      showLeave: false,
       showMenu: false,
       isHidden: false,
       myGame: null,
@@ -81,7 +121,14 @@ export default {
     };
   },
   methods: {
+    isLeave() {
+      this.showLeave = true
+    },
     backHome() {
+      // if(this.isLeave) {
+      //   this.displayLeave = true
+      // } else {
+      //   }
       window.location.href = process.env.VUE_APP_BASE_URL
       // window.location.href = window.location.origin
       console.log(window.location.origin)
@@ -430,7 +477,7 @@ body {
     );
     border: 1px solid transparent;
     border-radius: 3px;
-    padding: 12px 10px;
+    padding: 9px 10px;
     width: 100%;
   }
   &Secondary {
@@ -442,7 +489,7 @@ body {
     background: var(--cl-white);
     border: 1px solid var(--cl-main);
     border-radius: 3px;
-    padding: 12px 10px;
+    padding: 9px 10px;
     width: 100%;
   }
   &Share {

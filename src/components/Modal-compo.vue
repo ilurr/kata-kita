@@ -97,7 +97,8 @@ export default {
     font-size: 16px;
     line-height: 24px;
     color: var(--cl-black);
-    min-height: 128px;
+    background: #fafafa;
+    min-height: 80px;
     max-height: 60vh;
     overflow-y: auto;
   }
@@ -138,6 +139,8 @@ export default {
       background: var(--cl-white);
       border-bottom-left-radius: 10px;
       border-bottom-right-radius: 10px;
+      display: flex;
+      gap: 5px;
     }
   }
   &Share {

@@ -182,7 +182,7 @@
         </div>
       </template>
       <template #footer>
-        <div class="modalGame__footer center-flex">
+        <div class="modalGame__footer">
           <button class="button buttonPrimary" @click="$emit('backHome')">
             <!-- <button class="button buttonPrimary" @click="showResult = false, userAns = false"> -->
             <img
@@ -1355,8 +1355,8 @@ export default {
       border-radius: 3px;
       border: 1px solid var(--cl-secondary);
       padding: 10px 20px;
-      height: 49px;
-      margin-left: 10px;
+      height: 40px;
+      // margin-left: 10px;
       img {
         max-width: 18px;
         height: auto;

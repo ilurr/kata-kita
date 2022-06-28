@@ -23,7 +23,7 @@
         </button>
       </div>
       <div class="footerItem" id="btnhome">
-        <button class="button footerBack__btn" @click="$emit('backHome')">
+        <button class="button footerBack__btn" @click="$emit('isLeave')">
           <span class="buttonIcon icon-home"></span>
           <!-- <img
             src="@/assets/icon-home.png"
@@ -55,6 +55,7 @@
 export default {
   name: "Footer_compo",
   props: ["isBackActive"],
+  // emits: ["isLeave"],
   methods: {
     // backHome() {
     //   window.location.href = window.location.origin
