@@ -1,7 +1,7 @@
 <template>
   <!-- <p>Prop from child 1: {{ api }}</p> -->
   <div class="gameWrap bgMain center-flex" id="gameWrap">
-    <canvas class="gameCanvas" id="gameCanvas" width="330" height="587"></canvas>
+    <canvas class="gameCanvas" id="gameCanvas" width="900" height="1600"></canvas>
     <div class="gameHead center-flex">
       <div class="gameHead__wrap">
         <button class="button buttonHead -help" @click="showHelp = true">
@@ -483,8 +483,8 @@ export default {
       userAns: false,
       userRank: {
         template: {
-          // score: process.env.VUE_APP_BASE_URL+'asset/bg-skor.png'
-          score: 'https://i.ibb.co/x8NGB3Y/bg-skor.png'
+          score: 'https://i.ibb.co/vjp0CxH/bg-skor.png'
+          // score: process.env.VUE_APP_BASE_URL+'bg-skor.png'
         },
         rankNow: 0,
         rankLast: 0,
@@ -1020,75 +1020,77 @@ export default {
       console.log(this.shareTxt)
     },
 
-    shareLink(sosmed) {
-      const encodeURI = this.shareTxt.replace(/\n/g, "%0A");
-      if(sosmed=='twitter') {
-        const shareToTwitter = `https://twitter.com/intent/tweet?text=${encodeURI}`;
-        window.open(shareToTwitter, "_blank");
+    shareLink(site) {
+      let encodeURI = this.shareTxt.replace(/\n/g, "%0A");
+      if(site=='twitter') {
+        let stw = `https://twitter.com/intent/tweet?text=${encodeURI}`;
+        window.open(stw, "_blank");
       }
-      if(sosmed=='facebook') {
-        const shareToFacebook = `https://www.facebook.com/sharer/sharer.php?u=`+process.env.VUE_APP_BASE_URL;
-        window.open(shareToFacebook, "_blank");
+      if(site=='facebook') {
+        let sfb = `https://www.facebook.com/sharer/sharer.php?u=`+process.env.VUE_APP_BASE_URL;
+        window.open(sfb, "_blank");
       }
     },
 
     initCanvas() {
-      let _this = this
-      let images
-      let canvas = document.getElementById('gameCanvas');
-      let context = canvas.getContext('2d');
+      let _ = this
+      let img
+      let cn = document.getElementById('gameCanvas');
+      let cx = cn.getContext('2d');
 
-      images = new Image();
-      images.onload = function () {
-        context.drawImage(images, 0, 0);
+      img = new Image();
+      img.onload = function () {
+        cx.drawImage(img, 0, 0);
+        let w = cn.width
+        let h = cn.height
 
         // initial
-        context.font = "500 20px Roboto Slab";
-        context.fillStyle = "#fff";
-        context.textAlign = "center";
-        context.fillText(_this.users.initial.toUpperCase(), 90, 188);
+        cx.font = "500 55px Roboto Slab";
+        cx.fillStyle = "#fff";
+        cx.textAlign = "center";
+        cx.fillText(_.users.initial.toUpperCase(), w/3 - 55, h/4 + 108);
 
         // name
-        context.font = "700 16px Mukta";
-        context.fillStyle = "#fff";
-        context.textAlign = "left";
-        context.fillText((_this.users.data.first_name+(_this.users.data.last_name.length>0?' '+_this.users.data.last_name:'')), 134, 176);
+        cx.font = "700 45px Mukta";
+        cx.fillStyle = "#fff";
+        cx.textAlign = "left";
+        cx.fillText((_.users.data.first_name+(_.users.data.last_name.length>0?' '+_.users.data.last_name:'')), w/2 - 86, h/3 - 60);
 
         //score text
-        context.font = "700 16px Mukta";
-        context.fillStyle = "#333333";
-        context.textAlign = "left";
-        context.fillText(_this.levelChar+" huruf", 165, 414);
+        cx.font = "700 39px Mukta";
+        cx.fillStyle = "#333333";
+        cx.textAlign = "left";
+        cx.fillText(_.levelChar+" huruf", w/2, h/2 + 328);
 
         //score
-        context.font = "500 28px Roboto Slab";
-        context.fillStyle = "#ff512f";
-        context.textAlign = "right";
-        context.fillText((_this.userRank.rankLast.length>0?"#"+_this.userRank.rankLast:'-'), 303, 418);
+        cx.font = "500 55px Roboto Slab";
+        cx.fillStyle = "#ff512f";
+        cx.textAlign = "right";
+        cx.fillText((_.userRank.rankLast.length>0?"#"+_.userRank.rankLast:'-'), w - 80, h/2 + 333);
 
-        context.font = "500 32px Roboto Slab";
-        context.fillStyle = "#333333";
-        context.textAlign = "center";
-        context.fillText(_this.totalScore, 82, 355);
+        cx.font = "500 70px Roboto Slab";
+        cx.fillStyle = "#333333";
+        cx.textAlign = "center";
+        cx.fillText(_.totalScore, w/2 - 215, h/2 + 150);
 
-        context.font = "500 32px Roboto Slab";
-        context.fillStyle = "#333333";
-        context.textAlign = "left";
-        context.fillText(_this.userRank.scoreNow, 190, 355);
+        cx.font = "500 70px Roboto Slab";
+        cx.fillStyle = "#333333";
+        cx.textAlign = "center";
+        cx.fillText(_.userRank.scoreNow, w/2 + 215, h/2 + 150);
 
-        context.font = "500 18px Roboto Slab";
-        context.fillStyle = "#ff512f";
-        context.textAlign = "left";
-        context.fillText("+"+_this.totalScore, 266, 345);
+        cx.font = "500 35px Roboto Slab";
+        cx.fillStyle = "#ff512f";
+        cx.textAlign = "center";
+        cx.fillText("+"+_.totalScore, w/2 + 215, h/2 + 193);
 
       };
-      images.src = this.userRank.template.score;
-      images.setAttribute('crossorigin', 'anonymous'); // works for me
+      img.src = this.userRank.template.score;
+      img.setAttribute('crossorigin', 'anonymous'); // works for me
     },
     downloadCanvas(save) {
       let filesArray
       let url = document.getElementById('gameCanvas').toDataURL();
-      if(save) {
+      if(save==true) {
         fetch(url)
           .then(function (response) {
               return response.blob()
@@ -1110,7 +1112,7 @@ export default {
                   });
               } else {
                 let tab = window.open('about:blank', '_blank');
-                tab.document.write('<img src="'+url+'"/>');
+                tab.document.write('<img src="'+url+'" style="height: 100%"/>');
               }
           })
           .catch(function (error) {
@@ -1118,7 +1120,7 @@ export default {
           });
       } else {
         let tab = window.open('about:blank', '_blank');
-        tab.document.write('<img src="'+url+'"/>');
+        tab.document.write('<img src="'+url+'" style="height: 100%"/>');
       }
     },
 
@@ -1140,6 +1142,8 @@ export default {
     // z-index: 9;
     visibility: hidden;
     opacity: 0;
+    width: 100%;
+    height: 100%;
   }
   &Board {
     position: relative;

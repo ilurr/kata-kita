@@ -1,6 +1,6 @@
 <template>
   <div class="scoreWrap bgMain">
-    <canvas class="rankCanvas" id="rankCanvas" width="330" height="587"></canvas>
+    <canvas class="rankCanvas" id="rankCanvas" width="900" height="1600"></canvas>
     <div class="scoreHead center-flex">
       <h2 class="scoreTitle" id="text2">Skor</h2>
       <div class="scoreHead__wrap">
@@ -170,8 +170,8 @@ export default {
       },
       userRank: {
         template: {
-          // rank: process.env.VUE_APP_BASE_URL+'asset/bg-rank.png'
-          rank: 'https://i.ibb.co/ggn04dF/bg-rank.png'
+          // rank: '/bg-rank.png'
+          rank: 'https://i.ibb.co/6BHGFF4/bg-rank.png'
         },
         name: '',
         rankNow: {
@@ -201,68 +201,66 @@ export default {
   },
   methods: {
     initCanvas() {
-      let _this = this
-      let images
-      let canvas = document.getElementById('rankCanvas');
-      let context = canvas.getContext('2d');
+      let _ = this
+      let img
+      let cn = document.getElementById('rankCanvas');
+      let cx = cn.getContext('2d');
 
-      images = new Image();
-      images.onload = function () {
-        context.drawImage(images, 0, 0);
+      img = new Image();
+      img.onload = function () {
+        cx.drawImage(img, 0, 0);
+        let w = cn.width
+        let h = cn.height
 
         // initial
-        context.font = "500 45px Roboto Slab";
-        context.fillStyle = "#fff";
-        context.textAlign = "center";
-        context.fillText(_this.users.initial.toUpperCase(), 165, 225);
+        cx.font = "500 120px Roboto Slab";
+        cx.fillStyle = "#fff";
+        cx.textAlign = "center";
+        cx.fillText(_.users.initial.toUpperCase(), w/2, h/3 + 80);
 
         // name
-        context.font = "700 16px Mukta";
-        context.fillStyle = "#333333";
-        context.textAlign = "center";
-        context.fillText((_this.users.data.first_name+(_this.users.data.last_name.length>0?' '+_this.users.data.last_name:'')), 165, 296);
+        cx.font = "700 50px Mukta";
+        cx.fillStyle = "#333333";
+        cx.textAlign = "center";
+        cx.fillText((_.users.data.first_name+(_.users.data.last_name.length>0?' '+_.users.data.last_name:'')), w/2, h/2 + 10);
 
         // score txt
-        context.font = "400 16px Mukta";
-        context.fillStyle = "#333333";
-        context.textAlign = "left";
-        context.fillText("Tantangan 4 huruf", 40, 375);
-        context.font = "400 16px Mukta";
-        context.fillStyle = "#333333";
-        context.textAlign = "left";
-        context.fillText("Tantangan 5 huruf", 40, 425);
-        context.font = "400 16px Mukta";
-        context.fillStyle = "#333333";
-        context.textAlign = "left";
-        context.fillText("Tantangan 6 huruf", 40, 475);
+        cx.font = "400 45px Mukta";
+        cx.fillStyle = "#333333";
+        cx.textAlign = "left";
+        cx.fillText("Tantangan 4 huruf", 90, h/2 + 220);
+        cx.font = "400 45px Mukta";
+        cx.fillStyle = "#333333";
+        cx.textAlign = "left";
+        cx.fillText("Tantangan 5 huruf", 90, h/2 + 360);
+        cx.font = "400 45px Mukta";
+        cx.fillStyle = "#333333";
+        cx.textAlign = "left";
+        cx.fillText("Tantangan 6 huruf", 90, h/2 + 500);
 
         // rank
-        context.font = "500 28px Roboto Slab";
-        context.fillStyle = "#ff512f";
-        context.textAlign = "right";
-        context.fillText((_this.userRank.rankNow.level4.length>0?"#"+_this.userRank.rankNow.level4:'-'), 290, 380);
+        cx.font = "500 70px Roboto Slab";
+        cx.fillStyle = "#ff512f";
+        cx.textAlign = "right";
+        cx.fillText((_.userRank.rankNow.level4.length>0?"#"+_.userRank.rankNow.level4:'-'), w - 100, h/2 + 230);
 
-        context.font = "500 28px Roboto Slab";
-        context.fillStyle = "#ff512f";
-        context.textAlign = "right";
-        context.fillText((_this.userRank.rankNow.level5.length>0?"#"+_this.userRank.rankNow.level5:'-'), 290, 430);
+        cx.font = "500 70px Roboto Slab";
+        cx.fillStyle = "#ff512f";
+        cx.textAlign = "right";
+        cx.fillText((_.userRank.rankNow.level5.length>0?"#"+_.userRank.rankNow.level5:'-'), w - 100, h/2 + 370);
 
-        context.font = "500 28px Roboto Slab";
-        context.fillStyle = "#ff512f";
-        context.textAlign = "right";
-        context.fillText((_this.userRank.rankNow.level6.length>0?"#"+_this.userRank.rankNow.level6:'-'), 290, 480);
+        cx.font = "500 70px Roboto Slab";
+        cx.fillStyle = "#ff512f";
+        cx.textAlign = "right";
+        cx.fillText((_.userRank.rankNow.level6.length>0?"#"+_.userRank.rankNow.level6:'-'), w - 100, h/2 + 510);
       };
-      images.src = this.userRank.template.rank;
-      images.setAttribute('crossorigin', 'anonymous'); // works for me
-
-      // _this.loadImages(this.userRank.template, function (images) {
-      //   context.drawImage(images, 0, 0);
-      // });
+      img.src = this.userRank.template.rank;
+      img.setAttribute('crossorigin', 'anonymous'); // works for me
     },
     downloadCanvas(save) {
       let filesArray
       let url = document.getElementById('rankCanvas').toDataURL();
-      if(save) {
+      if(save==true) {
         fetch(url)
           .then(function (response) {
               return response.blob()
@@ -284,7 +282,7 @@ export default {
                   });
               } else {
                 let tab = window.open('about:blank', '_blank');
-                tab.document.write('<img src="'+url+'"/>');
+                tab.document.write('<img src="'+url+'" style="height: 100%"/>');
               }
           })
           .catch(function (error) {
@@ -292,7 +290,7 @@ export default {
           });
       } else {
         let tab = window.open('about:blank', '_blank');
-        tab.document.write('<img src="'+url+'"/>');
+        tab.document.write('<img src="'+url+'" style="height: 100%"/>');
       }
 
     },
@@ -340,6 +338,8 @@ export default {
     // z-index: 9;
     visibility: hidden;
     opacity: 0;
+    width: 100%;
+    height: 100%;
   }
 }
 .score {

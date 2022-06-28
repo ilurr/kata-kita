@@ -33,26 +33,8 @@
 
   <Menu_level @showGame="displayGame" v-if="showMenu" />
 
-  <!-- <Game_compo :myGame="myGame" v-if="myGame" /> -->
   <Game_compo :levelChar="levelChar" v-if="displayGameBoard" @backHome='backHome' :users="users" />
   <Scoreboard_compo v-if="displayScoreboard" :users="users" />
-  <!-- <Scoreboard_compo /> -->
-
-  <!-- <h2>Welcome {{ name }}</h2>
-  <button @click="changeName">Change Name</button>
-  <p>Name : <input type="text" v-model="name" /></p>
-  <p>
-    <a :href="url" target="_blank" rel="noopener noreferrer"
-      >Go to my Portfolio</a
-    >
-  </p>
-
-  <input type="text" placeholder="Cari berdasar tebakan" v-model="find" />
-  <ul>
-    <li v-for="answer in findData" :key="answer.id">
-      {{ answer.guest }} - {{ answer.time }}
-    </li>
-  </ul> -->
 
   <Footer_compo :isBackActive="isBackActive" @backHome='backHome' />
 </template>
