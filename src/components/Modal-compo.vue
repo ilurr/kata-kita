@@ -98,7 +98,7 @@ export default {
     line-height: 24px;
     color: var(--cl-black);
     background: #fafafa;
-    min-height: 80px;
+    min-height: 70px;
     max-height: 60vh;
     overflow-y: auto;
   }

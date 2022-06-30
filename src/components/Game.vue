@@ -1,39 +1,24 @@
 <template>
-  <!-- <p>Prop from child 1: {{ api }}</p> -->
   <div class="gameWrap bgMain center-flex" id="gameWrap">
     <canvas class="gameCanvas" id="gameCanvas" width="900" height="1600"></canvas>
     <div class="gameHead center-flex">
       <div class="gameHead__wrap">
         <button class="button buttonHead -help" @click="showHelp = true">
           <span class="buttonIcon icon-help"></span>
-          <!-- <img
-            src="@/assets/help.png"
-            class="gameHead__img"
-            alt="How to Play"
-            width="40"
-            height="36"
-          /> -->
         </button>
         <button class="button buttonHead -audio" :class="{'-active': audio.isPlaying}" @click.prevent="audio.isPlaying ? pause(audio) : play(audio)">
           <span class="buttonIcon icon-audio"></span>
-          <!-- <img
-            src="@/assets/sound.png"
-            class="gameHead__img"
-            alt="Sound"
-            width="40"
-            height="36"
-          /> -->
         </button>
       </div>
       <div class="gameHead__wrap">
-        <button class="button buttonClue">
+        <button class="button buttonClue" @click="showDialogContekan = true">
           <img
             src="@/assets/icon-clue.png"
             class="gameHead__img"
             alt=""
             width="16"
             height="16"
-          />Contekan (3x)
+          />Contekan ({{ clueLimit }}x)
         </button>
       </div>
     </div>
@@ -42,7 +27,7 @@
       <div class="gameBoard__toast">
         <div id="gameToast" class="gameToast" :class="{'-active': toast.show}">
           <div class="gameToast__wrapper">
-            <div class="gameToast__content">{{toast.msg}}</div>
+            <div class="gameToast__content" v-html="toast.msg"></div>
             <button class="button gameToast__close" @click="toast.show = false"><span class="icon-close"></span></button>
           </div>
         </div>
@@ -403,6 +388,122 @@
   </Teleport>
   <!-- e: modal share -->
 
+  <!-- s: modal dialog contekan -->
+  <Teleport to="body">
+    <Modal_compo :show="showDialogContekan" @close="showDialogContekan = false">
+      <template #header>
+        <div class="modalHead align-center">
+          <h3 class="modalTitle">Gunakan Petunjuk?</h3>
+          <img
+            src="@/assets/icon-clue.png"
+            class="modalShare__icon"
+            alt=""
+            width="25"
+            height="25"
+          />
+        </div>
+      </template>
+      <template #body>
+        <div class="modalGame__body">
+          <p>
+            Anda akan menonton iklan untuk mendapatkan 1 bantuan huruf.
+          </p>
+        </div>
+      </template>
+      <template #footer>
+        <div class="modalGame__footer">
+          <button class="button buttonSecondary" @click="showDialogContekan = false">
+            Batal 
+          </button>
+          <button class="button buttonPrimary" @click="isContekan()">
+            Ya, Lanjutkan 
+          </button>
+        </div>
+      </template>
+    </Modal_compo>
+  </Teleport>
+  <!-- e: modal dialog contekan -->
+
+  <!-- s: modal contekan -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <Clue_compo :show="showContekan" @close="showContekan = false">
+        <template #body>
+          <div class="clue-timer"><span id="clueTimerDisplay">{{ clueTimerDisplay }} {{ ansChance }} {{ clueInsert }}</span></div>
+          <div class="clue-ads -full">
+            <img src="https://tpc.googlesyndication.com/simgad/241969906600065835" alt="">
+          </div>
+          <button class="button clue-close" @click="showCloseContekan = true">
+            <img
+              src="@/assets/icon-close.png"
+              class="modalIcon"
+              alt=""
+              width="15"
+              height="15"
+            />
+          </button>
+        </template>
+      </Clue_compo>
+    </Transition>
+  </Teleport>
+  <!-- e: modal contekan -->
+
+  <!-- s: modal claim -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <Clue_compo :show="showClaim" @close="showClaim = false">
+        <template #body>
+          <div class="clue-ads">
+            <img src="https://tpc.googlesyndication.com/simgad/241969906600065835" alt="">
+          </div>
+          <div class="clue-footer">
+            <button class="button buttonPrimary clue-claim-button" @click="resumeGame()">
+              Klaim Petunjuk
+            </button>
+            <div class="clue-info">{{ clueLimit }} jatah tersisa</div>
+          </div>
+        </template>
+      </Clue_compo>
+    </Transition>
+  </Teleport>
+  <!-- e: modal claim -->
+
+  <!-- s: modal dialog leave contekan -->
+  <Teleport to="body">
+    <Modal_compo :show="showCloseContekan" @close="showCloseContekan = false">
+      <template #header>
+        <div class="modalHead align-center">
+          <h3 class="modalTitle">Lompati Iklan?</h3>
+          <img
+            src="@/assets/icon-clue.png"
+            class="modalShare__icon"
+            alt=""
+            width="25"
+            height="25"
+          />
+        </div>
+      </template>
+      <template #body>
+        <div class="modalGame__body">
+          <p>
+            Dengan melewatkan iklan, Anda tidak dapat mengklaim imbalan petunjuk kata.
+          </p>
+        </div>
+      </template>
+      <template #footer>
+        <div class="modalGame__footer">
+          <button class="button buttonSecondary" @click="resumeGame()">
+            Ya, Lewati 
+          </button>
+          <button class="button buttonPrimary" @click="showCloseContekan = false">
+            Batal 
+          </button>
+        </div>
+      </template>
+    </Modal_compo>
+  </Teleport>
+  <!-- e: modal dialog leave contekan -->
+
 </template>
 
 <script>
@@ -413,6 +514,7 @@ import { gsap, Expo, Sine } from "gsap";
 import KeyInput from "./InputBoard.vue";
 import KeyBtn from "./ButtonKeyboard.vue";
 import Modal_compo from "@/components/Modal-compo.vue";
+import Clue_compo from "@/components/Clue-compo.vue";
 
 export default {
   name: "Game_compo",
@@ -420,6 +522,7 @@ export default {
     KeyInput,
     KeyBtn,
     Modal_compo,
+    Clue_compo,
   },
   props: ["levelChar","users"],
   emits: ["backHome"],
@@ -481,7 +584,11 @@ export default {
       showErrorMsg: '',
       showHelp: false,
       showShare: false,
+      showDialogContekan: false,
+      showContekan: false,
       showResult: false,
+      showCloseContekan: false,
+      showClaim: false,
       userAns: false,
       userRank: {
         template: {
@@ -516,9 +623,16 @@ export default {
       ansChanceMax: 5,
       ansScore: 0,
       totalScore: 0,
+      ansTimerPause: false,
       ansTimer: 0,
       ansTimerDisplay: "00:00",
       ansTimerVar: Number,
+      clueTimer: 0,
+      clueTimerDisplay: "",
+      clueTimerVar: Number,
+      clueLimit: 3,
+      clueInsert: '',
+      isWatchedAd: false,
       ansSecVar: 300,
       ansSecMax: 600,
       ansScoreTemp: [],
@@ -720,15 +834,68 @@ export default {
       return (new Array(length + 1).join(pad) + string).slice(-length);
     },
 
+    resumeGame() {
+      let _this = this
+      _this.toggleTimer('play')
+      _this.stopTimer(this.clueTimerVar)
+      this.showClaim = false;
+      this.showContekan = false;
+      this.showDialogContekan = false
+      this.showCloseContekan = false
+      if(this.isWatchedAd) {
+        _this.insertClue()
+      }
+    },
+
+    insertClue() {
+      let _this = this
+      let idx
+      if(this.clueInsert.length>0) {
+        idx = this.clueInsert.substr(0,1) +''+ this.clueInsert.substr(1,1).toUpperCase()
+      } else {
+        idx = 1 +''+ this.getQ.decryptedTitle.substr(0,1).toUpperCase()
+      }
+      _this.toastShow('Huruf <strong>ke-'+ idx.substr(0,1) + '</strong> adalah: <strong>' + idx.substr(1,1) +'</strong>', false);
+    },
+
+    isContekan() {
+      let _this = this
+      _this.toggleTimer('pause')
+      _this.runClueTimer(10)
+      this.showDialogContekan = false
+      this.showContekan = true
+    },
+
+    toggleTimer(status) {
+      let _this = this;
+      if(status=='play') {
+        if(this.ansTimer>0) {
+          this.ansTimerPause = false
+          _this.runTimer(this.ansTimer)
+        }
+      } else if(status=='pause') {
+        this.ansTimerPause = true
+        _this.stopTimer(this.ansTimerVar)
+      } else {
+        if(this.ansTimerPause) {
+          this.ansTimerPause = false
+          _this.runTimer(this.ansTimer)
+        } else {
+          this.ansTimerPause = true
+          _this.stopTimer(this.ansTimerVar)
+        }
+      }
+    },
+
     // stop timer
-    stopTimer() {
-      clearInterval(this.ansTimerVar);
+    stopTimer(el) {
+      clearInterval(el);
     },
 
     // timer func, in second
-    runTimer() {
+    runTimer(time) {
       let _this = this;
-      let localTimer = 0;
+      let localTimer = time;
 
       this.ansTimerVar = setInterval(function () {
         localTimer++;
@@ -738,6 +905,28 @@ export default {
         _this.ansTimer = localTimer;
         if(minutes>58) {
           window.location.href = process.env.VUE_APP_BASE_URL
+        }
+      }, 1000);
+    },
+
+    runClueTimer(time) {
+      let _this = this;
+      let clueLocalTimer = time;
+      this.isWatchedAd = false
+
+      this.clueTimerVar = setInterval(function () {
+        console.log(clueLocalTimer)
+        clueLocalTimer--;
+        // let minutes = Math.floor(clueLocalTimer / 60);
+        // let seconds = clueLocalTimer - minutes * 60;
+        // _this.clueTimerDisplay = (minutes>0?_this.str_pad(minutes, "0", 2)+ ":":'') + "" + _this.str_pad(seconds, "0", 2);
+        _this.clueTimerDisplay = clueLocalTimer+ ' detik';
+        _this.clueTimer = clueLocalTimer;
+        if(clueLocalTimer==0) {
+          _this.stopTimer(_this.clueTimerVar)
+          _this.showClaim = true
+          _this.showContekan = false
+          _this.isWatchedAd = true
         }
       }, 1000);
     },
@@ -752,7 +941,7 @@ export default {
 
       // timer running when user start typing
       if (this.keyPressFirst == 0) {
-        _this.runTimer();
+        _this.runTimer(0);
         this.keyPressFirst = 1;
       }
 
@@ -797,6 +986,7 @@ export default {
     // button Enter func
     onEnterPress(e) {
       let _this = this;
+      this.toast.show = false
 
       // effect
       _this.animateZoom(e)
@@ -875,18 +1065,18 @@ export default {
       this.ansChance = 0;
       this.ansTimer = 0;
       this.showResult = true;
-      this.ansWord.map(function (item) {
-        item.char = [];
-      });
+      // this.ansWord.map(function (item) {
+      //   item.char = [];
+      // });
       // this.ansEmoji.map(function (item) {
       //   item.emoji = [];
       // });
-      document
-        .querySelectorAll(".inputTxt")
-        .forEach((e) => e.removeAttribute("style"));
-      document
-        .querySelectorAll(".keyBtn")
-        .forEach((e) => e.removeAttribute("style"));
+      // document
+      //   .querySelectorAll(".inputTxt")
+      //   .forEach((e) => e.removeAttribute("style"));
+      // document
+      //   .querySelectorAll(".keyBtn")
+      //   .forEach((e) => e.removeAttribute("style"));
       console.log("game over");
     },
 
@@ -899,7 +1089,7 @@ export default {
       console.log("Total Huruf Tertabak: " + this.ansScore);
       console.log("Total Waktu: " + this.ansTimer);
 
-      _this.stopTimer();
+      _this.stopTimer(this.ansTimerVar);
 
       // under 10 seconds, penalti 10 detik hahaha, masak sih bisa jawab under 10 detik, yg bener aja gan
       if (this.ansTimer < 10) {
@@ -955,6 +1145,7 @@ export default {
       let _this = this;
       console.log("answer " + answer);
       let localScore = 0;
+      let localClue = 0;
 
       let soal = this.getQ.decryptedTitle.split("");
       console.log("soal " + soal);
@@ -970,6 +1161,10 @@ export default {
           // grey
           _this.colorIt("inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1), ".keyBtn[keychar="+char+"]", "#000", "var(--cl-wrong)")
           _this.ansEmoji[_this.ansChance].emoji.push('w')
+          if(localClue==0) {
+            _this.clueInsert = (index+1)+soal[index]
+            localClue++
+          }
           for (let j = 0; j < _this.levelChar; j++) {
             if (soal[j] == char) {
               // yellow
@@ -1217,24 +1412,28 @@ export default {
     }
     &__content {
       font-weight: 400;
-      font-size: 14px;
+      font-size: 16px;
+      font-family: var(--font-child);
       flex-basis: 0;
       flex-grow: 1;
       padding: 0 10px;
       overflow: hidden;
       display: -webkit-box;
       -webkit-box-orient: vertical;
-      max-height: 20px;
+      // max-height: 20px;
       -webkit-line-clamp: 1;
       text-overflow: ellipsis;
       overflow-wrap: break-word;
-      min-width: 140px;
+      min-width: 180px;
     }
     &__close {
       width: 40px;
       height: 40px;
       flex-basis: 40px;
       flex-grow: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       @media screen and (max-height: 500px) {
         height: 34px;
       }
@@ -1355,7 +1554,7 @@ export default {
     line-height: 20px;
     color: var(--cl-main);
     border: 1px solid var(--cl-main);
-    visibility: hidden;
+    // visibility: hidden;
   }
   &Game {
     &__share {
