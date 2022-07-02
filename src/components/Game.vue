@@ -11,14 +11,17 @@
         </button>
       </div>
       <div class="gameHead__wrap">
-        <button class="button buttonClue" @click="showDialogContekan = true">
+        <button class="button buttonClue" :class="{'-disabled': clueLimit<1}" @click.prevent="clueLimit>0 ? showDialogContekan = true : showDialogContekan = false">
           <img
             src="@/assets/icon-clue.png"
             class="gameHead__img"
             alt=""
             width="16"
             height="16"
-          />Contekan ({{ clueLimit }}x)
+          />
+          <span v-if="clueLimit>0">Contekan ({{ clueLimit }}x)</span>
+          <span v-else>Contekan Habis</span>
+          <!-- <span v-else>{{ clueLimitCharge }}</span> -->
         </button>
       </div>
     </div>
@@ -631,6 +634,8 @@ export default {
       clueTimerDisplay: "",
       clueTimerVar: Number,
       clueLimit: 3,
+      clueIsCount: 0,
+      clueLimitCharge: "00:30",
       clueInsert: '',
       isWatchedAd: false,
       ansSecVar: 300,
@@ -657,6 +662,7 @@ export default {
   mounted() {
     console.log(process.env.VUE_APP_KEY)
     let _this = this
+    _this.cekClueLimit()
     if(this.levelChar>0) {
       _this.getQuestion()
       _this.getRankBefore()
@@ -677,7 +683,6 @@ export default {
           this.userRank.status = error.response.status
           this.apiMyRank.status = error.response.status
         });
-        console.log(this.apiMyRank.status);
     },
     getRankAfter() {
       let ermsg = 'Terdapat kesalahan sistem dalam memproses jawaban Anda, silakan refresh halaman ini.'
@@ -696,7 +701,6 @@ export default {
           this.userRank.status = error.response.status
           this.apiMyRank.status = error.response.status
         });
-        console.log(this.apiMyRank.status);
     },
     getQuestion() {
       let ermsg = 'Terdapat kesalahan sistem dalam memuat pertanyaan, silakan refresh halaman ini.'
@@ -719,29 +723,28 @@ export default {
         });
         console.log(this.apiQuestion);
     },
-    async getQuestion_() {
-        try {
-          const response = await axios.get(process.env.VUE_APP_API_URL + this.apiQuestion.url + '?level=' + this.levelChar);
-          console.log(response);
-          if (!response.ok) {
-            const error = (response && response.message) || response.statusText;
-            this.apiQuestion.status = error
-            // return Promise.reject(error);
-          }
+    // async getQuestion_() {
+    //     try {
+    //       const response = await axios.get(process.env.VUE_APP_API_URL + this.apiQuestion.url + '?level=' + this.levelChar);
+    //       console.log(response);
+    //       if (!response.ok) {
+    //         const error = (response && response.message) || response.statusText;
+    //         this.apiQuestion.status = error
+    //         // return Promise.reject(error);
+    //       }
 
-          this.apiQuestion.query = response.data
-          this.apiQuestion.status = response.status
+    //       this.apiQuestion.query = response.data
+    //       this.apiQuestion.status = response.status
 
-          this.getQ.decryptedId = this.apiQuestion.query.data.id
-          this.getQ.decryptedTitle = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.title, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).toLowerCase()
-          this.getQ.decryptedDescription = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.description, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).replace(/&nbsp;/g, " ")
+    //       this.getQ.decryptedId = this.apiQuestion.query.data.id
+    //       this.getQ.decryptedTitle = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.title, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).toLowerCase()
+    //       this.getQ.decryptedDescription = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.description, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).replace(/&nbsp;/g, " ")
 
-        } catch (error) {
-          console.log(error.response.status);
-          this.apiQuestion.status = error.response.status
-        }
+    //     } catch (error) {
+    //       this.apiQuestion.status = error.response.status
+    //     }
 
-    },
+    // },
     getKBBI(answer) {
       let _this = this;
         axios.get(process.env.VUE_APP_API_URL + this.apiKBBI.url + '?title=' + answer.join('')).then((response) => {
@@ -753,7 +756,6 @@ export default {
           _this.animateShake()
           _this.toastShow('Kata tidak ada di dalam kamus!', true);
         });
-
         console.log(this.apiKBBI.status);
     },
 
@@ -846,14 +848,99 @@ export default {
         _this.insertClue()
       }
     },
+    cekClueLimit() {
+      let _this = this
+      let localClueLimit = _this.getCookie('clue_limit')
+      let localClueIsCount = _this.getCookie('clue_is_count')
+      let localClueCount = _this.getCookie('clue_count')
+
+      // cooki exist
+      if(localClueLimit.length>0) {
+        // set max contekan
+        if(localClueLimit>3) {
+          this.clueLimit = 3
+          _this.setCookie('clue_limit', 3, 365);
+        } else {
+          this.clueLimit = localClueLimit
+        }
+        console.log('ada'+localClueLimit)
+      } else {
+        _this.setCookie('clue_limit', this.clueLimit, 365);
+        localClueLimit = this.clueLimit
+        console.log('init'+localClueLimit)
+      }
+
+      if(localClueIsCount.length>0) {
+        this.clueIsCount = 1
+      } else {
+        _this.setCookie('clue_is_count', this.clueIsCount, 365);
+        localClueIsCount = this.clueIsCount
+        console.log('init'+localClueIsCount)
+      }
+
+      // init
+      if(!localClueCount && localClueLimit<3) {
+        if(localClueIsCount<1) {
+          _this.setCookie('clue_count', 1, 0.0208333)
+          localClueCount = 1
+
+          _this.setCookie('clue_is_count', 1, 365);
+          localClueIsCount = 1
+          this.clueIsCount = 1
+        } else {
+          this.clueLimit++
+          _this.setCookie('clue_limit', this.clueLimit, 365);
+          localClueLimit = this.clueLimit
+
+          _this.setCookie('clue_is_count', 0, 365);
+          localClueIsCount = 0
+          this.clueIsCount = 0
+        }
+      }
+
+      console.log(localClueIsCount)
+
+    },
+    getCookie(cname) {
+      let name = cname + "=";
+      let decodedCookie = decodeURIComponent(document.cookie);
+      let ca = decodedCookie.split(';');
+      for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    },
+    setCookie(cname, cvalue, exdays) {
+      let d = new Date();
+      d.setTime(d.getTime() + (exdays*24*60*60*1000));
+      let expires = "expires=" + d.toGMTString();
+      // document.cookie = cname + "=" + cvalue + ";" + expires + "; path=/;";
+      document.cookie = cname + "=" + cvalue + ";" + expires + "; path=/; domain=kompas.com; SameSite=None; Secure";
+      // console.log('kukis')
+    },
 
     insertClue() {
       let _this = this
       let idx
+      this.clueLimit--
       if(this.clueInsert.length>0) {
         idx = this.clueInsert.substr(0,1) +''+ this.clueInsert.substr(1,1).toUpperCase()
       } else {
         idx = 1 +''+ this.getQ.decryptedTitle.substr(0,1).toUpperCase()
+      }
+      if(this.clueIsCount>0) {
+        _this.setCookie('clue_limit', this.clueLimit, 365);
+      } else {
+        _this.setCookie('clue_limit', this.clueLimit, 365);
+        _this.setCookie('clue_count', 1, 0.0208333);
+        _this.setCookie('clue_is_count', 1, 365);
+        this.clueIsCount = 1
       }
       _this.toastShow('Huruf <strong>ke-'+ idx.substr(0,1) + '</strong> adalah: <strong>' + idx.substr(1,1) +'</strong>', false);
     },
@@ -1554,6 +1641,15 @@ export default {
     line-height: 20px;
     color: var(--cl-main);
     border: 1px solid var(--cl-main);
+    &.-disabled {
+      pointer-events: none;
+      background: #F1F1F1;
+      color: #757575;
+      border: 1px solid #F1F1F1;
+      img {
+        filter: grayscale(1);
+      }
+    }
     // visibility: hidden;
   }
   &Game {
