@@ -28,7 +28,7 @@ export default {
     // margin-bottom: 8vh;
     // max-width: 160px;
     width: auto;
-    height: 130px;
+    height: 160px;
     transform: scale(0) rotate(180deg);
     @media screen and (max-height: 500px) {
       height: 100px;
@@ -44,7 +44,7 @@ export default {
     background-image: url(@/assets/bg-home-top.png);
     background-repeat: no-repeat;
     background-position: top center;
-    background-size: 250px;
+    background-size: 290px;
     pointer-events: none;
     //opacity: 0;
     transform: translate(0,-20%);

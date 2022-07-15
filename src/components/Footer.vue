@@ -36,14 +36,12 @@
         </button>
       </div>
       <div class="footerItem -play">
-        <a href="https://play.kompas.com/" target="_parent">
-          <img
-            src="@/assets/logokomplay.png"
-            alt="Kompas Play"
-            width="148"
-            height="18"
-          />
-        </a>
+        <img
+          src="@/assets/logokomplay.png"
+          alt="Kompas Play"
+          width="148"
+          height="18"
+        />
       </div>
     </div>
   </div>

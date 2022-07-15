@@ -151,7 +151,7 @@
               <div class="modalGame__num" v-if="totalScore">
                 {{ totalScore }}
               </div>
-              <div class="modalGame__num" v-else>-</div>
+              <div class="modalGame__num" v-else>0</div>
             </div>
             <div class="modalGame__box">
               <img
@@ -185,12 +185,7 @@
           </button>
           <!-- </button> -->
           <button class="button buttonGame__share" @click="showShare = true">
-            <img
-              src="@/assets/icon-share.png"
-              alt="Bagikan"
-              width="25"
-              height="28"
-            />
+            <span class="buttonIcon icon-share"></span>
           </button>
         </div>
       </template>
@@ -432,7 +427,7 @@
     <Transition name="modal">
       <Clue_compo :show="showContekan" @close="showContekan = false">
         <template #body>
-          <div class="clue-timer"><span id="clueTimerDisplay">{{ clueTimerDisplay }} {{ ansChance }} {{ clueInsert }}</span></div>
+          <div class="clue-timer"><span id="clueTimerDisplay">{{ clueTimerDisplay }}</span></div>
           <div class="clue-ads -full">
             <img src="https://tpc.googlesyndication.com/simgad/241969906600065835" alt="">
           </div>
@@ -478,7 +473,7 @@
         <div class="modalHead align-center">
           <h3 class="modalTitle">Lompati Iklan?</h3>
           <img
-            src="@/assets/icon-clue.png"
+            src="@/assets/icon-forward.png"
             class="modalShare__icon"
             alt=""
             width="25"
@@ -921,7 +916,7 @@ export default {
       d.setTime(d.getTime() + (exdays*24*60*60*1000));
       let expires = "expires=" + d.toGMTString();
       // document.cookie = cname + "=" + cvalue + ";" + expires + "; path=/;";
-      document.cookie = cname + "=" + cvalue + ";" + expires + "; path=/; domain=kompas.com; SameSite=None; Secure";
+      document.cookie = cname + "=" + cvalue + ";" + expires + "; path=/; domain=kompas.com; SameSite=None; Secure"; // live
       // console.log('kukis')
     },
 
@@ -948,7 +943,7 @@ export default {
     isContekan() {
       let _this = this
       _this.toggleTimer('pause')
-      _this.runClueTimer(10)
+      _this.runClueTimer(process.env.VUE_APP_ADS_COUNT)
       this.showDialogContekan = false
       this.showContekan = true
     },
@@ -1011,9 +1006,10 @@ export default {
         _this.clueTimer = clueLocalTimer;
         if(clueLocalTimer==0) {
           _this.stopTimer(_this.clueTimerVar)
-          _this.showClaim = true
+          // _this.showClaim = true
           _this.showContekan = false
           _this.isWatchedAd = true
+          _this.resumeGame()
         }
       }, 1000);
     },
@@ -1179,9 +1175,9 @@ export default {
       _this.stopTimer(this.ansTimerVar);
 
       // under 10 seconds, penalti 10 detik hahaha, masak sih bisa jawab under 10 detik, yg bener aja gan
-      if (this.ansTimer < 10) {
-        this.ansTimer = 10;
-      }
+      // if (this.ansTimer < 10) {
+      //   this.ansTimer = 10;
+      // }
 
       // max timer (10 minutes)
       if (this.ansTimer > this.ansSecMax) {
@@ -1189,11 +1185,13 @@ export default {
       }
 
       // Rumus : (((1 - (Response Time / Variabel Detik) / 2) * 940) / Kesempatan Jawab ) + Huruf Tertebak
-      this.totalScore =
-        ((1 - this.ansTimer / this.ansSecVar / 2) * 940) / this.ansChance +
-        this.ansScore;
+      if(this.ansScore > 0) {
+        this.totalScore = (((1 - (this.ansTimer / this.ansSecVar) / 2) * 940) / this.ansChance) + (this.ansScore * 10);
+      } else {
+        this.totalScore = 0
+      }
       this.totalScore = Math.round(this.totalScore);
-      if (this.totalScore) {
+      if (this.totalScore>-1) {
 
         this.apiAnswer.post = {
           "id_question": this.getQ.decryptedId,
@@ -1543,6 +1541,9 @@ export default {
     @media screen and (max-height: 500px) {
       height: calc(100% - 0px);
     }
+    @media screen and (min-height: 700px) {
+      padding-bottom: 40px;
+    }
     & > * {
       z-index: 2;
     }
@@ -1559,6 +1560,9 @@ export default {
       justify-content: flex-start;
       @media screen and (max-height: 670px) {
         padding: 5px 15px;
+      }
+      @media screen and (min-height: 700px) {
+        padding: 35px 15px 10px;
       }
     }
     &__img {
@@ -1601,34 +1605,6 @@ export default {
 }
 
 .button {
-  &Head {
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    border: 1px solid #ED543A;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fff;
-    // border-radius: 4px;
-    @media screen and (max-height: 500px) {
-      width: 34px;
-      height: 34px;
-    }
-    &.-active {
-      &.-audio {
-        border: transparent;
-        .icon-audio {
-          background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.72.55a.5.5 0 0 0-.527.055L3.828 4H1a1.001 1.001 0 0 0-1 1v4a1.001 1.001 0 0 0 1 1h2.828l4.365 3.395A.5.5 0 0 0 9 13V1a.5.5 0 0 0-.28-.45ZM8 11.979 4.307 9.105A.5.5 0 0 0 4 9H1V5h3a.5.5 0 0 0 .307-.105L8 2.022v9.956ZM11.498 5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 1 0Zm2-1v5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 1 0Z' fill='%23fff'/%3E%3C/svg%3E");
-        }
-      }
-    }
-    .buttonIcon {
-      margin-right: 0;
-      width: 16px;
-      height: 16px;
-    }
-  }
   &Clue {
     // margin-left: 15px;
     // margin-right: 15px;
@@ -1658,11 +1634,16 @@ export default {
       border: 1px solid var(--cl-secondary);
       padding: 10px 20px;
       height: 40px;
-      // margin-left: 10px;
-      img {
-        max-width: 18px;
-        height: auto;
+      .buttonIcon {
+        width: 18px;
+        height: 20px;
+        margin-right: 0;
       }
+      // margin-left: 10px;
+      // img {
+      //   max-width: 18px;
+      //   height: auto;
+      // }
     }
   }
 }

@@ -293,7 +293,7 @@ export default {
     this.getUsers();
     console.log("Mounted");
     gsap.to("#headerTop", 0.5, {
-      y: -20,
+      y: -30,
       delay: 0.2,
       //opacity: 1,
       ease: Expo.easeOut,
@@ -436,6 +436,34 @@ body {
     font-size: 14px;
     padding: 10px 15px;
   }
+  &Head {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid #ED543A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    // border-radius: 4px;
+    @media screen and (max-height: 500px) {
+      width: 34px;
+      height: 34px;
+    }
+    &.-active {
+      &.-audio {
+        border: transparent;
+        .icon-audio {
+          background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.72.55a.5.5 0 0 0-.527.055L3.828 4H1a1.001 1.001 0 0 0-1 1v4a1.001 1.001 0 0 0 1 1h2.828l4.365 3.395A.5.5 0 0 0 9 13V1a.5.5 0 0 0-.28-.45ZM8 11.979 4.307 9.105A.5.5 0 0 0 4 9H1V5h3a.5.5 0 0 0 .307-.105L8 2.022v9.956ZM11.498 5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 1 0Zm2-1v5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 1 0Z' fill='%23fff'/%3E%3C/svg%3E");
+        }
+      }
+    }
+    .buttonIcon {
+      margin-right: 0;
+      width: 16px;
+      height: 16px;
+    }
+  }
   &Menu {
     width: calc(100% - 60px);
     padding: 20px;
@@ -519,7 +547,7 @@ body {
 .menu {
   &Wrap {
     position: absolute;
-    top: 50%;
+    top: 52.5%;
     left: 50%;
     transform: translate(-50%,-50%);
     z-index: 1;
@@ -562,7 +590,7 @@ body {
     height: 17px;
     background-size: 100% auto;
     background-image: url("data:image/svg+xml,%3Csvg width='17' height='20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 19.749a1.5 1.5 0 0 1-1.5-1.5V1.75A1.5 1.5 0 0 1 2.782.47l13.498 8.25a1.5 1.5 0 0 1 0 2.559L2.782 19.529a1.5 1.5 0 0 1-.782.22ZM2 1.75v16.498L15.498 10 2 1.75Z' fill='%23fff'/%3E%3C/svg%3E");
-}
+  }
   &-enter {
     width: 24px;
     height: 24px;
@@ -593,6 +621,13 @@ body {
   }
   &-help {
     background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 .5A6.5 6.5 0 1 0 13.5 7 6.507 6.507 0 0 0 7 .5Zm0 12A5.5 5.5 0 1 1 12.5 7 5.507 5.507 0 0 1 7 12.5Zm.75-2.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm1.5-4.5A2.254 2.254 0 0 1 7.5 7.944V8a.5.5 0 0 1-1 0v-.5A.5.5 0 0 1 7 7a1.25 1.25 0 1 0-1.25-1.25.5.5 0 0 1-1 0 2.25 2.25 0 0 1 4.5 0Z' fill='url(%23a)'/%3E%3Cdefs%3E%3ClinearGradient id='a' x1='-1.994' y1='-3.4' x2='17.198' y2='-2.066' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FF512F'/%3E%3Cstop offset='1' stop-color='%23F09819'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E");
+  }
+  &-share {
+    background-image: url("data:image/svg+xml,%3Csvg width='19' height='22' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14.5 14a3.737 3.737 0 0 0-2.682 1.134l-4.322-2.779c.34-.871.34-1.839 0-2.71l4.322-2.779a3.745 3.745 0 1 0-.813-1.26L6.683 8.383a3.75 3.75 0 1 0 0 5.232l4.322 2.779A3.75 3.75 0 1 0 14.5 14Zm0-12a2.25 2.25 0 1 1 0 4.5 2.25 2.25 0 0 1 0-4.5ZM4 13.25a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5ZM14.5 20a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5Z' fill='url(%23a)'/%3E%3Cdefs%3E%3ClinearGradient id='a' x1='-3.207' y1='-5.796' x2='23.406' y2='-4.21' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FF512F'/%3E%3Cstop offset='1' stop-color='%23F09819'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E");
+    background-size: auto 100%;
+  }
+  &-download {
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.523 7.04a.627.627 0 1 1 .891-.884l2.211 2.211V1.125a.625.625 0 0 1 1.25 0v7.242l2.21-2.21a.627.627 0 0 1 .892.882L8.695 10.32a.64.64 0 0 1-.89 0L4.523 7.04Zm10.602 2.21a.625.625 0 0 0-.625.625v4.375H2V9.875a.625.625 0 0 0-1.25 0v4.375A1.25 1.25 0 0 0 2 15.5h12.5a1.25 1.25 0 0 0 1.25-1.25V9.875a.625.625 0 0 0-.625-.625Z' fill='url(%23a)'/%3E%3Cdefs%3E%3ClinearGradient id='a' x1='-2.127' y1='-4' x2='20.017' y2='-2.461' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FF512F'/%3E%3Cstop offset='1' stop-color='%23F09819'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E");
   }
 }
 .center-flex {

@@ -131,8 +131,8 @@ export default {
   }
   &List {
     list-style: none;
-    padding: 0;
-    margin: 0;
+    padding: 0 10px 0 0;
+    margin: 0 -10px 0 0;
     max-height: calc(100% - 30px);
     overflow-y: auto;
   }

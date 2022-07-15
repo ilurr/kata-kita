@@ -4,34 +4,20 @@
     <div class="scoreHead center-flex">
       <h2 class="scoreTitle" id="text2">Skor</h2>
       <div class="scoreHead__wrap">
-        <button class="button" id="show-modal" @click="showShare = true">
-          <img
-            src="@/assets/share.png"
-            class="scoreHead__img"
-            alt="Bagikan"
-            width="42"
-            height="40"
-          />
+        <button class="button buttonHead scoreBtn -download" @click="downloadCanvas('yes')">
+          <span class="buttonIcon icon-download"></span>
+        </button>
+        <button class="button buttonHead -share" @click="downloadCanvas('no')">
+          <span class="buttonIcon icon-share"></span>
         </button>
       </div>
     </div>
     <div class="scoreLvl center-flex">
-      <!-- <button class="button buttonScore buttonMenu buttonMenu--active">
-        4 Kata
-      </button>
-      <button class="button buttonScore buttonMenu">5 Kata</button>
-      <button class="button buttonScore buttonMenu">6 Kata</button> -->
-
-      <button
+      <button class="button buttonScore buttonMenu"
         v-for="tab in tabs"
         :key="tab.tabname"
-        :class="[
-          'button buttonScore buttonMenu',
-          { '-active': currentTab === tab.tabname },
-        ]"
-        @click="currentTab = tab.tabname"
-      >
-        {{ tab.text }} Kata
+        :class="{ '-active': currentTab === tab.tabname }" @click="currentTab = tab.tabname">
+        {{ tab.text }} Huruf
       </button>
     </div>
     <div class="scoreContent">
@@ -256,10 +242,14 @@ export default {
       img.src = this.userRank.template.rank;
       img.setAttribute('crossorigin', 'anonymous'); // works for me
     },
-    downloadCanvas() {
+    downloadCanvas(save) {
       let filesArray
       let url = document.getElementById('rankCanvas').toDataURL();
-      // if(save==true) {
+      if(save=='yes') {
+        let tab = window.open('about:blank', '_blank');
+        tab.document.write('<img src="'+url+'" style="height: 100%"/>');
+      } else {
+
         fetch(url)
           .then(function (response) {
               return response.blob()
@@ -287,10 +277,7 @@ export default {
           .catch(function (error) {
               console.log(error);
           });
-      // } else {
-      //   let tab = window.open('about:blank', '_blank');
-      //   tab.document.write('<img src="'+url+'" style="height: 100%"/>');
-      // }
+      }
 
     },
     getRankAfter(lvl) {
@@ -372,13 +359,17 @@ export default {
     justify-content: space-between;
     width: 100%;
     height: 60px;
+    padding: 0 5px;
     &__wrap {
+      position: relative;
       padding-left: 10px;
       padding-right: 10px;
+      display: flex;
+      gap: 10px;
     }
   }
   &Title {
-    margin: 0 15px;
+    margin-left: 10px;
     font-family: var(--font-parent);
     font-weight: 500;
     font-size: 24px;
@@ -386,8 +377,15 @@ export default {
     color: var(--cl-white);
   }
   &Lvl {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+  &Btn {
+    &.-download {
+      @media screen and (min-width: 768px) {
+        display: none;
+      }
+    }
   }
 }
 .button {
