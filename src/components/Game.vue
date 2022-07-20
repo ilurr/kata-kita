@@ -20,8 +20,8 @@
             height="16"
           />
           <span v-if="clueLimit>0">Contekan ({{ clueLimit }}x)</span>
-          <span v-else>Contekan Habis</span>
-          <!-- <span v-else>{{ clueLimitCharge }}</span> -->
+          <!-- <span v-else>Contekan Habis</span> -->
+          <span v-else>{{ clueLimitCharge }}</span>
         </button>
       </div>
     </div>
@@ -175,13 +175,8 @@
         <div class="modalGame__footer">
           <button class="button buttonPrimary" @click="$emit('backHome')">
             <!-- <button class="button buttonPrimary" @click="showResult = false, userAns = false"> -->
-            <img
-              src="@/assets/icon-home-white.png"
-              class="modalGame__icon"
-              alt=""
-              width="18"
-              height="18"
-            />Kembali ke Beranda
+            <span class="buttonIcon icon-reload"></span>
+            Main Lagi
           </button>
           <!-- </button> -->
           <button class="button buttonGame__share" @click="showShare = true">
@@ -630,7 +625,8 @@ export default {
       clueTimerVar: Number,
       clueLimit: 3,
       clueIsCount: 0,
-      clueLimitCharge: "00:30",
+      clueIntv: Number,
+      clueLimitCharge: "Contekan Habis",
       clueInsert: '',
       isWatchedAd: false,
       ansSecVar: 300,
@@ -658,6 +654,7 @@ export default {
     console.log(process.env.VUE_APP_KEY)
     let _this = this
     _this.cekClueLimit()
+    _this.countdownClue()
     if(this.levelChar>0) {
       _this.getQuestion()
       _this.getRankBefore()
@@ -845,6 +842,7 @@ export default {
     },
     cekClueLimit() {
       let _this = this
+      let cDate = new Date()
       let localClueLimit = _this.getCookie('clue_limit')
       let localClueIsCount = _this.getCookie('clue_is_count')
       let localClueCount = _this.getCookie('clue_count')
@@ -876,7 +874,7 @@ export default {
       // init
       if(!localClueCount && localClueLimit<3) {
         if(localClueIsCount<1) {
-          _this.setCookie('clue_count', 1, 0.0208333)
+          _this.setCookie('clue_count', parseInt(cDate.getTime() + (0.0208333*24*60*60*1000)), 0.0208333)
           localClueCount = 1
 
           _this.setCookie('clue_is_count', 1, 365);
@@ -916,12 +914,35 @@ export default {
       d.setTime(d.getTime() + (exdays*24*60*60*1000));
       let expires = "expires=" + d.toGMTString();
       // document.cookie = cname + "=" + cvalue + ";" + expires + "; path=/;";
-      document.cookie = cname + "=" + cvalue + ";" + expires + "; path=/; domain=kompas.com; SameSite=None; Secure"; // live
-      // console.log('kukis')
+      document.cookie = cname + "=" + cvalue + ";" + expires + "; path=/; "+ process.env.VUE_APP_COOKIE; // live
+      console.log(d)
     },
+    countdownClue() {
+      let _this = this
+      let localClueCount = _this.getCookie('clue_count')
+      let cMin, cSec;
+      console.log(localClueCount)
+      if(localClueCount) {
+        this.clueIntv = setInterval(function () {
+          let cDate = new Date();
+          let cTimer = localClueCount - cDate.getTime()
+          cMin = Math.floor(cTimer / 60000)
+          cSec = ((cTimer % 60000) / 1000).toFixed(0)
+  
+          _this.clueLimitCharge = (cSec == 60 ? (cMin+1) + ":00" : cMin + ":" + (cSec < 10 ? "0" : "") + cSec)
+          console.log(cDate.getTime())
+          console.log(_this.clueLimitCharge)
 
+          if (cTimer < 500) {
+            _this.clueLimitCharge = "Contekan Bertambah"
+            clearInterval(_this.clueIntv)
+          }
+        }, 1000);
+      }
+    },
     insertClue() {
       let _this = this
+      let cDate = new Date()
       let idx
       this.clueLimit--
       if(this.clueInsert.length>0) {
@@ -933,7 +954,7 @@ export default {
         _this.setCookie('clue_limit', this.clueLimit, 365);
       } else {
         _this.setCookie('clue_limit', this.clueLimit, 365);
-        _this.setCookie('clue_count', 1, 0.0208333);
+        _this.setCookie('clue_count', parseInt(cDate.getTime() + (0.0208333*24*60*60*1000)), 0.0208333);
         _this.setCookie('clue_is_count', 1, 365);
         this.clueIsCount = 1
       }
@@ -1624,6 +1645,9 @@ export default {
       border: 1px solid #F1F1F1;
       img {
         filter: grayscale(1);
+      }
+      span {
+        min-width: 35px;
       }
     }
     // visibility: hidden;

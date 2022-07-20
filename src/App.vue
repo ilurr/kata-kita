@@ -216,11 +216,11 @@ export default {
       if(!this.users.isLogged) {
         window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_parent');
       } else {
-        // gsap.to("#headerTop", 0.5, {
-        //   y: -90,
-        //   scale: 0.8,
-        //   ease: Expo.easeOut,
-        // });
+        gsap.to("#headerTop", 0.5, {
+          y: -90,
+          scale: 0.8,
+          ease: Expo.easeOut,
+        });
         gsap.to("#logo", 0.5, {
           scale: 1,
           ease: Expo.easeOut,
@@ -628,6 +628,10 @@ body {
   }
   &-download {
     background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.523 7.04a.627.627 0 1 1 .891-.884l2.211 2.211V1.125a.625.625 0 0 1 1.25 0v7.242l2.21-2.21a.627.627 0 0 1 .892.882L8.695 10.32a.64.64 0 0 1-.89 0L4.523 7.04Zm10.602 2.21a.625.625 0 0 0-.625.625v4.375H2V9.875a.625.625 0 0 0-1.25 0v4.375A1.25 1.25 0 0 0 2 15.5h12.5a1.25 1.25 0 0 0 1.25-1.25V9.875a.625.625 0 0 0-.625-.625Z' fill='url(%23a)'/%3E%3Cdefs%3E%3ClinearGradient id='a' x1='-2.127' y1='-4' x2='20.017' y2='-2.461' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23FF512F'/%3E%3Cstop offset='1' stop-color='%23F09819'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E");
+  }
+  &-reload {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M212.333 224.333H12c-6.627 0-12-5.373-12-12V12C0 5.373 5.373 0 12 0h48c6.627 0 12 5.373 12 12v78.112C117.773 39.279 184.26 7.47 258.175 8.007c136.906.994 246.448 111.623 246.157 248.532C504.041 393.258 393.12 504 256.333 504c-64.089 0-122.496-24.313-166.51-64.215-5.099-4.622-5.334-12.554-.467-17.42l33.967-33.967c4.474-4.474 11.662-4.717 16.401-.525C170.76 415.336 211.58 432 256.333 432c97.268 0 176-78.716 176-176 0-97.267-78.716-176-176-176-58.496 0-110.28 28.476-142.274 72.333h98.274c6.627 0 12 5.373 12 12v48c0 6.627-5.373 12-12 12z' fill='%23fff'/%3E%3C/svg%3E");
+    background-size: auto 100%;
   }
 }
 .center-flex {
