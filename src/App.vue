@@ -102,6 +102,8 @@ export default {
         data: {},
         error: '',
         isLogged: false,
+        isMobile: false,
+        adUnit: process.env.VUE_APP_ADS_SLOT
       },
       showLeave: false,
       showMenu: false,
@@ -121,6 +123,16 @@ export default {
     };
   },
   methods: {
+    userAgent() {
+      if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+        this.users.isMobile = true
+        this.users.adUnit = process.env.VUE_APP_ADS_SLOT_MOBILE
+      } else {
+        this.users.isMobile = false
+        this.users.adUnit = process.env.VUE_APP_ADS_SLOT
+      }
+      console.log(this.users.isMobile)
+    },
     isLeave() {
       this.showLeave = true
     },
@@ -272,26 +284,9 @@ export default {
       }
     },
   },
-  beforeCreate() {
-    console.log("Before create");
-  },
-  created() {
-    this.baseurl = process.env.VUE_APP_API_URL
-    console.log("Created"); //call data after component created
-    this.answers = [
-      { id: 1, guest: "marjan", time: 1000 },
-      { id: 2, guest: "parhan", time: 4000 },
-      { id: 3, guest: "darkan", time: 5000 },
-      { id: 4, guest: "marlam", time: 8000 },
-      { id: 5, guest: "damkar", time: 16000 },
-    ];
-  },
-  beforeMount() {
-    console.log("Before mount");
-  },
   mounted() {
+    this.userAgent()
     this.getUsers();
-    console.log("Mounted");
     gsap.to("#headerTop", 0.5, {
       y: -30,
       delay: 0.2,
@@ -334,13 +329,6 @@ export default {
         });
       },
     });
-  },
-  computed: {
-    findData() {
-      return this.answers.filter((item) => {
-        return item.guest.match(this.find);
-      });
-    },
   },
 };
 </script>

@@ -508,6 +508,7 @@ import KeyInput from "./InputBoard.vue";
 import KeyBtn from "./ButtonKeyboard.vue";
 import Modal_compo from "@/components/Modal-compo.vue";
 import Clue_compo from "@/components/Clue-compo.vue";
+// import { createSlotAd, destroyedSlotAd } from "@/common/ads";
 
 export default {
   name: "Game_compo",
@@ -639,10 +640,17 @@ export default {
         { char: "zxcvbnm" },
       ],
       getQ: { decryptedId: "", decryptedTitle: "", decryptedDescription: "" },
+      // rewardedSlot: 0,
+      // googletag: window.googletag || {cmd: []}
     }
   },
   setup() {
     console.log(CryptoJS);
+  },
+  beforeCreate() {
+    window.googletag.cmd.push(function() {
+      window.googletag.destroySlots();
+    });
   },
   created() {
     window.addEventListener("keydown", this.doCommand);
@@ -661,6 +669,40 @@ export default {
     }
   },
   methods: {
+    createSlotAd() {
+      let _this = this
+      let rewardedSlot
+      window.googletag.cmd.push(function() {
+        // rewardedSlot = googletag.defineOutOfPageSlot('/31800665/KOMPAS.COM_Mobile_Web/play/gamesKataKita', googletag.enums.OutOfPageFormat.REWARDED).addService(googletag.pubads());
+        rewardedSlot = window.googletag.defineOutOfPageSlot(_this.users.adUnit, window.googletag.enums.OutOfPageFormat.REWARDED);
+        console.log(rewardedSlot)
+        if (rewardedSlot) {
+          rewardedSlot.addService(window.googletag.pubads());
+          
+          window.googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
+            console.log('rewardedSlot')
+            _this.showDialogContekan = false
+            event.makeRewardedVisible();
+          });
+
+          window.googletag.pubads().addEventListener('rewardedSlotClosed', function() {
+            console.log('gajadi')
+            _this.showDialogContekan = false
+            window.googletag.destroySlots([rewardedSlot]);
+          });
+
+          window.googletag.pubads().addEventListener('rewardedSlotGranted', function() {
+            window.googletag.destroySlots([rewardedSlot]);
+            _this.isWatchedAd = true
+            _this.resumeGame()
+          });
+
+          window.googletag.enableServices();
+          window.googletag.display(rewardedSlot);
+        }
+      });
+    },
+
     getRankBefore() {
       // let _this = this;
         axios.get(process.env.VUE_APP_API_URL + this.apiMyRank.url + '?level=' + this.levelChar + '&kgid=' + this.users.kmpsid).then((response) => {
@@ -964,9 +1006,11 @@ export default {
     isContekan() {
       let _this = this
       _this.toggleTimer('pause')
-      _this.runClueTimer(process.env.VUE_APP_ADS_COUNT)
-      this.showDialogContekan = false
-      this.showContekan = true
+      // _this.runClueTimer(process.env.VUE_APP_ADS_COUNT)
+      // this.showDialogContekan = false
+      // this.showContekan = true
+
+      _this.createSlotAd()
     },
 
     toggleTimer(status) {
