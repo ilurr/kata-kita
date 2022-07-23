@@ -12,26 +12,12 @@
       <div class="footerItem" id="btnback">
         <button class="button footerBack__btn" @click="$emit('backHome')">
           <span class="buttonIcon icon-back"></span>
-          <!-- <img
-            src="@/assets/icon-back.png"
-            alt=""
-            class="footerBack"
-            width="16"
-            height="14"
-          /> -->
           <span class="buttonTxt">Kembali</span>
         </button>
       </div>
       <div class="footerItem" id="btnhome">
         <button class="button footerBack__btn" @click="$emit('isLeave')">
           <span class="buttonIcon icon-home"></span>
-          <!-- <img
-            src="@/assets/icon-home.png"
-            alt=""
-            class="footerBack"
-            width="16"
-            height="16"
-          /> -->
           <span class="buttonTxt">Beranda</span>        
         </button>
       </div>
@@ -48,18 +34,9 @@
 </template>
 
 <script>
-// import { gsap, Expo, Back } from "gsap";
-
 export default {
   name: "Footer_compo",
   props: ["isBackActive"],
-  // emits: ["isLeave"],
-  methods: {
-    // backHome() {
-    //   window.location.href = window.location.origin
-    //   console.log(window.location.origin)
-    // },
-  },
 };
 </script>
 

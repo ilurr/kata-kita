@@ -37,8 +37,6 @@
 </template>
 
 <script>
-// import { gsap, Expo } from "gsap";
-
 export default {
   name: "Menu_level",
   data() {

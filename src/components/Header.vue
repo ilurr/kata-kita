@@ -10,14 +10,12 @@
       width="482"
       height="360"
     />
-    <!-- <h1 cl>{{ gametitle }}</h1> -->
   </div>
 </template>
 
 <script>
 export default {
   name: "Header_compo",
-  props: ["gametitle"],
 };
 </script>
 

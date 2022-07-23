@@ -1,32 +1,17 @@
 <template>
-  <Header_compo :gametitle="gametitle" />
+  <Header_compo />
 
-  <!-- @click="(showMenu = !showMenu), (isHidden = true), hideMenu" -->
   <div v-if="!isHidden" id="menuWrap" class="menuWrap">
     <button
       class="button buttonMenu -active -loading"
       id="btnstart"
       @click="hideMenu"
     >
-      <span class="buttonIcon icon-game">
-        <!-- <img
-          src="@/assets/icon-game.png"
-          alt=""
-          width="23"
-          height="17"
-        /> -->
-      </span>
+      <span class="buttonIcon icon-game"></span>
       <span class="buttonTxt">Yuk Main</span>
     </button>
     <button class="button buttonMenu -loading" id="btnscore" @click="showScoreboard">
-      <span class="buttonIcon icon-trophy">
-        <!-- <img
-          src="@/assets/icon-score.png"
-          alt=""
-          width="20"
-          height="16"
-        /> -->
-      </span>
+      <span class="buttonIcon icon-trophy"></span>
       <span class="buttonTxt">Papan Skor</span>
     </button>
   </div>
@@ -108,17 +93,11 @@ export default {
       showLeave: false,
       showMenu: false,
       isHidden: false,
-      myGame: null,
       isBackActive: false,
       displayScoreboard: false,
       displayGameBoard: false,
-      number: 0,
-      tweenedNumber: 0,
       name: "Ilma",
       url: "https://ilmaisme.github.io",
-      answers: [],
-      find: "",
-      gametitle: "Game Kompla",
       levelChar: Number
     };
   },
@@ -137,13 +116,7 @@ export default {
       this.showLeave = true
     },
     backHome() {
-      // if(this.isLeave) {
-      //   this.displayLeave = true
-      // } else {
-      //   }
       window.location.href = process.env.VUE_APP_BASE_URL
-      // window.location.href = window.location.origin
-      console.log(window.location.origin)
     },
     getCookie(cname) {
       let name = cname + "=";
@@ -226,7 +199,7 @@ export default {
     },
     hideMenu() {
       if(!this.users.isLogged) {
-        window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_parent');
+        this.openSSO()
       } else {
         gsap.to("#headerTop", 0.5, {
           y: -90,
@@ -256,7 +229,7 @@ export default {
     },
     showScoreboard() {
       if(!this.users.isLogged) {
-        window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_parent');
+        this.openSSO()
       } else {
         gsap.to("#menuWrap", 0.5, {
           scale: 0,
@@ -283,6 +256,9 @@ export default {
         // console.log(this.userData);
       }
     },
+  },
+  openSSO() {
+    window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_parent');
   },
   mounted() {
     this.userAgent()
@@ -370,23 +346,6 @@ export default {
   height: 100%;
   height: -webkit-fill-available;
   overflow: auto;
-}
-@font-face {
-  font-family: "Roboto Slab";
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: local("Roboto Slab"),
-    url(https://fonts.gstatic.com/s/robotoslab/v22/BngbUXZYTXPIvIBgJJSb6s3BzlRRfKOFbvjovoSmb2Rj.woff2)
-      format("woff2");
-}
-@font-face {
-  font-family: "Mukta";
-  font-style: normal;
-  font-weight: 400;
-  src: local("Mukta"),
-    url(https://fonts.gstatic.com/s/mukta/v12/iJWKBXyXfDDVXbnBrXw.woff2)
-      format("woff2");
 }
 html,
 body {

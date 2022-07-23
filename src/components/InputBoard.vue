@@ -5,7 +5,6 @@
     :id="inputName"
     :value="inputValue"
   />
-  <!-- </button> -->
 </template>
 
 <script>

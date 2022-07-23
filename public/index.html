@@ -9,7 +9,7 @@
       })(window,document,'script','dataLayer','GTM-PT7PC4');</script>
       <!-- End Google Tag Manager -->
   
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0,maximum-scale=1">
 
@@ -34,22 +34,41 @@
     <meta property="fb:app_id" content="324557847592228" />
     <!-- e:fb meta -->
 
-    <!-- S:tweeter card -->
+    <!-- S:twitter card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@kompascom" />
     <meta name="twitter:creator" content="@kompascom">
     <meta name="twitter:title" content="<%= process.env.VUE_APP_TITLE %>" />
     <meta name="twitter:description" content="<%= process.env.VUE_APP_DESC %>" />
     <meta name="twitter:image" content="<%= BASE_URL %>banner-game-kata-kita.jpg" />
-    <!-- E:tweeter card -->
+    <!-- E:twitter card -->
+
+    <style>
+      @font-face {
+      font-family: "Roboto Slab";
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: local("Roboto Slab"),
+        url(https://fonts.gstatic.com/s/robotoslab/v22/BngbUXZYTXPIvIBgJJSb6s3BzlRRfKOFbvjovoSmb2Rj.woff2)
+          format("woff2");
+    }
+    @font-face {
+      font-family: "Mukta";
+      font-style: normal;
+      font-weight: 400;
+      src: local("Mukta"),
+        url(https://fonts.gstatic.com/s/mukta/v12/iJWKBXyXfDDVXbnBrXw.woff2)
+          format("woff2");
+    }
+    </style>
 
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <link rel="canonical" href="<%= BASE_URL %>" />
     <title><%= process.env.VUE_APP_TITLE %></title>
 
     <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
-    <script>var googletag = googletag || {};
-      googletag.cmd = googletag.cmd || [];</script>
+    <script>var googletag = googletag || {}; googletag.cmd = googletag.cmd || [];</script>
 
   </head>
   <body>

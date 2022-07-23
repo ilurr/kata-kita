@@ -3,8 +3,8 @@
     <div v-if="show" class="clue-mask">
       <div class="clue-wrapper">
         <div class="clue-container">
-					<slot name="body"></slot>
-				</div>
+			<slot name="body"></slot>
+		</div>
       </div>
     </div>
   </Transition>
