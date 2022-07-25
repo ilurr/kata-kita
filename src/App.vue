@@ -23,6 +23,32 @@
 
   <Footer_compo :isBackActive="isBackActive" @backHome='backHome' @isLeave='isLeave' />
 
+  <!-- s: modal error -->
+  <Teleport to="body">
+    <Modal_compo :show="showError" @close="showError = false">
+      <template #header>
+        <div class="modalHead center-flex">
+          <h3 class="modalTitle">Error</h3>
+        </div>
+      </template>
+      <template #body>
+        <div class="modalGame__body">
+          <p>
+            {{ showErrorMsg }}
+          </p>
+        </div>
+      </template>
+      <template #footer>
+        <div class="modalGame__footer">
+          <button class="button buttonSecondary" @click="backHome()">
+            Refresh 
+          </button>
+        </div>
+      </template>
+    </Modal_compo>
+  </Teleport>
+  <!-- e: modal error -->
+
   <!-- s: modal leave -->
   <Teleport to="body">
     <Modal_compo :show="showLeave" @close="showLeave = false">
@@ -90,6 +116,8 @@ export default {
         isMobile: false,
         adUnit: process.env.VUE_APP_ADS_SLOT
       },
+      showError: false,
+      showErrorMsg: '',
       showLeave: false,
       showMenu: false,
       isHidden: false,
@@ -102,6 +130,10 @@ export default {
     };
   },
   methods: {
+    modalError(msg) {
+      this.showError = true
+      this.showErrorMsg = msg
+    },
     userAgent() {
       if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
         this.users.isMobile = true
@@ -134,6 +166,8 @@ export default {
       return "";
     },
     async getUsers() {
+      let _this = this;
+      let ermsg = 'Gagal load akun Anda, silakan refresh halaman ini.'
       try {
         const response = await axios.get("https://subs.kompas.com/api/v1/subscription?user_id=" + this.getCookie('kmps_usrid') + "&token=" + this.getCookie('kmp_uid') + "&loginwith=" + this.getCookie("lgn_w"));
         console.log(response.data);
@@ -155,6 +189,7 @@ export default {
         document.getElementById('btnscore').classList.remove('-loading')
 
       } catch (error) {
+        _this.modalError(ermsg);
         console.log(error.response.status);
         this.users.error = error.response.status
       }
@@ -198,8 +233,9 @@ export default {
       });
     },
     hideMenu() {
+      let _this = this
       if(!this.users.isLogged) {
-        this.openSSO()
+        _this.openSSO()
       } else {
         gsap.to("#headerTop", 0.5, {
           y: -90,
@@ -228,8 +264,9 @@ export default {
       }
     },
     showScoreboard() {
+      let _this = this
       if(!this.users.isLogged) {
-        this.openSSO()
+        _this.openSSO()
       } else {
         gsap.to("#menuWrap", 0.5, {
           scale: 0,
@@ -256,9 +293,9 @@ export default {
         // console.log(this.userData);
       }
     },
-  },
-  openSSO() {
-    window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_parent');
+    openSSO() {
+      window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_parent');
+    },
   },
   mounted() {
     this.userAgent()

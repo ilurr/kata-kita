@@ -508,7 +508,6 @@ import KeyInput from "./InputBoard.vue";
 import KeyBtn from "./ButtonKeyboard.vue";
 import Modal_compo from "@/components/Modal-compo.vue";
 import Clue_compo from "@/components/Clue-compo.vue";
-// import { createSlotAd, destroyedSlotAd } from "@/common/ads";
 
 export default {
   name: "Game_compo",
@@ -640,12 +639,7 @@ export default {
         { char: "zxcvbnm" },
       ],
       getQ: { decryptedId: "", decryptedTitle: "", decryptedDescription: "" },
-      // rewardedSlot: 0,
-      // googletag: window.googletag || {cmd: []}
     }
-  },
-  setup() {
-    console.log(CryptoJS);
   },
   beforeCreate() {
     window.googletag.cmd.push(function() {
@@ -682,13 +676,14 @@ export default {
           window.googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
             console.log('rewardedSlot')
             _this.showDialogContekan = false
+            _this.toggleTimer('pause')
             event.makeRewardedVisible();
           });
 
           window.googletag.pubads().addEventListener('rewardedSlotClosed', function() {
+            window.googletag.destroySlots([rewardedSlot]);
             console.log('gajadi')
             _this.showDialogContekan = false
-            window.googletag.destroySlots([rewardedSlot]);
           });
 
           window.googletag.pubads().addEventListener('rewardedSlotGranted', function() {
@@ -699,6 +694,8 @@ export default {
 
           window.googletag.enableServices();
           window.googletag.display(rewardedSlot);
+        } else {
+          console.log('rewarded not defined')
         }
       });
     },
@@ -757,28 +754,6 @@ export default {
         });
         console.log(this.apiQuestion);
     },
-    // async getQuestion_() {
-    //     try {
-    //       const response = await axios.get(process.env.VUE_APP_API_URL + this.apiQuestion.url + '?level=' + this.levelChar);
-    //       console.log(response);
-    //       if (!response.ok) {
-    //         const error = (response && response.message) || response.statusText;
-    //         this.apiQuestion.status = error
-    //         // return Promise.reject(error);
-    //       }
-
-    //       this.apiQuestion.query = response.data
-    //       this.apiQuestion.status = response.status
-
-    //       this.getQ.decryptedId = this.apiQuestion.query.data.id
-    //       this.getQ.decryptedTitle = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.title, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).toLowerCase()
-    //       this.getQ.decryptedDescription = JSON.parse(CryptoJS.AES.decrypt(this.apiQuestion.query.data.description, this.key, {format: this.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)).replace(/&nbsp;/g, " ")
-
-    //     } catch (error) {
-    //       this.apiQuestion.status = error.response.status
-    //     }
-
-    // },
     getKBBI(answer) {
       let _this = this;
         axios.get(process.env.VUE_APP_API_URL + this.apiKBBI.url + '?title=' + answer.join('')).then((response) => {
@@ -872,6 +847,7 @@ export default {
 
     resumeGame() {
       let _this = this
+      console.log('resumeGame')
       _this.toggleTimer('play')
       _this.stopTimer(this.clueTimerVar)
       this.showClaim = false;
@@ -1006,6 +982,7 @@ export default {
     isContekan() {
       let _this = this
       _this.toggleTimer('pause')
+      console.log('isContekan')
       // _this.runClueTimer(process.env.VUE_APP_ADS_COUNT)
       // this.showDialogContekan = false
       // this.showContekan = true
