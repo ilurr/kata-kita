@@ -664,36 +664,38 @@ export default {
   },
   methods: {
     createSlotAd() {
+      console.log('createSlotAd')
       let _this = this
       let rewardedSlot
-      window.googletag.cmd.push(function() {
+      let googletag = window.googletag || {cmd: []}
+      googletag.cmd.push(function() {
         // rewardedSlot = googletag.defineOutOfPageSlot('/31800665/KOMPAS.COM_Mobile_Web/play/gamesKataKita', googletag.enums.OutOfPageFormat.REWARDED).addService(googletag.pubads());
-        rewardedSlot = window.googletag.defineOutOfPageSlot(_this.users.adUnit, window.googletag.enums.OutOfPageFormat.REWARDED);
+        rewardedSlot = googletag.defineOutOfPageSlot(_this.users.adUnit, googletag.enums.OutOfPageFormat.REWARDED);
         console.log(rewardedSlot)
         if (rewardedSlot) {
-          rewardedSlot.addService(window.googletag.pubads());
+          rewardedSlot.addService(googletag.pubads());
           
-          window.googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
+          googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
             console.log('rewardedSlot')
             _this.showDialogContekan = false
             _this.toggleTimer('pause')
             event.makeRewardedVisible();
           });
 
-          window.googletag.pubads().addEventListener('rewardedSlotClosed', function() {
-            window.googletag.destroySlots([rewardedSlot]);
+          googletag.pubads().addEventListener('rewardedSlotClosed', function() {
+            googletag.destroySlots([rewardedSlot]);
             console.log('gajadi')
             _this.showDialogContekan = false
           });
 
-          window.googletag.pubads().addEventListener('rewardedSlotGranted', function() {
-            window.googletag.destroySlots([rewardedSlot]);
+          googletag.pubads().addEventListener('rewardedSlotGranted', function() {
+            googletag.destroySlots([rewardedSlot]);
             _this.isWatchedAd = true
             _this.resumeGame()
           });
 
-          window.googletag.enableServices();
-          window.googletag.display(rewardedSlot);
+          googletag.enableServices();
+          googletag.display(rewardedSlot);
         } else {
           console.log('rewarded not defined')
         }

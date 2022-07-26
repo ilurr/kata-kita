@@ -40,7 +40,7 @@
       </template>
       <template #footer>
         <div class="modalGame__footer">
-          <button class="button buttonSecondary" @click="backHome()">
+          <button class="button buttonPrimary" @click="backHome()">
             Refresh 
           </button>
         </div>
@@ -167,7 +167,7 @@ export default {
     },
     async getUsers() {
       let _this = this;
-      let ermsg = 'Gagal load akun Anda, silakan refresh halaman ini.'
+      let ermsg = 'Gagal memuat akun Anda, silakan refresh halaman ini.'
       try {
         const response = await axios.get("https://subs.kompas.com/api/v1/subscription?user_id=" + this.getCookie('kmps_usrid') + "&token=" + this.getCookie('kmp_uid') + "&loginwith=" + this.getCookie("lgn_w"));
         console.log(response.data);
