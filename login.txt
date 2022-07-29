@@ -1,0 +1,53 @@
+kmp_uid
+V0hkek5USTVTRVpKVGpsNmNuVlBaM1I0U0dwMlVHVmthVzlxSzNJemFGSlNZbEoxUkVOMWJrTmtiM3BwY0hGb1VESk1jVkk0TVVnNGRGaFRTMVUzYWtGWGVpOTJVR0YyTWpsQldHMUlhVlZvUzJST1VsRTlQUT09
+
+lgn_w
+kompasid
+
+kmps_usrid
+b8ccd701afbd0b8dd872c8d6d95db54b
+
+[
+    {
+        "domain": "localhost",
+        "hostOnly": true,
+        "httpOnly": false,
+        "name": "lgn_w",
+        "path": "/",
+        "sameSite": null,
+        "secure": false,
+        "session": true,
+        "storeId": null,
+        "value": "kompasid"
+    },
+    {
+        "domain": "localhost",
+        "hostOnly": true,
+        "httpOnly": false,
+        "name": "kmp_uid",
+        "path": "/",
+        "sameSite": null,
+        "secure": false,
+        "session": true,
+        "storeId": null,
+        "value": "V0hkek5USTVTRVpKVGpsNmNuVlBaM1I0U0dwMlVHVmthVzlxSzNJemFGSlNZbEoxUkVOMWJrTmtiM3BwY0hGb1VESk1jVkk0TVVnNGRGaFRTMVUzYWtGWGVpOTJVR0YyTWpsQldHMUlhVlZvUzJST1VsRTlQUT09"
+    },
+    {
+        "domain": "localhost",
+        "hostOnly": true,
+        "httpOnly": false,
+        "name": "kmps_usrid",
+        "path": "/",
+        "sameSite": null,
+        "secure": false,
+        "session": true,
+        "storeId": null,
+        "value": "b8ccd701afbd0b8dd872c8d6d95db54b"
+    }
+]
+
+VUE_APP_BASE_URL=/
+VUE_APP_ADS_COUNT=10
+VUE_APP_COOKIE= 
+VUE_APP_ADS_SLOT=/22639388115/rewarded_web_example
+VUE_APP_ADS_SLOT_MOBILE=/22639388115/rewarded_web_example
