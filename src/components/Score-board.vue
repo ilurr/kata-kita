@@ -128,6 +128,7 @@ import Modal_compo from "@/components/Modal-compo.vue";
 import score4_compo from "@/components/score4-board.vue";
 import score5_compo from "@/components/score5-board.vue";
 import score6_compo from "@/components/score6-board.vue";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 export default {
   components: {
@@ -156,8 +157,8 @@ export default {
       },
       userRank: {
         template: {
-          // rank: '/bg-rank.png'
-          rank: 'https://i.ibb.co/6BHGFF4/bg-rank.png'
+          rank: process.env.VUE_APP_BASE_URL+'bg-rank.png'
+          // rank: 'https://i.ibb.co/6BHGFF4/bg-rank.png'
         },
         name: '',
         rankNow: {
@@ -178,6 +179,7 @@ export default {
   },
   mounted() {
     // let _this = this
+    logEvent(getAnalytics(), 'KATAKITA_KLIK_PAPANSKOR');
     if(this.users.kmpsid.length>0) {
       this.getRankAfter(4)
       this.getRankAfter(5)
@@ -243,6 +245,7 @@ export default {
       img.setAttribute('crossorigin', 'anonymous'); // works for me
     },
     downloadCanvas(save) {
+      logEvent(getAnalytics(), 'KATAKITA_PAPANSKOR_SHARE');
       let filesArray
       let url = document.getElementById('rankCanvas').toDataURL();
       if(save=='yes') {

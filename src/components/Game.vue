@@ -3,7 +3,7 @@
     <canvas class="gameCanvas" id="gameCanvas" width="900" height="1600"></canvas>
     <div class="gameHead center-flex">
       <div class="gameHead__wrap">
-        <button class="button buttonHead -help" @click="showHelp = true">
+        <button class="button buttonHead -help" @click="showHelpBox()">
           <span class="buttonIcon icon-help"></span>
         </button>
         <button class="button buttonHead -audio" :class="{'-active': audio.isPlaying}" @click.prevent="audio.isPlaying ? pause(audio) : play(audio)">
@@ -11,7 +11,7 @@
         </button>
       </div>
       <div class="gameHead__wrap">
-        <button class="button buttonClue" :class="{'-disabled': clueLimit<1}" @click.prevent="clueLimit>0 ? showDialogContekan = true : showDialogContekan = false">
+        <button class="button buttonClue" :class="{'-disabled': clueLimit<1}" @click.prevent="clueLimit>0 ? showDialogContekanBox() : showDialogContekan = false">
           <img
             src="@/assets/icon-clue.png"
             class="gameHead__img"
@@ -179,7 +179,7 @@
             Main Lagi
           </button>
           <!-- </button> -->
-          <button class="button buttonGame__share" @click="showShare = true">
+          <button class="button buttonGame__share" @click="showShareBox()">
             <span class="buttonIcon icon-share"></span>
           </button>
         </div>
@@ -405,7 +405,7 @@
       </template>
       <template #footer>
         <div class="modalGame__footer">
-          <button class="button buttonSecondary" @click="showDialogContekan = false">
+          <button class="button buttonSecondary" @click="showDialogContekanDismiss()">
             Batal 
           </button>
           <button class="button buttonPrimary" @click="isContekan()">
@@ -508,6 +508,7 @@ import KeyInput from "./InputBoard.vue";
 import KeyBtn from "./ButtonKeyboard.vue";
 import Modal_compo from "@/components/Modal-compo.vue";
 import Clue_compo from "@/components/Clue-compo.vue";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 export default {
   name: "Game_compo",
@@ -585,8 +586,8 @@ export default {
       userAns: false,
       userRank: {
         template: {
-          score: 'https://i.ibb.co/vjp0CxH/bg-skor.png'
-          // score: process.env.VUE_APP_BASE_URL+'bg-skor.png'
+          // score: 'https://i.ibb.co/vjp0CxH/bg-skor.png'
+          score: process.env.VUE_APP_BASE_URL+'bg-skor.png'
         },
         rankNow: 0,
         rankLast: 0,
@@ -658,11 +659,20 @@ export default {
     _this.cekClueLimit()
     _this.countdownClue()
     if(this.levelChar>0) {
+      logEvent(getAnalytics(), 'KATAKITA_PLAY_'+this.levelChar+'HURUF');
       _this.getQuestion()
       _this.getRankBefore()
     }
   },
   methods: {
+    showShareBox() {
+      this.showShare = true
+      logEvent(getAnalytics(), 'KATAKITA_SHARE');
+    },
+    showHelpBox() {
+      this.showHelp = true
+      logEvent(getAnalytics(), 'KATAKITA_BANTUAN');
+    },
     createSlotAd() {
       console.log('createSlotAd')
       let _this = this
@@ -676,6 +686,7 @@ export default {
           rewardedSlot.addService(googletag.pubads());
           
           googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
+            logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_SHOW');
             console.log('rewardedSlot')
             _this.showDialogContekan = false
             _this.toggleTimer('pause')
@@ -683,12 +694,14 @@ export default {
           });
 
           googletag.pubads().addEventListener('rewardedSlotClosed', function() {
+            logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_FAILED');
             googletag.destroySlots([rewardedSlot]);
             console.log('gajadi')
             _this.showDialogContekan = false
           });
 
           googletag.pubads().addEventListener('rewardedSlotGranted', function() {
+            logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_SUCCESS');
             googletag.destroySlots([rewardedSlot]);
             _this.isWatchedAd = true
             _this.resumeGame()
@@ -980,8 +993,16 @@ export default {
       }
       _this.toastShow('Huruf <strong>ke-'+ idx.substr(0,1) + '</strong> adalah: <strong>' + idx.substr(1,1) +'</strong>', false);
     },
-
+    showDialogContekanBox() {
+      logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS');
+      this.showDialogContekan = true
+    },
+    showDialogContekanDismiss() {
+      logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_BATAL');
+      this.showDialogContekan = false
+    },
     isContekan() {
+      logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_CLICKED');
       let _this = this
       _this.toggleTimer('pause')
       console.log('isContekan')
@@ -1183,6 +1204,7 @@ export default {
 
     // display popup result, reset variables
     onGameOver() {
+      logEvent(getAnalytics(), 'KATAKITA_GAME_OVER');
       // this.getRankAfter()
       // this.initCanvas()
       this.generateText()

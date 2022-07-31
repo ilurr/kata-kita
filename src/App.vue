@@ -96,6 +96,7 @@ import Game_compo from "@/components/Game.vue";
 import Scoreboard_compo from "@/components/Score-board.vue";
 import Footer_compo from "@/components/Footer.vue";
 import Modal_compo from "@/components/Modal-compo.vue";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 export default {
   name: "App",
@@ -148,6 +149,7 @@ export default {
       this.showLeave = true
     },
     backHome() {
+      logEvent(getAnalytics(), 'KATAKITA_HOME');
       window.location.href = process.env.VUE_APP_BASE_URL
     },
     getCookie(cname) {
@@ -233,6 +235,7 @@ export default {
       });
     },
     hideMenu() {
+      logEvent(getAnalytics(), 'KATAKITA_KLIK_YUKMAIN');
       let _this = this
       if(!this.users.isLogged) {
         _this.openSSO()
@@ -298,6 +301,7 @@ export default {
     },
   },
   mounted() {
+    logEvent(getAnalytics(), 'KATAKITA_LOAD_GAME');
     this.userAgent()
     this.getUsers();
     gsap.to("#headerTop", 0.5, {
