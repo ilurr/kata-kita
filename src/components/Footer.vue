@@ -21,6 +21,12 @@
           <span class="buttonTxt">Beranda</span>        
         </button>
       </div>
+      <div class="footerItem" id="btnhome2">
+        <button class="button footerBack__btn" @click="$emit('backHome')">
+          <span class="buttonIcon icon-home"></span>
+          <span class="buttonTxt">Beranda</span>        
+        </button>
+      </div>
       <div class="footerItem -play">
         <img
           src="@/assets/logokomplay.png"

@@ -35,7 +35,7 @@
       </li>
     </ul>
   </div>
-  <div v-else>
+  <div class="scoreContent__wrap text-center" v-else>
     <p>Data masih kosong</p>
   </div>    
 </template>

@@ -18,7 +18,7 @@
 
   <Menu_level @showGame="displayGame" v-if="showMenu" />
 
-  <Game_compo :levelChar="levelChar" v-if="displayGameBoard" @backHome='backHome' :users="users" />
+  <Game_compo :levelChar="levelChar" v-if="displayGameBoard" @playAgain='playAgain' @backHome='backHome' :users="users" />
   <Scoreboard_compo v-if="displayScoreboard" :users="users" />
 
   <Footer_compo :isBackActive="isBackActive" @backHome='backHome' @isLeave='isLeave' />
@@ -196,6 +196,35 @@ export default {
         this.users.error = error.response.status
       }
     },
+    playAgain() {
+      logEvent(getAnalytics(), 'KATAKITA_PLAY_PLAY_AGAIN');
+      this.showResult = false
+      this.isBackActive = true;
+      this.displayGameBoard = false;
+      gsap.to("#logo", 0.5, {
+        scale: 1,
+        opacity: 1,
+        ease: Expo.easeOut,
+        onComplete: () => {
+          this.showMenu = true;
+        }
+      });
+      gsap.to("#headerTop", 0.5, {
+        y: -90,
+        opacity: 1,
+        scale: 0.8,
+        ease: Expo.easeOut,
+      });
+      gsap.to("#btnhome", 0.2, {
+        display: 'none',
+        ease: Expo.easeOut,
+      });
+      gsap.to("#btnhome2", 0.2, {
+        display: 'block',
+        delay: 0.2,
+        ease: Expo.easeOut,
+      });
+    },
     displayGame(val) {
       this.levelChar = val;
       gsap.to("#headerTop", 0.5, {
@@ -223,15 +252,20 @@ export default {
         scale: 0,
         ease: Expo.easeIn,
       });
-      gsap.to("#btnback", 0.5, {
+      gsap.to("#btnback", 0.2, {
         display: 'none',
         ease: Expo.easeOut,
-        onComplete: () => {
-          gsap.to("#btnhome", 0.5, {
-            display: 'block',
-            ease: Expo.easeIn,
-          });
-        }
+        // onComplete: () => {
+        //   }
+      });
+      gsap.to("#btnhome2", 0.2, {
+        display: 'none',
+        ease: Expo.easeOut,
+      });
+      gsap.to("#btnhome", 0.2, {
+        display: 'block',
+        delay: 0.2,
+        ease: Expo.easeIn,
       });
     },
     hideMenu() {

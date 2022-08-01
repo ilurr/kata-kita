@@ -173,7 +173,7 @@
       </template>
       <template #footer>
         <div class="modalGame__footer">
-          <button class="button buttonPrimary" @click="$emit('backHome')">
+          <button class="button buttonPrimary" @click="$emit('playAgain')">
             <!-- <button class="button buttonPrimary" @click="showResult = false, userAns = false"> -->
             <span class="buttonIcon icon-reload"></span>
             Main Lagi
@@ -519,7 +519,7 @@ export default {
     Clue_compo,
   },
   props: ["levelChar","users"],
-  emits: ["backHome"],
+  emits: ["backHome","playAgain"],
   data() {
     return {
       key: 'G4mKatKit',
@@ -963,8 +963,8 @@ export default {
           cSec = ((cTimer % 60000) / 1000).toFixed(0)
   
           _this.clueLimitCharge = (cSec == 60 ? (cMin+1) + ":00" : cMin + ":" + (cSec < 10 ? "0" : "") + cSec)
-          console.log(cDate.getTime())
-          console.log(_this.clueLimitCharge)
+          // console.log(cDate.getTime())
+          // console.log(_this.clueLimitCharge)
 
           if (cTimer < 500) {
             _this.clueLimitCharge = "Contekan Bertambah"
@@ -1534,6 +1534,7 @@ export default {
       // display: flex;
       // justify-content: center;
       margin: 0 auto;
+      color: #fff;
     }
   }
   &Toast {
