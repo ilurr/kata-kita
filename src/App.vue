@@ -458,6 +458,18 @@ body {
     font-size: 14px;
     padding: 10px 15px;
   }
+  &.-disabled {
+    pointer-events: none;
+    background: #F1F1F1;
+    color: #757575;
+    border: 1px solid #F1F1F1;
+    img {
+      filter: grayscale(1);
+    }
+    span {
+      min-width: 35px;
+    }
+  }
   &Head {
     width: 36px;
     height: 36px;

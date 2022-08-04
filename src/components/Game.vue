@@ -302,6 +302,54 @@
   </Teleport>
   <!-- e: modal error -->
 
+  <!-- s: modal iklan kosong -->
+  <Teleport to="body">
+    <Modal_compo :show="adEmpty" @close="adEmpty = false">
+      <template #header>
+        <div class="modalHead center-flex">
+          <h3 class="modalTitle">Iklan</h3>
+        </div>
+      </template>
+      <template #body>
+        <div class="modalGame__body">
+          <p>Iklan tidak tersedia, silakan coba beberapa saat lagi.</p>
+        </div>
+      </template>
+      <template #footer>
+        <div class="modalGame__footer">
+          <button class="button buttonSecondary" @click="adEmpty = false">
+            <img
+              src="@/assets/icon-close.png"
+              class="modalIcon"
+              alt=""
+              width="15"
+              height="15"
+            />Tutup 
+          </button>
+        </div>
+      </template>
+    </Modal_compo>
+  </Teleport>
+  <!-- e: modal iklan kosong -->
+
+  <!-- s: modal loading iklan -->
+  <Teleport to="body">
+    <Modal_compo :show="adLoading" @close="adLoading = false">
+      <template #header>
+        <div class="modalHead center-flex">
+          <h3 class="modalTitle">Iklan</h3>
+        </div>
+      </template>
+      <template #body>
+        <div class="modalGame__body">
+          <p class="text-center">Silakan tunggu...</p>
+        </div>
+      </template>
+      <template #footer></template>
+    </Modal_compo>
+  </Teleport>
+  <!-- e: modal loading iklan -->
+
   <!-- s: modal share -->
   <Teleport to="body">
     <!-- use the modal component, pass in the prop -->
@@ -408,7 +456,7 @@
           <button class="button buttonSecondary" @click="showDialogContekanDismiss()">
             Batal 
           </button>
-          <button class="button buttonPrimary" @click="isContekan()">
+          <button id="isContekanBtn" class="button buttonPrimary" @click="isContekan()">
             Ya, Lanjutkan 
           </button>
         </div>
@@ -640,6 +688,9 @@ export default {
         { char: "zxcvbnm" },
       ],
       getQ: { decryptedId: "", decryptedTitle: "", decryptedDescription: "" },
+      adLoading: false,
+      adEmpty: false,
+      adCheck: Number
     }
   },
   beforeCreate() {
@@ -675,8 +726,12 @@ export default {
     },
     createSlotAd() {
       console.log('createSlotAd')
+      document.getElementById('isContekanBtn').classList.add('-disabled')
+      this.showDialogContekan = false
+      this.adLoading = true
       let _this = this
       let rewardedSlot
+      this.isWatchedAd = false
       let googletag = window.googletag || {cmd: []}
       googletag.cmd.push(function() {
         // rewardedSlot = googletag.defineOutOfPageSlot('/31800665/KOMPAS.COM_Mobile_Web/play/gamesKataKita', googletag.enums.OutOfPageFormat.REWARDED).addService(googletag.pubads());
@@ -685,10 +740,24 @@ export default {
         if (rewardedSlot) {
           rewardedSlot.addService(googletag.pubads());
           
+          googletag.pubads().addEventListener('slotRenderEnded', function(event) {
+            // let slotId = event.slot.getSlotElementId();
+            let isEmpty = event.isEmpty;
+            if (isEmpty) {
+              console.log('kosyong')
+              clearInterval(_this.adCheck)
+              _this.adLoading = false
+              _this.adEmpty = true
+            // } else {
+            //   console.log(slotId)
+            }
+          });
+
           googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
             logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_SHOW');
             console.log('rewardedSlot')
-            _this.showDialogContekan = false
+            // _this.showDialogContekan = false
+            _this.adLoading = false
             _this.toggleTimer('pause')
             event.makeRewardedVisible();
           });
@@ -697,22 +766,33 @@ export default {
             logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_FAILED');
             googletag.destroySlots([rewardedSlot]);
             console.log('gajadi')
-            _this.showDialogContekan = false
+            // _this.showDialogContekan = false
+            _this.adLoading = false
+            clearInterval(_this.adCheck)
           });
 
           googletag.pubads().addEventListener('rewardedSlotGranted', function() {
             logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_SUCCESS');
             googletag.destroySlots([rewardedSlot]);
             _this.isWatchedAd = true
-            _this.resumeGame()
+            // _this.resumeGame()
           });
 
           googletag.enableServices();
           googletag.display(rewardedSlot);
         } else {
           console.log('rewarded not defined')
+          clearInterval(_this.adCheck)
         }
       });
+      this.adCheck = setInterval(function () {
+        console.log(_this.isWatchedAd)
+        if(_this.isWatchedAd) {
+          _this.resumeGame()
+          console.log('clear')
+          clearInterval(_this.adCheck)
+        }
+      }, 900)
     },
 
     getRankBefore() {
@@ -1684,18 +1764,6 @@ export default {
     line-height: 20px;
     color: var(--cl-main);
     border: 1px solid var(--cl-main);
-    &.-disabled {
-      pointer-events: none;
-      background: #F1F1F1;
-      color: #757575;
-      border: 1px solid #F1F1F1;
-      img {
-        filter: grayscale(1);
-      }
-      span {
-        min-width: 35px;
-      }
-    }
     // visibility: hidden;
   }
   &Game {

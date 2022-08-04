@@ -12,12 +12,7 @@
           </div>
 
           <div class="modal-footer">
-            <slot name="footer">
-              default footer
-              <button class="modal-default-button" @click="$emit('close')">
-                OK
-              </button>
-            </slot>
+            <slot name="footer"></slot>
           </div>
         </div>
       </div>
@@ -106,6 +101,12 @@ export default {
     padding: 14px 15px;
     position: relative;
     box-shadow: 0px -5px 10px rgba(51, 51, 51, 0.05);
+    &:empty {
+      box-shadow: none;
+      padding: 5px;
+      background: #fafafa;
+      border-radius: 0 0 10px 10px;
+    }
   }
   &Head {
     display: flex;
