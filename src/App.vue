@@ -143,7 +143,6 @@ export default {
         this.users.isMobile = false
         this.users.adUnit = process.env.VUE_APP_ADS_SLOT
       }
-      console.log(this.users.isMobile)
     },
     isLeave() {
       this.showLeave = true
@@ -248,10 +247,6 @@ export default {
           // });
         },
       });
-      gsap.to("#ftLogo", 0.5, {
-        scale: 0,
-        ease: Expo.easeIn,
-      });
       gsap.to("#btnback", 0.2, {
         display: 'none',
         ease: Expo.easeOut,
@@ -282,6 +277,10 @@ export default {
         gsap.to("#logo", 0.5, {
           scale: 1,
           ease: Expo.easeOut,
+        });
+        gsap.to("#ftLogo", 0.5, {
+          opacity: 0,
+          ease: Expo.easeIn,
         });
         gsap.to("#menuWrap", 0.5, {
           scale: 0,
@@ -467,7 +466,7 @@ body {
       filter: grayscale(1);
     }
     span {
-      min-width: 35px;
+      min-width: 40px;
     }
   }
   &Head {

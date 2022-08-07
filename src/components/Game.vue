@@ -11,7 +11,7 @@
         </button>
       </div>
       <div class="gameHead__wrap">
-        <button class="button buttonClue" :class="{'-disabled': clueLimit<1}" @click.prevent="clueLimit>0 ? showDialogContekanBox() : showDialogContekan = false">
+        <button class="button buttonClue" :class="{'-disabled': clueLimit<1}" @click.prevent="clueLimit>0 ? dialogContekanBox() : dialogContekan = false">
           <img
             src="@/assets/icon-clue.png"
             class="gameHead__img"
@@ -431,7 +431,7 @@
 
   <!-- s: modal dialog contekan -->
   <Teleport to="body">
-    <Modal_compo :show="showDialogContekan" @close="showDialogContekan = false">
+    <Modal_compo :show="dialogContekan" @close="dialogContekan = false">
       <template #header>
         <div class="modalHead align-center">
           <h3 class="modalTitle">Gunakan Petunjuk?</h3>
@@ -453,10 +453,10 @@
       </template>
       <template #footer>
         <div class="modalGame__footer">
-          <button class="button buttonSecondary" @click="showDialogContekanDismiss()">
+          <button class="button buttonSecondary" @click="dialogContekanDismiss()">
             Batal 
           </button>
-          <button id="isContekanBtn" class="button buttonPrimary" @click="isContekan()">
+          <button id="yesContekanBtn" class="button buttonPrimary" @click="isContekan()">
             Ya, Lanjutkan 
           </button>
         </div>
@@ -626,7 +626,7 @@ export default {
       showErrorMsg: '',
       showHelp: false,
       showShare: false,
-      showDialogContekan: false,
+      dialogContekan: false,
       showContekan: false,
       showResult: false,
       showCloseContekan: false,
@@ -678,6 +678,8 @@ export default {
       clueLimitCharge: "Contekan Habis",
       clueInsert: '',
       isWatchedAd: false,
+      isCancelAd: false,
+      isReadyAd: false,
       ansSecVar: 300,
       ansSecMax: 600,
       ansScoreTemp: [],
@@ -705,7 +707,6 @@ export default {
     window.removeEventListener("keydown", this.doCommand);
   },
   mounted() {
-    console.log(process.env.VUE_APP_KEY)
     let _this = this
     _this.cekClueLimit()
     _this.countdownClue()
@@ -726,56 +727,48 @@ export default {
     },
     createSlotAd() {
       console.log('createSlotAd')
-      document.getElementById('isContekanBtn').classList.add('-disabled')
-      this.showDialogContekan = false
+      document.getElementById('yesContekanBtn').classList.add('-disabled')
+      this.dialogContekan = false
       this.adLoading = true
       let _this = this
       let rewardedSlot
       this.isWatchedAd = false
+      this.isCancelAd = false
+      this.isReadyAd = false
       let googletag = window.googletag || {cmd: []}
       googletag.cmd.push(function() {
-        // rewardedSlot = googletag.defineOutOfPageSlot('/31800665/KOMPAS.COM_Mobile_Web/play/gamesKataKita', googletag.enums.OutOfPageFormat.REWARDED).addService(googletag.pubads());
         rewardedSlot = googletag.defineOutOfPageSlot(_this.users.adUnit, googletag.enums.OutOfPageFormat.REWARDED);
         console.log(rewardedSlot)
         if (rewardedSlot) {
           rewardedSlot.addService(googletag.pubads());
           
           googletag.pubads().addEventListener('slotRenderEnded', function(event) {
-            // let slotId = event.slot.getSlotElementId();
             let isEmpty = event.isEmpty;
             if (isEmpty) {
               console.log('kosyong')
               clearInterval(_this.adCheck)
               _this.adLoading = false
               _this.adEmpty = true
-            // } else {
-            //   console.log(slotId)
             }
           });
 
           googletag.pubads().addEventListener('rewardedSlotReady', function(event) {
-            logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_SHOW');
-            console.log('rewardedSlot')
-            // _this.showDialogContekan = false
+            console.log('rewardedSlotReady')
             _this.adLoading = false
+            _this.isReadyAd = true
             _this.toggleTimer('pause')
             event.makeRewardedVisible();
           });
 
           googletag.pubads().addEventListener('rewardedSlotClosed', function() {
-            logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_FAILED');
             googletag.destroySlots([rewardedSlot]);
             console.log('gajadi')
-            // _this.showDialogContekan = false
-            _this.adLoading = false
-            clearInterval(_this.adCheck)
+            _this.isCancelAd = true
           });
 
           googletag.pubads().addEventListener('rewardedSlotGranted', function() {
-            logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_SUCCESS');
             googletag.destroySlots([rewardedSlot]);
             _this.isWatchedAd = true
-            // _this.resumeGame()
           });
 
           googletag.enableServices();
@@ -786,10 +779,21 @@ export default {
         }
       });
       this.adCheck = setInterval(function () {
-        console.log(_this.isWatchedAd)
         if(_this.isWatchedAd) {
+          logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_SUCCESS');
+          console.log('KATAKITA_REWARDED_ADS_SUCCESS')
           _this.resumeGame()
-          console.log('clear')
+          clearInterval(_this.adCheck)
+        }
+        if(_this.isReadyAd) {
+          logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_SHOW');
+          console.log('KATAKITA_REWARDED_ADS_SHOW')
+          _this.isReadyAd = false
+        }
+        if(_this.isCancelAd) {
+          logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_FAILED');
+          console.log('KATAKITA_REWARDED_ADS_FAILED')
+          _this.adLoading = false
           clearInterval(_this.adCheck)
         }
       }, 900)
@@ -899,7 +903,7 @@ export default {
       const token = JSON.stringify({
         "token": _this.generateJWT()
       })
-      console.log(token)
+      // console.log(token)
       const request = new Request(process.env.VUE_APP_API_URL + this.apiAnswer.url,
         {
           method: "POST",
@@ -909,7 +913,7 @@ export default {
       const res = await fetch(request);
       const data = await res.json();
       this.apiAnswer.status = data;
-      console.log(this.apiAnswer.status)
+      // console.log(this.apiAnswer.status)
       if(data) {
         _this.getRankAfter()
         // _this.initCanvas()
@@ -947,7 +951,7 @@ export default {
       _this.stopTimer(this.clueTimerVar)
       this.showClaim = false;
       this.showContekan = false;
-      this.showDialogContekan = false
+      this.dialogContekan = false
       this.showCloseContekan = false
       if(this.isWatchedAd) {
         _this.insertClue()
@@ -1004,7 +1008,7 @@ export default {
         }
       }
 
-      console.log(localClueIsCount)
+      console.log("lagi itung "+localClueIsCount)
 
     },
     getCookie(cname) {
@@ -1034,7 +1038,7 @@ export default {
       let _this = this
       let localClueCount = _this.getCookie('clue_count')
       let cMin, cSec;
-      console.log(localClueCount)
+      // console.log(localClueCount)
       if(localClueCount) {
         this.clueIntv = setInterval(function () {
           let cDate = new Date();
@@ -1073,13 +1077,13 @@ export default {
       }
       _this.toastShow('Huruf <strong>ke-'+ idx.substr(0,1) + '</strong> adalah: <strong>' + idx.substr(1,1) +'</strong>', false);
     },
-    showDialogContekanBox() {
+    dialogContekanBox() {
       logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS');
-      this.showDialogContekan = true
+      this.dialogContekan = true
     },
-    showDialogContekanDismiss() {
+    dialogContekanDismiss() {
       logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_BATAL');
-      this.showDialogContekan = false
+      this.dialogContekan = false
     },
     isContekan() {
       logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_CLICKED');
@@ -1087,7 +1091,7 @@ export default {
       _this.toggleTimer('pause')
       console.log('isContekan')
       // _this.runClueTimer(process.env.VUE_APP_ADS_COUNT)
-      // this.showDialogContekan = false
+      // this.dialogContekan = false
       // this.showContekan = true
 
       _this.createSlotAd()
@@ -1136,28 +1140,28 @@ export default {
       }, 1000);
     },
 
-    runClueTimer(time) {
-      let _this = this;
-      let clueLocalTimer = time;
-      this.isWatchedAd = false
+    // runClueTimer(time) {
+    //   let _this = this;
+    //   let clueLocalTimer = time;
+    //   this.isWatchedAd = false
 
-      this.clueTimerVar = setInterval(function () {
-        console.log(clueLocalTimer)
-        clueLocalTimer--;
-        // let minutes = Math.floor(clueLocalTimer / 60);
-        // let seconds = clueLocalTimer - minutes * 60;
-        // _this.clueTimerDisplay = (minutes>0?_this.str_pad(minutes, "0", 2)+ ":":'') + "" + _this.str_pad(seconds, "0", 2);
-        _this.clueTimerDisplay = clueLocalTimer+ ' detik';
-        _this.clueTimer = clueLocalTimer;
-        if(clueLocalTimer==0) {
-          _this.stopTimer(_this.clueTimerVar)
-          // _this.showClaim = true
-          _this.showContekan = false
-          _this.isWatchedAd = true
-          _this.resumeGame()
-        }
-      }, 1000);
-    },
+    //   this.clueTimerVar = setInterval(function () {
+    //     console.log(clueLocalTimer)
+    //     clueLocalTimer--;
+    //     // let minutes = Math.floor(clueLocalTimer / 60);
+    //     // let seconds = clueLocalTimer - minutes * 60;
+    //     // _this.clueTimerDisplay = (minutes>0?_this.str_pad(minutes, "0", 2)+ ":":'') + "" + _this.str_pad(seconds, "0", 2);
+    //     _this.clueTimerDisplay = clueLocalTimer+ ' detik';
+    //     _this.clueTimer = clueLocalTimer;
+    //     if(clueLocalTimer==0) {
+    //       _this.stopTimer(_this.clueTimerVar)
+    //       // _this.showClaim = true
+    //       _this.showContekan = false
+    //       _this.isWatchedAd = true
+    //       _this.resumeGame()
+    //     }
+    //   }, 1000);
+    // },
 
     // fungsi ketika user pencet huruf pada layar
     onKeyPress(e, char) {
@@ -1406,11 +1410,10 @@ export default {
           }
         }
       });
-      console.log(this.ansEmoji)
 
       // overall chance
       this.ansChance++;
-      console.log(this.ansChance);
+      // console.log(this.ansChance);
 
       // scoring letter
       this.ansScore = this.ansScoreTemp.length;
