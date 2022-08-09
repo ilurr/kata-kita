@@ -115,6 +115,8 @@ export default {
         error: '',
         isLogged: false,
         isMobile: false,
+        isBgmPlay: false,
+        bgm: new Audio(require("@/assets/fx/kata-kita-bgm.mp3")),
         adUnit: process.env.VUE_APP_ADS_SLOT
       },
       showError: false,
@@ -195,11 +197,12 @@ export default {
         this.users.error = error.response.status
       }
     },
-    playAgain() {
+    playAgain(bgm) {
       logEvent(getAnalytics(), 'KATAKITA_PLAY_PLAY_AGAIN');
       this.showResult = false
       this.isBackActive = true;
       this.displayGameBoard = false;
+      this.users.isBgmPlay = bgm
       gsap.to("#logo", 0.5, {
         scale: 1,
         opacity: 1,

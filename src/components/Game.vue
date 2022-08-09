@@ -6,7 +6,7 @@
         <button class="button buttonHead -help" @click="showHelpBox()">
           <span class="buttonIcon icon-help"></span>
         </button>
-        <button class="button buttonHead -audio" :class="{'-active': audio.isPlaying}" @click.prevent="audio.isPlaying ? pause(audio) : play(audio)">
+        <button class="button buttonHead -audio" :class="{'-active': isLocalBgmPlay}" @click.prevent="isLocalBgmPlay ? pause(backsound) : play(backsound)">
           <span class="buttonIcon icon-audio"></span>
         </button>
       </div>
@@ -173,7 +173,7 @@
       </template>
       <template #footer>
         <div class="modalGame__footer">
-          <button class="button buttonPrimary" @click="$emit('playAgain')">
+          <button class="button buttonPrimary" @click="$emit('playAgain', isLocalBgmPlay)">
             <!-- <button class="button buttonPrimary" @click="showResult = false, userAns = false"> -->
             <span class="buttonIcon icon-reload"></span>
             Main Lagi
@@ -609,10 +609,6 @@ export default {
           return cipherParams;
         }
       },
-      audio: {
-        file: new Audio(require("@/assets/fx/beautifulrussia.mp3")),
-        isPlaying: false,
-      },
       fx: {
         tap: new Audio(require("@/assets/fx/tap.mp3")),
         juggle: new Audio(require("@/assets/fx/jadi.mp3")),
@@ -622,6 +618,8 @@ export default {
         show: false,
         msg: ''
       },
+      isLocalBgmPlay: this.users.isBgmPlay,
+      backsound: this.users.bgm,
       showError: false,
       showErrorMsg: '',
       showHelp: false,
@@ -926,13 +924,13 @@ export default {
       audio.play();
     },
     play(audio) {
-      audio.isPlaying = true;
-      audio.file.play();
-      audio.file.loop = true;
+      this.isLocalBgmPlay = true;
+      audio.play();
+      audio.loop = true;
     },
     pause(audio) {
-      audio.isPlaying = false;
-      audio.file.pause();
+      this.isLocalBgmPlay = false;
+      audio.pause();
     },
     // fungsi general, untuk pecah string jadi array per-karakter
     splitChar(char) {
@@ -964,7 +962,7 @@ export default {
       let localClueIsCount = _this.getCookie('clue_is_count')
       let localClueCount = _this.getCookie('clue_count')
 
-      // cooki exist
+      // cooki limit exist
       if(localClueLimit.length>0) {
         // set max contekan
         if(localClueLimit>3) {
@@ -973,19 +971,20 @@ export default {
         } else {
           this.clueLimit = localClueLimit
         }
-        console.log('ada'+localClueLimit)
+        // console.log('sudh ada'+localClueLimit)
       } else {
         _this.setCookie('clue_limit', this.clueLimit, 365);
         localClueLimit = this.clueLimit
-        console.log('init'+localClueLimit)
+        // console.log('init awal '+localClueLimit)
       }
 
+      // status, ada countdown aktif?
       if(localClueIsCount.length>0) {
         this.clueIsCount = 1
       } else {
         _this.setCookie('clue_is_count', this.clueIsCount, 365);
         localClueIsCount = this.clueIsCount
-        console.log('init'+localClueIsCount)
+        // console.log('init status countdown '+localClueIsCount)
       }
 
       // init
