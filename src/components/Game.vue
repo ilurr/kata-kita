@@ -1216,6 +1216,8 @@ export default {
 
     // button Enter func
     onEnterPress(e) {
+      e.classList.add('-disabled')
+
       let _this = this;
       this.toast.show = false
 
@@ -1235,6 +1237,7 @@ export default {
       } else {
         _this.finalScore();
       }
+      e.classList.remove('-disabled')
     },
 
     animateZoom(e) {

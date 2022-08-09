@@ -78,6 +78,15 @@ export default {
         height: 26px;
       }
     }
+    &.-disabled {
+      pointer-events: none;
+      background: #F1F1F1;
+      color: #757575;
+      border: 1px solid #F1F1F1;
+      img {
+        filter: grayscale(1);
+      }
+    }
   }
 }
 </style>
