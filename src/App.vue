@@ -115,7 +115,7 @@ export default {
         error: '',
         isLogged: false,
         isMobile: false,
-        isBgmPlay: false,
+        isBgmPlay: true,
         bgm: new Audio(require("@/assets/fx/kata-kita-bgm.mp3")),
         adUnit: process.env.VUE_APP_ADS_SLOT
       },

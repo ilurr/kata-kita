@@ -706,6 +706,9 @@ export default {
   },
   mounted() {
     let _this = this
+    if(this.isLocalBgmPlay) {
+      _this.play(this.backsound)
+    }
     _this.cekClueLimit()
     _this.countdownClue()
     if(this.levelChar>0) {
