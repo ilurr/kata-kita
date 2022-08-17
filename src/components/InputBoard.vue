@@ -37,6 +37,9 @@ export default {
     font-family: var(--font-parent);
     font-size: 18px;
     font-weight: 500;
+    @media screen and (max-height: 650px) {
+      height: 43px;
+    }
     @media screen and (max-height: 670px) {
       height: 45px;
     }

@@ -54,7 +54,7 @@ export default {
     justify-content: center;
     align-items: center;
     @media screen and (max-height: 650px) {
-      height: 38px;
+      height: 35px;
     }
     @media screen and (max-height: 500px) {
       height: 30px;

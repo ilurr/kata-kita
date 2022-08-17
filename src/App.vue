@@ -333,7 +333,7 @@ export default {
       }
     },
     openSSO() {
-      window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(window.location.href+'?login=true'), '_parent');
+      window.open('https://account.kompas.com/login/a29tcGFz/'+btoa(process.env.VUE_APP_PARENT_URL+'?login=true'), '_parent');
     },
   },
   mounted() {

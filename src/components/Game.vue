@@ -632,7 +632,6 @@ export default {
       userAns: false,
       userRank: {
         template: {
-          // score: 'https://i.ibb.co/vjp0CxH/bg-skor.png'
           score: process.env.VUE_APP_BASE_URL+'bg-skor.png'
         },
         rankNow: 0,
@@ -852,7 +851,7 @@ export default {
           _this.modalError(ermsg);
           this.apiQuestion.status = error.response.status
         });
-        console.log(this.apiQuestion);
+        //console.log(this.apiQuestion);
     },
     getKBBI(answer) {
       let _this = this;
@@ -865,7 +864,7 @@ export default {
           _this.animateShake()
           _this.toastShow('Kata tidak ada di dalam kamus!', true);
         });
-        console.log(this.apiKBBI.status);
+        //console.log(this.apiKBBI.status);
     },
 
     modalError(msg) {
@@ -1034,7 +1033,7 @@ export default {
       let expires = "expires=" + d.toGMTString();
       // document.cookie = cname + "=" + cvalue + ";" + expires + "; path=/;";
       document.cookie = cname + "=" + cvalue + ";" + expires + "; path=/; "+ process.env.VUE_APP_COOKIE; // live
-      console.log(d)
+      //console.log(d)
     },
     countdownClue() {
       let _this = this
@@ -1091,7 +1090,7 @@ export default {
       logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_CLICKED');
       let _this = this
       _this.toggleTimer('pause')
-      console.log('isContekan')
+      //console.log('isContekan')
       // _this.runClueTimer(process.env.VUE_APP_ADS_COUNT)
       // this.dialogContekan = false
       // this.showContekan = true
@@ -1235,7 +1234,7 @@ export default {
         } else {
           _this.animateJuggle()
           _this.toastShow('Huruf kurang lengkap!', true);
-          console.log("Ada yang kosong kotaknya");
+          // console.log("Ada yang kosong kotaknya");
         }
       } else {
         _this.finalScore();
@@ -1315,7 +1314,7 @@ export default {
       // document
       //   .querySelectorAll(".keyBtn")
       //   .forEach((e) => e.removeAttribute("style"));
-      console.log("game over");
+      //console.log("game over");
     },
 
     // final scoring
@@ -1324,7 +1323,7 @@ export default {
       let valid = false;
       console.log("Level User: " + this.levelChar);
       console.log("Total Kesempatan Jawab: " + this.ansChance);
-      console.log("Total Huruf Tertabak: " + this.ansScore);
+      console.log("Total Huruf Tertebak: " + this.ansScore);
       console.log("Total Waktu: " + this.ansTimer);
 
       _this.stopTimer(this.ansTimerVar);
@@ -1383,12 +1382,12 @@ export default {
     // checking one by one tile answer
     checkTile(answer) {
       let _this = this;
-      console.log("answer " + answer);
+      //console.log("answer " + answer);
       let localScore = 0;
       let localClue = 0;
 
       let soal = this.getQ.decryptedTitle.split("");
-      console.log("soal " + soal);
+      //console.log("soal " + soal);
 
       answer.map(function (char, index) {
         if (char == soal[index]) {
@@ -1453,8 +1452,8 @@ export default {
         }
         // this.shareTxt += i+'\n'
       }
-      this.shareTxt += '\n'+ process.env.VUE_APP_BASE_URL
-      console.log(this.shareTxt)
+      this.shareTxt += '\n'+ process.env.VUE_APP_PARENT_URL
+      //console.log(this.shareTxt)
     },
 
     shareLink(site) {
@@ -1464,7 +1463,7 @@ export default {
         window.open(stw, "_blank");
       }
       if(site=='facebook') {
-        let sfb = `https://www.facebook.com/sharer/sharer.php?u=`+process.env.VUE_APP_BASE_URL;
+        let sfb = `https://www.facebook.com/sharer/sharer.php?u=`+process.env.VUE_APP_PARENT_URL;
         window.open(sfb, "_blank");
       }
     },
@@ -1586,6 +1585,9 @@ export default {
     position: relative;
     padding: 0;
     min-height: 310px;
+    @media screen and (max-height: 650px) {
+      min-height: 284px;
+    }
     @media screen and (max-height: 670px) {
       min-height: 295px;
     }
@@ -1749,7 +1751,7 @@ export default {
       // padding: 0 20px;
       justify-content: space-between;
       align-items: center;
-      @media screen and (max-height: 500px) {
+      @media screen and (max-height: 650px) {
         margin: 5px 0 2px;
       }
     }

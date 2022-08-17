@@ -158,7 +158,6 @@ export default {
       userRank: {
         template: {
           rank: process.env.VUE_APP_BASE_URL+'bg-rank.png'
-          // rank: 'https://i.ibb.co/6BHGFF4/bg-rank.png'
         },
         name: '',
         rankNow: {
