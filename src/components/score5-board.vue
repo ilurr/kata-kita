@@ -76,7 +76,7 @@ export default {
     async getRank() {
       try {
         const response = await axios.get(process.env.VUE_APP_API_URL + this.apiRank.url + '?level=5&kgid=' + this.users.kmpsid + '&page=' + this.page);
-        console.log(response);
+        // console.log(response);
         if (!response.ok) {
           const error = (response && response.message) || response.statusText;
           this.apiRank.status = error
@@ -86,7 +86,7 @@ export default {
         if(response.data) {
           this.apiRank.query = response.data
           this.apiRank.status = response.status
-          console.log(this.apiRank.query);
+          // console.log(this.apiRank.query);
         }
 
       } catch (error) {

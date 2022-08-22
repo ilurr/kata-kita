@@ -738,7 +738,7 @@ export default {
       let googletag = window.googletag || {cmd: []}
       googletag.cmd.push(function() {
         rewardedSlot = googletag.defineOutOfPageSlot(_this.users.adUnit, googletag.enums.OutOfPageFormat.REWARDED);
-        console.log(rewardedSlot)
+        // console.log(rewardedSlot)
         if (rewardedSlot) {
           rewardedSlot.addService(googletag.pubads());
           
@@ -1009,7 +1009,7 @@ export default {
         }
       }
 
-      console.log("lagi itung "+localClueIsCount)
+      // console.log("lagi itung "+localClueIsCount)
 
     },
     getCookie(cname) {

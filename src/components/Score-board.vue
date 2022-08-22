@@ -301,8 +301,8 @@ export default {
               this.userRank.rankNow.level6 = response.data.myrank.position
             }
             this.userRank.name = response.data.myrank.name
-          } else {
-            console.log(lvl+' kosong')
+          // } else {
+            // console.log(lvl+' kosong')
             // _this.modalError(ermsg);
           }
           if(lvl==6) {
@@ -312,7 +312,7 @@ export default {
           _this.modalError(ermsg);
           this.userRank.status = error.response.status
         });
-        console.log(this.userRank);
+        // console.log(this.userRank);
     },
     modalError(msg) {
       this.showError = true
