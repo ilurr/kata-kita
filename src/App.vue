@@ -420,8 +420,8 @@ export default {
   // max-height: -webkit-fill-available;
   // height: 800px;
   margin: auto;
-  height: 100%;
   height: -webkit-fill-available;
+  height: 100vh;
   overflow: auto;
 }
 html,
@@ -432,7 +432,7 @@ body {
   // min-height: -webkit-fill-available;
   // max-height: -webkit-fill-available;
   height: 100vh;
-  height: -webkit-fill-available;
+  // height: -webkit-fill-available;
   overflow: hidden;
 }
 .button {

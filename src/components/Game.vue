@@ -1607,15 +1607,15 @@ export default {
   &Board {
     position: relative;
     padding: 0;
-    min-height: 310px;
-    @media screen and (max-height: 650px) {
-      min-height: 284px;
-    }
-    @media screen and (max-height: 670px) {
-      min-height: 295px;
-    }
-    @media screen and (max-height: 500px) {
-      min-height: 235px;
+    min-height: 235px;
+    // @media screen and (max-height: 650px) {
+    //   min-height: 284px;
+    // }
+    // @media screen and (max-height: 670px) {
+    //   min-height: 295px;
+    // }
+    @media screen and (min-height: 700px) {
+      min-height: 310px;
     }
     &__wrapper {
       position: relative;
@@ -1623,11 +1623,11 @@ export default {
     }
     &__toast {
       position: relative;
-      min-height: 50px;
+      min-height: 38px;
       padding: 2px 10px;
       will-change: transform;
-      @media screen and (max-height: 500px) {
-        min-height: 38px;
+      @media screen and (min-height: 700px) {
+        min-height: 50px;
       }
     }
     &__row {
@@ -1654,14 +1654,14 @@ export default {
     position: relative;
     border-radius: 5px;
     overflow: hidden;
-    height: 40px;
+    height: 34px;
     background: #fff;
     visibility: hidden;
     opacity: 0;
     will-change: transform;
     transition: all .2s ease;
-    @media screen and (max-height: 500px) {
-      height: 34px;
+    @media screen and (min-height: 700px) {
+      height: 40px;
     }
     &.-active {
       opacity: 1;
@@ -1674,6 +1674,11 @@ export default {
       justify-content: space-around;
       align-items: center;
       border-left: 5px solid var(--cl-almost);
+      height: 34px;
+      padding-right: 40px;
+      @media screen and (min-height: 700px) {
+        height: 40px;
+      }
     }
     &__content {
       font-weight: 400;
@@ -1693,14 +1698,22 @@ export default {
     }
     &__close {
       width: 40px;
-      height: 40px;
+      height: 34px;
       flex-basis: 40px;
       flex-grow: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      @media screen and (max-height: 500px) {
-        height: 34px;
+      padding: 0;
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 1;
+      @media screen and (min-height: 700px) {
+        height: 40px;
+      }
+      .icon-close {
+        background-size: 16px;
       }
     }
   }
@@ -1718,10 +1731,8 @@ export default {
     padding-bottom: 20px;
     z-index: 2;
     // transform: scale(0);
-    @media screen and (max-height: 500px) {
-      height: calc(100% - 0px);
-    }
     @media screen and (min-height: 700px) {
+      // height: calc(100% - 56px);
       padding-bottom: 40px;
     }
     & > * {
@@ -1734,16 +1745,19 @@ export default {
     justify-content: space-between;
     width: 100%;
     &__wrap {
-      padding: 10px 15px;
+      padding: 5px 15px;
       display: flex;
       gap: 10px;
       justify-content: flex-start;
-      @media screen and (max-height: 670px) {
-        padding: 5px 15px;
-      }
       @media screen and (min-height: 700px) {
         padding: 35px 15px 10px;
       }
+      // @media screen and (max-height: 500px) {
+      //   padding: 5px 15px;
+      // }
+      // @media screen and (min-height: 700px) {
+      //   padding: 35px 15px 10px;
+      // }
     }
     &__img {
       vertical-align: middle;
@@ -1768,14 +1782,14 @@ export default {
     }
     &__top {
       position: relative;
-      margin: 10px 0;
+      margin: 5px 0 2px;
       display: flex;
       // width: 100vw;
       // padding: 0 20px;
       justify-content: space-between;
       align-items: center;
-      @media screen and (max-height: 650px) {
-        margin: 5px 0 2px;
+      @media screen and (min-height: 700px) {
+        margin: 10px 0;
       }
     }
     &__delete {

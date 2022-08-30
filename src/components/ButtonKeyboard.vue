@@ -38,8 +38,8 @@ export default {
 <style scoped lang="scss">
 .key {
   &Btn {
-    min-width: 28px;
-    height: 40px;
+    min-width: 25px;
+    height: 35px;
     background-color: var(--cl-white);
     color: #000;
     font-family: var(--font-parent);
@@ -54,12 +54,12 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    @media screen and (max-height: 650px) {
-      height: 35px;
-    }
-    @media screen and (max-height: 500px) {
-      height: 30px;
-      min-width: 25px;
+    // @media screen and (max-height: 650px) {
+    //   height: 35px;
+    // }
+    @media screen and (min-height: 600px) {
+      min-width: 28px;
+      height: 40px;
     }
     & > span {
       display: block;

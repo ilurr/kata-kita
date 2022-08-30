@@ -61,17 +61,17 @@ export default {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-20%);
+    transform: translate(-50%,-30%);
     z-index: 1;
     width: 100%;
-    @media screen and (max-height: 500px) {
-      transform: translate(-50%,-30%);
+    @media screen and (min-height: 600px) {
+      transform: translate(-50%,-20%);
     }
 }
 .buttonMenu {
-  padding: 24px 30px;
-  @media screen and (max-height: 500px) {
-    padding: 15px 20px;
+  padding: 15px 20px;
+  @media screen and (min-height: 600px) {
+    padding: 24px 30px;
   }
   &__lvl {
     text-align: left;

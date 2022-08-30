@@ -22,8 +22,8 @@ export default {
 <style scoped lang="scss">
 .input {
   &Txt {
-    width: 40px;
-    height: 46px;
+    width: 35px;
+    height: 35px;
     color: #454545;
     background-color: var(--cl-white);
     margin: 2px;
@@ -39,15 +39,18 @@ export default {
     font-size: 18px;
     font-weight: 500;
     outline: none;
-    @media screen and (max-height: 650px) {
+    // @media screen and (max-height: 650px) {
+    //   height: 43px;
+    // }
+    // @media screen and (max-height: 670px) {
+    //   height: 45px;
+    // }
+    @media screen and (min-height: 600px) {
       height: 43px;
+      width: 40px;
     }
-    @media screen and (max-height: 670px) {
-      height: 45px;
-    }
-    @media screen and (max-height: 500px) {
-      height: 35px;
-      width: 35px;
+    @media screen and (min-height: 700px) {
+      height: 46px;
     }
   }
 }
