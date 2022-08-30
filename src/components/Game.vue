@@ -747,6 +747,7 @@ export default {
             if (isEmpty) {
               console.log('kosyong')
               clearInterval(_this.adCheck)
+              _this.toggleTimer('play')
               _this.adLoading = false
               _this.adEmpty = true
             }
@@ -794,6 +795,7 @@ export default {
           logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_FAILED');
           console.log('KATAKITA_REWARDED_ADS_FAILED')
           _this.adLoading = false
+          _this.toggleTimer('play')
           clearInterval(_this.adCheck)
         }
       }, 900)
@@ -949,7 +951,7 @@ export default {
       let _this = this
       console.log('resumeGame')
       _this.toggleTimer('play')
-      _this.stopTimer(this.clueTimerVar)
+      // _this.stopTimer(this.clueTimerVar)
       this.showClaim = false;
       this.showContekan = false;
       this.dialogContekan = false
