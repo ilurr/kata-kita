@@ -863,8 +863,9 @@ export default {
           this.apiKBBI.status = error.response.status
           _this.animateShake()
           _this.toastShow('Kata tidak ada di dalam kamus!', true);
+          _this.toggleDisabled(document.querySelector(".keyBtn[keychar=enter]"), 'remove')
         });
-        //console.log(this.apiKBBI.status);
+        console.log(this.apiKBBI.status);
     },
 
     modalError(msg) {
@@ -1201,7 +1202,10 @@ export default {
           _this.onKeyPress(document.querySelector(".keyBtn[keychar=delete]"), 'delete')
           // document.querySelector(".keyBtn[keychar=delete]").focus();
         } else if(e.keyCode == 13) {
-          _this.onEnterPress(document.querySelector(".keyBtn[keychar=enter]"))
+          e.preventDefault();
+          if (!document.querySelector(".keyBtn[keychar=enter]").hasAttribute('disabled')) {
+            _this.onEnterPress(document.querySelector(".keyBtn[keychar=enter]"))
+          }
           //document.querySelector(".keyBtn[keychar=enter]").focus(); // bugs twice call function
         } else {
           for(let u=0;u<this.keyBoardChar.length;u++) {
@@ -1218,13 +1222,14 @@ export default {
 
     // button Enter func
     onEnterPress(e) {
-      e.classList.add('-disabled')
-
       let _this = this;
+
+      _this.toggleDisabled(e, 'add')
       this.toast.show = false
 
       // effect
       _this.animateZoom(e)
+      console.log("enter nih");
 
       if (this.ansChance <= this.ansChanceMax) {
 
@@ -1232,14 +1237,25 @@ export default {
           // _this.checkTile(this.ansWord[this.ansChance].char);
           _this.getKBBI(this.ansWord[this.ansChance].char);
         } else {
-          _this.animateJuggle()
+          _this.animateShake()
           _this.toastShow('Huruf kurang lengkap!', true);
+          _this.toggleDisabled(e, 'remove')
           // console.log("Ada yang kosong kotaknya");
         }
       } else {
         _this.finalScore();
       }
-      e.classList.remove('-disabled')
+      // e.classList.remove('-disabled')
+    },
+
+    toggleDisabled(e, state) {
+      if(state=='add') {
+        e.classList.add('-disabled')
+        e.disabled = true;
+      } else {
+        e.classList.remove('-disabled');
+        e.removeAttribute('disabled');
+      }
     },
 
     animateZoom(e) {
@@ -1382,7 +1398,7 @@ export default {
     // checking one by one tile answer
     checkTile(answer) {
       let _this = this;
-      //console.log("answer " + answer);
+      console.log("answer " + answer);
       let localScore = 0;
       let localClue = 0;
 
@@ -1390,6 +1406,7 @@ export default {
       //console.log("soal " + soal);
 
       answer.map(function (char, index) {
+        setTimeout(() => {
         if (char == soal[index]) {
           // green
           _this.colorIt("inputAnswer_" + (_this.ansChance + 1) + "_" + (index + 1), ".keyBtn[keychar="+char+"]", "#fff", "var(--cl-correct)")
@@ -1413,25 +1430,31 @@ export default {
             }
           }
         }
+        }, 100)
       });
 
-      // overall chance
-      this.ansChance++;
-      // console.log(this.ansChance);
+      setTimeout(() => {
+        // overall chance
+        this.ansChance++;
+        console.log(this.ansChance);
 
-      // scoring letter
-      this.ansScore = this.ansScoreTemp.length;
+        // scoring letter
+        this.ansScore = this.ansScoreTemp.length;
 
-      // all true in a row
-      if (localScore == this.levelChar) {
-        this.userAns = true;
-        _this.finalScore();
-      }
+        // all true in a row
+        if (localScore == this.levelChar) {
+          this.userAns = true;
+          _this.finalScore();
+        }
 
-      // max chance 
-      if (this.ansChance > this.ansChanceMax) {
-        _this.finalScore();
-      }
+        // max chance 
+        if (this.ansChance > this.ansChanceMax) {
+          _this.finalScore();
+        }
+
+        _this.toggleDisabled(document.querySelector(".keyBtn[keychar=enter]"), 'remove')
+
+      }, 150*this.levelChar)
 
     },
 

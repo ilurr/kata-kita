@@ -1,6 +1,7 @@
 <template>
   <button
     class="keyBtn"
+    tabindex="-1"
     :class="{ '-enter': isEnter, '-delete': isDelete }"
     :keyChar="keyChar"
     @click="$emit('onKeyPress', $event.target, keyChar)"
@@ -82,7 +83,7 @@ export default {
       pointer-events: none;
       background: #F1F1F1;
       color: #757575;
-      border: 1px solid #F1F1F1;
+      // border: 1px solid #F1F1F1;
       img {
         filter: grayscale(1);
       }
