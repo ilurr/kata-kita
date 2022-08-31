@@ -6,7 +6,7 @@
         <button class="button buttonHead -help" @click="showHelpBox()">
           <span class="buttonIcon icon-help"></span>
         </button>
-        <button class="button buttonHead -audio" :class="{'-active': isLocalBgmPlay}" @click.prevent="isLocalBgmPlay ? pause(backsound) : play(backsound)">
+        <button class="button buttonHead -audio" :class="{'-active': isLocalBgmPlay}" @click.prevent="isLocalBgmPlay ? pause(backsound, true) : play(backsound, false)">
           <span class="buttonIcon icon-audio"></span>
         </button>
       </div>
@@ -620,6 +620,7 @@ export default {
       },
       isLocalBgmPlay: this.users.isBgmPlay,
       backsound: this.users.bgm,
+      isBgmUser: false,
       showError: false,
       showErrorMsg: '',
       showHelp: false,
@@ -706,8 +707,9 @@ export default {
   mounted() {
     let _this = this
     if(this.isLocalBgmPlay) {
-      _this.play(this.backsound)
+      _this.play(this.backsound, false)
     }
+    _this.bgmCheck(this.backsound)
     _this.cekClueLimit()
     _this.countdownClue()
     if(this.levelChar>0) {
@@ -924,17 +926,33 @@ export default {
     },
 
     //play music
+    bgmCheck(audio){
+      let _this = this
+      document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState === "visible") {
+          if(!_this.isBgmUser) {
+            _this.play(audio, _this.isBgmUser)
+          }
+          // console.log("active")
+        } else {
+          _this.pause(audio, _this.isBgmUser)
+          // console.log("inactive")
+        }
+      })
+    },
     playFx(audio) {
       audio.currentTime = 0
       audio.play();
     },
-    play(audio) {
+    play(audio, user) {
       this.isLocalBgmPlay = true;
+      this.isBgmUser = user;
       audio.play();
       audio.loop = true;
     },
-    pause(audio) {
+    pause(audio, user) {
       this.isLocalBgmPlay = false;
+      this.isBgmUser = user;
       audio.pause();
     },
     // fungsi general, untuk pecah string jadi array per-karakter
