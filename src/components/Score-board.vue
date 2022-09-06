@@ -266,10 +266,10 @@ export default {
                   files: filesArray
               })) {
                   navigator.share({
-                      text: process.env.VUE_APP_DESC+' '+process.env.VUE_APP_BASE_URL,
+                      text: process.env.VUE_APP_TITLE+' \n\n'+process.env.VUE_APP_DESC+' \n\n',
                       files: filesArray,
                       title: process.env.VUE_APP_TITLE,
-                      url: process.env.VUE_APP_BASE_URL
+                      url: process.env.VUE_APP_PARENT_URL+'?source=share_copylink'
                   });
               } else {
                 let tab = window.open('about:blank', '_blank');
