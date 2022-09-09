@@ -1,6 +1,6 @@
 <template>
   <div class="gameWrap bgMain center-flex" id="gameWrap">
-    <canvas class="gameCanvas" id="gameCanvas" width="900" height="1600"></canvas>
+    <canvas class="gameCanvas" id="gameCanvas" width="900" height="1580"></canvas>
     <div class="gameHead center-flex">
       <div class="gameHead__wrap">
         <button class="button buttonHead -help" @click="showHelpBox()">
@@ -633,7 +633,7 @@ export default {
       userAns: false,
       userRank: {
         template: {
-          score: process.env.VUE_APP_BASE_URL+'bg-skor.png'
+          score: process.env.VUE_APP_BASE_URL+'bg-skor2.png'
         },
         rankNow: 0,
         rankLast: 0,
@@ -869,7 +869,7 @@ export default {
           _this.toastShow('Kata tidak ada di dalam kamus!', true);
           _this.toggleDisabled(document.querySelector(".keyBtn[keychar=enter]"), 'remove')
         });
-        console.log(this.apiKBBI.status);
+        // console.log(this.apiKBBI.status);
     },
 
     modalError(msg) {
@@ -1249,7 +1249,7 @@ export default {
 
       // effect
       _this.animateZoom(e)
-      console.log("enter nih");
+      // console.log("enter nih");
 
       if (this.ansChance <= this.ansChanceMax) {
 
@@ -1418,7 +1418,7 @@ export default {
     // checking one by one tile answer
     checkTile(answer) {
       let _this = this;
-      console.log("answer " + answer);
+      // console.log("answer " + answer);
       let localScore = 0;
       let localClue = 0;
 
@@ -1495,7 +1495,7 @@ export default {
         }
         // this.shareTxt += i+'\n'
       }
-      this.shareTxt += '\n'+ process.env.VUE_APP_PARENT_URL+'&source=share_twitter'
+      this.shareTxt += '\n'+ process.env.VUE_APP_SHORT_TW
       //console.log(this.shareTxt)
     },
 
@@ -1506,7 +1506,7 @@ export default {
         window.open(stw, "_blank");
       }
       if(site=='facebook') {
-        let sfb = `https://www.facebook.com/sharer/sharer.php?u=`+process.env.VUE_APP_PARENT_URL+'&source=share_facebook';
+        let sfb = `https://www.facebook.com/sharer/sharer.php?u=`+process.env.VUE_APP_SHORT_FB;
         window.open(sfb, "_blank");
       }
     },
@@ -1527,40 +1527,40 @@ export default {
         cx.font = "500 55px Roboto Slab";
         cx.fillStyle = "#fff";
         cx.textAlign = "center";
-        cx.fillText(_.users.initial.toUpperCase(), w/3 - 55, h/4 + 108);
+        cx.fillText(_.users.initial.toUpperCase(), w/3 - 170, h/4 + 110);
 
         // name
         cx.font = "700 45px Mukta";
         cx.fillStyle = "#fff";
         cx.textAlign = "left";
-        cx.fillText((_.users.data.first_name+(_.users.data.last_name.length>0?' '+_.users.data.last_name:'')), w/2 - 86, h/3 - 60);
+        cx.fillText((_.users.data.first_name+(_.users.data.last_name.length>0?' '+_.users.data.last_name:'')), w/2 - 205, h/3 - 60);
 
         //score text
         cx.font = "700 39px Mukta";
         cx.fillStyle = "#333333";
         cx.textAlign = "left";
-        cx.fillText(_.levelChar+" huruf", w/2, h/2 + 328);
+        cx.fillText(_.levelChar+" huruf", w/2 + 8, h/2 + 315);
 
         //score
         cx.font = "500 55px Roboto Slab";
         cx.fillStyle = "#ff512f";
         cx.textAlign = "right";
-        cx.fillText((_.userRank.rankLast.length>0?"#"+_.userRank.rankLast:'-'), w - 80, h/2 + 333);
+        cx.fillText((_.userRank.rankLast.length>0?"#"+_.userRank.rankLast:'-'), w - 80, h/2 + 317);
 
         cx.font = "500 70px Roboto Slab";
         cx.fillStyle = "#333333";
         cx.textAlign = "center";
-        cx.fillText(_.totalScore, w/2 - 215, h/2 + 150);
+        cx.fillText(_.totalScore, w/2 - 215, h/2 + 140);
 
         cx.font = "500 70px Roboto Slab";
         cx.fillStyle = "#333333";
         cx.textAlign = "center";
-        cx.fillText(_.userRank.scoreNow, w/2 + 215, h/2 + 150);
+        cx.fillText(_.userRank.scoreNow, w/2 + 215, h/2 + 128);
 
         cx.font = "500 35px Roboto Slab";
         cx.fillStyle = "#ff512f";
         cx.textAlign = "center";
-        cx.fillText("+"+_.totalScore, w/2 + 215, h/2 + 193);
+        cx.fillText("+"+_.totalScore, w/2 + 215, h/2 + 169);
 
       };
       img.src = this.userRank.template.score;
@@ -1587,7 +1587,7 @@ export default {
                       text: process.env.VUE_APP_TITLE+' \n\n'+process.env.VUE_APP_DESC+' \n\n',
                       files: filesArray,
                       title: process.env.VUE_APP_TITLE,
-                      url: process.env.VUE_APP_PARENT_URL+'?source=share_copylink'
+                      url: process.env.VUE_APP_SHORT_CL
                   });
               } else {
                 let tab = window.open('about:blank', '_blank');

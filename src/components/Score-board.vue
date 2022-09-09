@@ -1,6 +1,6 @@
 <template>
   <div class="scoreWrap bgMain">
-    <canvas class="rankCanvas" id="rankCanvas" width="900" height="1600"></canvas>
+    <canvas class="rankCanvas" id="rankCanvas" width="900" height="1580"></canvas>
     <div class="scoreHead center-flex">
       <h2 class="scoreTitle" id="text2">Skor</h2>
       <div class="scoreHead__wrap">
@@ -157,7 +157,7 @@ export default {
       },
       userRank: {
         template: {
-          rank: process.env.VUE_APP_BASE_URL+'bg-rank.png'
+          rank: process.env.VUE_APP_BASE_URL+'bg-rank2.png'
         },
         name: '',
         rankNow: {
@@ -202,43 +202,43 @@ export default {
         cx.font = "500 120px Roboto Slab";
         cx.fillStyle = "#fff";
         cx.textAlign = "center";
-        cx.fillText(_.users.initial.toUpperCase(), w/2, h/3 + 80);
+        cx.fillText(_.users.initial.toUpperCase(), w/2, h/3 + 5);
 
         // name
         cx.font = "700 50px Mukta";
         cx.fillStyle = "#333333";
         cx.textAlign = "center";
-        cx.fillText((_.users.data.first_name+(_.users.data.last_name.length>0?' '+_.users.data.last_name:'')), w/2, h/2 + 10);
+        cx.fillText((_.users.data.first_name+(_.users.data.last_name.length>0?' '+_.users.data.last_name:'')), w/2, h/2 - 100);
 
         // score txt
         cx.font = "400 45px Mukta";
         cx.fillStyle = "#333333";
         cx.textAlign = "left";
-        cx.fillText("Tantangan 4 huruf", 90, h/2 + 220);
+        cx.fillText("Tantangan 4 huruf", 100, h/2 + 100);
         cx.font = "400 45px Mukta";
         cx.fillStyle = "#333333";
         cx.textAlign = "left";
-        cx.fillText("Tantangan 5 huruf", 90, h/2 + 360);
+        cx.fillText("Tantangan 5 huruf", 100, h/2 + 240);
         cx.font = "400 45px Mukta";
         cx.fillStyle = "#333333";
         cx.textAlign = "left";
-        cx.fillText("Tantangan 6 huruf", 90, h/2 + 500);
+        cx.fillText("Tantangan 6 huruf", 100, h/2 + 380);
 
         // rank
         cx.font = "500 70px Roboto Slab";
         cx.fillStyle = "#ff512f";
         cx.textAlign = "right";
-        cx.fillText((_.userRank.rankNow.level4.length>0?"#"+_.userRank.rankNow.level4:'-'), w - 100, h/2 + 230);
+        cx.fillText((_.userRank.rankNow.level4.length>0?"#"+_.userRank.rankNow.level4:'-'), w - 100, h/2 + 100);
 
         cx.font = "500 70px Roboto Slab";
         cx.fillStyle = "#ff512f";
         cx.textAlign = "right";
-        cx.fillText((_.userRank.rankNow.level5.length>0?"#"+_.userRank.rankNow.level5:'-'), w - 100, h/2 + 370);
+        cx.fillText((_.userRank.rankNow.level5.length>0?"#"+_.userRank.rankNow.level5:'-'), w - 100, h/2 + 240);
 
         cx.font = "500 70px Roboto Slab";
         cx.fillStyle = "#ff512f";
         cx.textAlign = "right";
-        cx.fillText((_.userRank.rankNow.level6.length>0?"#"+_.userRank.rankNow.level6:'-'), w - 100, h/2 + 510);
+        cx.fillText((_.userRank.rankNow.level6.length>0?"#"+_.userRank.rankNow.level6:'-'), w - 100, h/2 + 380);
       };
       img.src = this.userRank.template.rank;
       img.setAttribute('crossorigin', 'anonymous'); // works for me
@@ -269,7 +269,7 @@ export default {
                       text: process.env.VUE_APP_TITLE+' \n\n'+process.env.VUE_APP_DESC+' \n\n',
                       files: filesArray,
                       title: process.env.VUE_APP_TITLE,
-                      url: process.env.VUE_APP_PARENT_URL+'?source=share_copylink'
+                      url: process.env.VUE_APP_SHORT_CL
                   });
               } else {
                 let tab = window.open('about:blank', '_blank');
