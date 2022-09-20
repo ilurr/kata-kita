@@ -678,6 +678,7 @@ export default {
       isWatchedAd: false,
       isCancelAd: false,
       isReadyAd: false,
+      isEmpty: false,
       ansSecVar: 300,
       ansSecMax: 600,
       ansScoreTemp: [],
@@ -737,6 +738,7 @@ export default {
       this.isWatchedAd = false
       this.isCancelAd = false
       this.isReadyAd = false
+      this.isEmpty = false
       let googletag = window.googletag || {cmd: []}
       googletag.cmd.push(function() {
         rewardedSlot = googletag.defineOutOfPageSlot(_this.users.adUnit, googletag.enums.OutOfPageFormat.REWARDED);
@@ -745,11 +747,11 @@ export default {
           rewardedSlot.addService(googletag.pubads());
           
           googletag.pubads().addEventListener('slotRenderEnded', function(event) {
-            let isEmpty = event.isEmpty;
-            if (isEmpty) {
+            _this.isEmpty = event.isEmpty;
+            if (_this.isEmpty) {
               console.log('kosyong')
-              clearInterval(_this.adCheck)
-              _this.toggleTimer('play')
+              // clearInterval(_this.adCheck)
+              // _this.toggleTimer('play')
               _this.adLoading = false
               _this.adEmpty = true
             }
@@ -782,6 +784,10 @@ export default {
         }
       });
       this.adCheck = setInterval(function () {
+        if(_this.isEmpty) {
+          _this.resumeGame()
+          clearInterval(_this.adCheck)
+        }
         if(_this.isWatchedAd) {
           logEvent(getAnalytics(), 'KATAKITA_REWARDED_ADS_SUCCESS');
           console.log('KATAKITA_REWARDED_ADS_SUCCESS')
@@ -974,7 +980,7 @@ export default {
       this.showContekan = false;
       this.dialogContekan = false
       this.showCloseContekan = false
-      if(this.isWatchedAd) {
+      if(this.isWatchedAd || this.isEmpty) {
         _this.insertClue()
       }
     },
